@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+app = FastAPI(title="TovarTaxi by NESAKO")from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List
 
