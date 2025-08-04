@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TovarTaxi by NESAKO</title>
+    <style>
+        body { font-family: Arial; padding: 2rem; }
+        h1 { color: darkgreen; }
+        .box { margin-bottom: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <h1>Dobrodošli u TovarTaxi</h1>
+
+    <div class="box">
+        <h3>Registracija korisnika</h3>
+        <p>POST /register</p>
+    </div>
+
+    <div class="box">
+        <h3>Kreiraj pošiljku</h3>
+        <p>POST /shipment/create</p>
+    </div>
+
+    <div class="box">
+        <h3>Statistika korisnika</h3>
+        <p>GET /stats/{user_id}</p>
+    </div>
+
+    <div class="box">
+        <h3>Prijavi kršenje pravila</h3>
+        <p>POST /report-violation</p>
+    </div>
+</body>
+</html>
