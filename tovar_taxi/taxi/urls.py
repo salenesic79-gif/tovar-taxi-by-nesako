@@ -1,13 +1,9 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+from tovar import views  # Pretpostavljam da je ime vaše aplikacije 'tovar'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('taxi_app.urls')),  # vodi sve na tvoju aplikaciju taxi_app
-]
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    path('', views.home, name='home'),  # početna stranica
+    path('tovar/', views.lista_tovara, name='lista_tovara'),
+    path('tovar/<int:tovar_id>/', views.detalji_tovara, name='detalji_tovara'),
 ]
