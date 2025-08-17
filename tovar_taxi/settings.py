@@ -8,3 +8,4 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'taxi_app',
 ]
+'taxi_app',
