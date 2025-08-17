@@ -85,6 +85,13 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+INSTALLED_APPS = [
+    ...
+]
+INSTALLED_APPS = [
+    ...
+    'tovar',
+]
 
 # Localization
 LANGUAGE_CODE = 'en-us'
