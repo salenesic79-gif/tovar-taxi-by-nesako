@@ -80,5 +80,9 @@ def order_details(request, order_id):
     context = {
         'order': order,
     }
-    
+    from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("Dobrodošao u Taxi aplikaciju!")
+
     return render(request, 'transport/order_details.html', context)
