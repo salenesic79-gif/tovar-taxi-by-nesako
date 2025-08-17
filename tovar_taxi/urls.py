@@ -1,4 +1,3 @@
-path('', include('transport.urls'))
 # tovar_taxi/urls.py
 from django.contrib import admin
 from django.urls import path, include
