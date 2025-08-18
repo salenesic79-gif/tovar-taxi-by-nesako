@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalji narudžbine #{{ order.id }}</title>
+</head>
+<body>
+    <h1>Detalji narudžbine #{{ order.id }}</h1>
+    <p><strong>Status:</strong> {{ order.get_status_display }}</p>
+    <p><strong>Poručilac:</strong> {{ order.client.username }}</p>
+
+    {% if order.driver %}
+        <p><strong>Vozač:</strong> {{ order.driver.username }}</p>
+    {% else %}
+        <p><strong>Vozač:</strong> Nije prihvaćena</p>
+    {% endif %}
+
+    <h2>Detalji o teretu</h2>
+    <ul>
+        <li>Polazna lokacija: {{ order.start_location }}</li>
+        <li>Krajnja lokacija: {{ order.end_location }}</li>
+        <li>Tip robe: {{ order.item_type }}</li>
+        <li>Težina: {{ order.item_weight }} kg</li>
+        <li>Dimenzije: {{ order.item_dimensions }}</li>
+    </ul>
+
+    <p><strong>Predložena cena:</strong> {{ order.proposed_price }} RSD</p>
+    <p><strong>Datum kreiranja:</strong> {{ order.created_at }}</p>
+
+    <hr>
+    <p><a href="{% url 'order_list' %}">Nazad na listu</a></p>
+</body>
+</html>
