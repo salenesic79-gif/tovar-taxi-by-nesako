@@ -16,6 +16,21 @@ class UserProfile(models.Model):
     def __str__(self):
         return f'{self.user.username} - {self.get_role_display()}'
 
+class Vehicle(models.Model):
+    driver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='vehicles')
+
+    license_plate = models.CharField(max_length=20, unique=True, verbose_name="Registarske tablice")
+    description = models.CharField(max_length=255, verbose_name="Opis (npr. Iveco, Mercedes)", blank=True)
+    height = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Visina (m)")
+    width = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Širina (m)")
+    length = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Dužina (m)")
+    weight_capacity = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Nosivost (t)")
+    color = models.CharField(max_length=50, blank=True, verbose_name="Boja vozila")
+
+    def __str__(self):
+        return f'Vozilo {self.license_plate} - {self.description}'
+
+
 class Order(models.Model):
     STATUSES = (
         ('pending', 'Na čekanju'),
@@ -27,9 +42,13 @@ class Order(models.Model):
 
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client_orders')
     driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='driver_orders')
+    accepted_vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True, related_name='accepted_orders')
     
-    start_location = models.CharField(max_length=255)
-    end_location = models.CharField(max_length=255)
+    # IZMENJENA POLJA: start_location i end_location
+    start_city = models.CharField(max_length=100, verbose_name="Grad (utovar)")
+    start_street = models.CharField(max_length=255, verbose_name="Adresa (utovar)")
+    end_city = models.CharField(max_length=100, verbose_name="Grad (istovar)")
+    end_street = models.CharField(max_length=255, verbose_name="Adresa (istovar)")
     
     item_type = models.CharField(max_length=100)
     item_weight = models.DecimalField(max_digits=10, decimal_places=2)
