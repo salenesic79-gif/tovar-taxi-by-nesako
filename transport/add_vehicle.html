@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dodaj vozilo</title>
+</head>
+<body>
+    <h1>Dodaj novo vozilo</h1>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Sačuvaj vozilo</button>
+    </form>
+
+    <hr>
+    <h2>Moja vozila</h2>
+    {% if vehicles %}
+        <ul>
+        {% for vehicle in vehicles %}
+            <li>{{ vehicle.description }} - {{ vehicle.license_plate }} ({{ vehicle.height }}m x {{ vehicle.width }}m x {{ vehicle.length }}m, {{ vehicle.weight_capacity }}t)</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Trenutno nemate unetih vozila.</p>
+    {% endif %}
+
+    <hr>
+    <a href="{% url 'order_list' %}">Nazad na listu narudžbina</a>
+</body>
+</html>
