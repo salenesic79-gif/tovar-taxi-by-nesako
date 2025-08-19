@@ -3,8 +3,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib import messages
-from .forms import CustomUserCreationForm, OrderCreationForm
-from .models import UserProfile, Order
+from .forms import CustomUserCreationForm, OrderCreationForm, VehicleForm
+from .models import UserProfile, Order, Vehicle
 
 def home(request):
     return render(request, 'transport/home.html')
@@ -41,15 +41,12 @@ def order_list(request):
     try:
         user_profile = request.user.profile
         if user_profile.role == 'driver':
-            # Prikaži narudžbine na čekanju za vozače
             pending_orders = Order.objects.filter(status='pending').order_by('-created_at')
             context = {'orders': pending_orders, 'is_driver': True}
         else:
-            # Prikaži sve narudžbine klijenta
             client_orders = Order.objects.filter(client=request.user).order_by('-created_at')
             context = {'orders': client_orders, 'is_driver': False}
     except UserProfile.DoesNotExist:
-        # Ako korisnik nema profil, pretpostavi da je klijent
         client_orders = Order.objects.filter(client=request.user).order_by('-created_at')
         context = {'orders': client_orders, 'is_driver': False}
 
@@ -92,3 +89,22 @@ def order_details(request, order_id):
     }
     
     return render(request, 'transport/order_details.html', context)
+
+@login_required
+def add_vehicle(request):
+    if request.method == 'POST':
+        form = VehicleForm(request.POST)
+        if form.is_valid():
+            vehicle = form.save(commit=False)
+            vehicle.driver = request.user
+            vehicle.save()
+            messages.success(request, 'Vozilo je uspešno dodato!')
+            return redirect('add_vehicle')
+    else:
+        form = VehicleForm()
+    
+    context = {
+        'form': form,
+        'vehicles': request.user.vehicles.all()
+    }
+    return render(request, 'transport/add_vehicle.html', context)
