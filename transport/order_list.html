@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slobodne narudžbine</title>
+</head>
+<body>
+    <h1>Slobodne narudžbine</h1>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if is_driver %}
+        <a href="{% url 'add_vehicle' %}">Dodaj/izmeni vozila</a>
+        <hr>
+        {% for order in orders %}
+            <div>
+                <h2>Narudžbina #{{ order.id }}</h2>
+                <p><strong>Polazna lokacija:</strong> {{ order.start_location }}</p>
+                <p><strong>Krajnja lokacija:</strong> {{ order.end_location }}</p>
+                <p><strong>Predložena cena:</strong> {{ order.proposed_price }} RSD</p>
+                
+                <a href="{% url 'accept_order' order.id %}">
+                    <button>Prihvati</button>
+                </a>
+                <a href="{% url 'order_details' order.id %}">Detalji</a>
+                <hr>
+            </div>
+        {% empty %}
+            <p>Trenutno nema slobodnih narudžbina.</p>
+        {% endfor %}
+    {% else %}
+        <a href="{% url 'create_order' %}">Kreiraj novu narudžbinu</a>
+        <hr>
+        {% for order in orders %}
+            <div>
+                <h2>Moja narudžbina #{{ order.id }}</h2>
+                <p><strong>Status:</strong> {{ order.get_status_display }}</p>
+                {% if order.driver %}
+                    <p><strong>Vozač:</strong> {{ order.driver.username }}</p>
+                {% else %}
+                    <p><strong>Status:</strong> Čeka da vozač prihvati</p>
+                {% endif %}
+                <a href="{% url 'order_details' order.id %}">Detalji</a>
+                <hr>
+            </div>
+        {% empty %}
+            <p>Trenutno nemaš aktivnih narudžbina.</p>
+        {% endfor %}
+    {% endif %}
+
+</body>
+</html>
