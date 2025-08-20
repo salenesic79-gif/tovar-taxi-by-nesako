@@ -39,27 +39,27 @@ class Order(models.Model):
         ('delivered', 'Isporučena'),
         ('cancelled', 'Otkazana'),
     )
-    
+
     is_loaded = models.BooleanField(default=False) 
 
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client_orders')
     driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='driver_orders')
-    
+
     accepted_vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True, related_name='accepted_orders')
 
     start_location = models.CharField(max_length=255)
     end_location = models.CharField(max_length=255)
-    
+
     item_type = models.CharField(max_length=100)
     item_weight = models.DecimalField(max_digits=10, decimal_places=2)
     item_dimensions = models.CharField(max_length=100)
-    
+
     proposed_price = models.DecimalField(max_digits=10, decimal_places=2)
     final_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    
+
     status = models.CharField(max_length=20, choices=STATUSES, default='pending')
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         return f'Narudžbina #{self.id} od {self.client.username}'
