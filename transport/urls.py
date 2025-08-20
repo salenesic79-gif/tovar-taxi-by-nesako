@@ -12,6 +12,5 @@ urlpatterns = [
     path('orders/', views.order_list, name='order_list'),
     path('accept-order/<int:order_id>/', views.accept_order, name='accept_order'),
     path('order/<int:order_id>/', views.order_details, name='order_details'),
-    # NOVI URL ZA DODAVANJE VOZILA
-    path('add-vehicle/', views.add_vehicle, name='add_vehicle'),
+    path('add-vehicle/', views.add_vehicle_view, name='add_vehicle'),
 ]
