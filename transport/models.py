@@ -12,6 +12,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     role = models.CharField(max_length=20, choices=USER_ROLES, default='client')
     average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
+    is_driver_validated = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.user.username} - {self.get_role_display()}'
@@ -30,7 +31,6 @@ class Vehicle(models.Model):
     def __str__(self):
         return f'Vozilo {self.license_plate} - {self.description}'
 
-
 class Order(models.Model):
     STATUSES = (
         ('pending', 'Na čekanju'),
@@ -39,16 +39,16 @@ class Order(models.Model):
         ('delivered', 'Isporučena'),
         ('cancelled', 'Otkazana'),
     )
+    
+    is_loaded = models.BooleanField(default=False) 
 
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client_orders')
     driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='driver_orders')
-    accepted_vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True, related_name='accepted_orders')
     
-    # IZMENJENA POLJA: start_location i end_location
-    start_city = models.CharField(max_length=100, verbose_name="Grad (utovar)")
-    start_street = models.CharField(max_length=255, verbose_name="Adresa (utovar)")
-    end_city = models.CharField(max_length=100, verbose_name="Grad (istovar)")
-    end_street = models.CharField(max_length=255, verbose_name="Adresa (istovar)")
+    accepted_vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True, related_name='accepted_orders')
+
+    start_location = models.CharField(max_length=255)
+    end_location = models.CharField(max_length=255)
     
     item_type = models.CharField(max_length=100)
     item_weight = models.DecimalField(max_digits=10, decimal_places=2)
