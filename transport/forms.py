@@ -21,7 +21,7 @@ class OrderCreationForm(forms.ModelForm):
             'item_dimensions': forms.TextInput(attrs={'placeholder': 'Npr. 1m x 2m x 1.5m'}),
             'proposed_price': forms.NumberInput(attrs={'placeholder': 'Cena koju ste spremni da platite'}),
         }
-        
+
 class VehicleForm(forms.ModelForm):
     class Meta:
         model = Vehicle
