@@ -1,7 +1,7 @@
 # transport/forms.py
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import UserProfile, Order, Vehicle # DODATO: import Vehicle
+from .models import UserProfile, Order, Vehicle
 
 class CustomUserCreationForm(UserCreationForm):
     role = forms.ChoiceField(choices=UserProfile.USER_ROLES, label="Uloga")
@@ -21,18 +21,17 @@ class OrderCreationForm(forms.ModelForm):
             'item_dimensions': forms.TextInput(attrs={'placeholder': 'Npr. 1m x 2m x 1.5m'}),
             'proposed_price': forms.NumberInput(attrs={'placeholder': 'Cena koju ste spremni da platite'}),
         }
-
-# NOVA FORMA ZA DODAVANJE VOZILA
+        
 class VehicleForm(forms.ModelForm):
     class Meta:
         model = Vehicle
-        exclude = ['driver']
+        fields = ['license_plate', 'description', 'height', 'width', 'length', 'weight_capacity', 'color']
         widgets = {
             'license_plate': forms.TextInput(attrs={'placeholder': 'Registarske tablice'}),
-            'description': forms.TextInput(attrs={'placeholder': 'Opis (npr. Iveco, Mercedes)'}),
-            'height': forms.NumberInput(attrs={'placeholder': 'Visina (m)'}),
-            'width': forms.NumberInput(attrs={'placeholder': 'Širina (m)'}),
-            'length': forms.NumberInput(attrs={'placeholder': 'Dužina (m)'}),
-            'weight_capacity': forms.NumberInput(attrs={'placeholder': 'Nosivost (t)'}),
+            'description': forms.TextInput(attrs={'placeholder': 'Npr. Iveco, Mercedes'}),
+            'height': forms.NumberInput(attrs={'placeholder': 'Visina u metrima'}),
+            'width': forms.NumberInput(attrs={'placeholder': 'Širina u metrima'}),
+            'length': forms.NumberInput(attrs={'placeholder': 'Dužina u metrima'}),
+            'weight_capacity': forms.NumberInput(attrs={'placeholder': 'Nosivost u tonama'}),
             'color': forms.TextInput(attrs={'placeholder': 'Boja vozila'}),
         }
