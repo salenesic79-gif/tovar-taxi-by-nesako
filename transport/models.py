@@ -32,6 +32,11 @@ class Vehicle(models.Model):
         return f'Vozilo {self.license_plate} - {self.description}'
 
 class Order(models.Model):
+  class Order(models.Model):
+    # ...
+    start_location = models.CharField(max_length=255)
+    end_location = models.CharField(max_length=255)
+    # ...  
     STATUSES = (
         ('pending', 'Na čekanju'),
         ('accepted', 'Prihvaćena'),
