@@ -9,6 +9,7 @@ class Vehicle(models.Model):
     def __str__(self):
         return f"{self.model} - {self.plate_number}"
 
+
 class Order(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
     vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True)
