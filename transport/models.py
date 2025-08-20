@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Vehicle(models.Model):
+
+class A1(models.Model):  # <- pre Order
     driver = models.ForeignKey(User, on_delete=models.CASCADE)
     plate_number = models.CharField(max_length=20, unique=True)
     model = models.CharField(max_length=50)
@@ -12,7 +13,7 @@ class Vehicle(models.Model):
 
 class Order(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True)
+    vehicle = models.ForeignKey(A1, on_delete=models.SET_NULL, null=True, blank=True)  # <- koristi A1
     start_location = models.CharField(max_length=255)
     end_location = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
