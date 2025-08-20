@@ -8,11 +8,11 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta(UserCreationForm.Meta):
         fields = UserCreationForm.Meta.fields + ('role',)
-
 class OrderCreationForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ['start_location', 'end_location', 'item_type', 'item_weight', 'item_dimensions', 'proposed_price']
+        # ...
         widgets = {
             'start_location': forms.TextInput(attrs={'placeholder': 'Polazna lokacija'}),
             'end_location': forms.TextInput(attrs={'placeholder': 'Krajnja lokacija'}),
