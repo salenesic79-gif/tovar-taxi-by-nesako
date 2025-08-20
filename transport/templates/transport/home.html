@@ -1,10 +1,11 @@
-<!-- transport/templates/transport/home.html -->
 <!DOCTYPE html>
 <html>
 <head>
     <title>Home</title>
 </head>
 <body>
-    <h1>Dobrodošli na Tovar Taxi!</h1>
+    <h1>Welcome to Taxi Transport</h1>
+    <p><a href="{% url 'order_create' %}">Create Order</a></p>
+    <p><a href="{% url 'vehicle_create' %}">Add Vehicle</a></p>
 </body>
 </html>
