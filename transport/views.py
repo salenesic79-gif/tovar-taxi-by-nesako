@@ -63,13 +63,18 @@ def accept_order(request, order_id):
     except UserProfile.DoesNotExist:
         messages.error(request, 'Vaš nalog nema definisanu ulogu. Molimo kontaktirajte administratora.')
         return redirect('order_list')
-
+    
+    vehicles = Vehicle.objects.filter(driver=request.user)
+    if not vehicles.exists():
+        messages.error(request, 'Morate dodati vozilo pre nego što prihvatite narudžbinu.')
+        return redirect('add_vehicle')
 
     if order.status != 'pending':
         messages.error(request, 'Ova narudžbina je već prihvaćena ili otkazana.')
         return redirect('order_list')
-    
+
     order.driver = request.user
+    order.accepted_vehicle = vehicles.first()
     order.status = 'accepted'
     order.save()
     
@@ -84,14 +89,21 @@ def order_details(request, order_id):
         messages.error(request, 'Nemate pravo pristupa ovoj narudžbini.')
         return redirect('order_list')
 
+    current_destination = None
+    if order.status == 'accepted' and not order.is_loaded:
+        current_destination = order.start_location
+    elif order.status == 'accepted' and order.is_loaded:
+        current_destination = order.end_location
+        
     context = {
         'order': order,
+        'current_destination': current_destination,
     }
     
     return render(request, 'transport/order_details.html', context)
-
+    
 @login_required
-def add_vehicle(request):
+def add_vehicle_view(request):
     if request.method == 'POST':
         form = VehicleForm(request.POST)
         if form.is_valid():
@@ -99,12 +111,8 @@ def add_vehicle(request):
             vehicle.driver = request.user
             vehicle.save()
             messages.success(request, 'Vozilo je uspešno dodato!')
-            return redirect('add_vehicle')
+            return redirect('order_list')
     else:
         form = VehicleForm()
     
-    context = {
-        'form': form,
-        'vehicles': request.user.vehicles.all()
-    }
-    return render(request, 'transport/add_vehicle.html', context)
+    return render(request, 'transport/add_vehicle.html', {'form': form})
