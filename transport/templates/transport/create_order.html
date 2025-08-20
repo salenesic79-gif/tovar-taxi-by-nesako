@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Kreiraj narudžbinu</title>
+    <title>Create Order</title>
 </head>
 <body>
-    <h1>Kreiraj narudžbinu</h1>
+    <h1>Create Order</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Kreiraj</button>
+        <button type="submit">Submit</button>
     </form>
+    <p><a href="{% url 'home' %}">Back to Home</a></p>
 </body>
 </html>
