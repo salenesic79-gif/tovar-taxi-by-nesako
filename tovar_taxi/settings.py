@@ -5,7 +5,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'tvoja-tajna-kljuc-ovde'  # promeni ovo u produkciji
+SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
 
 # DEBUG mod
 DEBUG = True
@@ -83,7 +83,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internacionalizacija
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'sr'
 TIME_ZONE = 'Europe/Belgrade'
 USE_I18N = True
 USE_TZ = True
@@ -91,8 +91,13 @@ USE_TZ = True
 # Statika i mediji
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default auto field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Login/Logout redirect URLs
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
