@@ -17,12 +17,13 @@ class Profile(models.Model):
 
 
 # Vozila koja koriste vozači
-class Vehicle(models.Model):
-    driver = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'profile__role': 'driver'})
-    make = models.CharField(max_length=100)   # marka (npr. Mercedes)
-    model = models.CharField(max_length=100)  # model (npr. Sprinter)
-    plate_number = models.CharField(max_length=20, unique=True)  # registracija
-    capacity = models.IntegerField()  # kapacitet u kg ili m3
+ class Vehicle(models.Model):
+    driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    plate_number = models.CharField(max_length=20)
+    name = models.CharField(max_length=100)  # ime vozila
+    capacity = models.IntegerField()
+    available = models.IntegerField(default=0)  # koliko trenutno slobodno
+
 
     def __str__(self):
         return f"{self.make} {self.model} - {self.plate_number}"
