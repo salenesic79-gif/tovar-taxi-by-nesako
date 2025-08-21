@@ -2,12 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from .forms import CustomUserCreationForm, OrderCreationForm, VehicleForm
-from .models import Order
+from .models import Order, Vehicle, Profile
 
 def home(request):
-    # putanja ka template-u sa prefiksom aplikacije
-    return render(request, 'transport/home.html')
-
+    return render(request, 'home.html')
 
 def user_signup(request):
     if request.method == 'POST':
@@ -23,6 +21,23 @@ def user_signup(request):
         form = CustomUserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
 
+@login_required
+def vehicle_create(request):
+    if request.method == 'POST':
+        form = VehicleForm(request.POST)
+        if form.is_valid():
+            vehicle = form.save(commit=False)
+            vehicle.driver = request.user.profile
+            vehicle.save()
+            return redirect('vehicle_list')
+    else:
+        form = VehicleForm()
+    return render(request, 'transport/vehicle_create.html', {'form': form})
+
+@login_required
+def vehicle_list(request):
+    vehicles = Vehicle.objects.filter(driver=request.user.profile)
+    return render(request, 'transport/vehicle_list.html', {'vehicles': vehicles})
 
 @login_required
 def order_create(request):
@@ -30,21 +45,14 @@ def order_create(request):
         form = OrderCreationForm(request.POST)
         if form.is_valid():
             order = form.save(commit=False)
-            order.client = request.user
+            order.customer = request.user.profile
             order.save()
             return redirect('order_list')
     else:
         form = OrderCreationForm()
     return render(request, 'transport/order_create.html', {'form': form})
 
-
 @login_required
-def vehicle_create(request):
-    if request.method == 'POST':
-        form = VehicleForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    else:
-        form = VehicleForm()
-    return render(request, 'transport/vehicle_create.html', {'form': form})
+def order_list(request):
+    orders = Order.objects.filter(customer=request.user.profile)
+    return render(request, 'transport/order_list.html', {'orders': orders})
