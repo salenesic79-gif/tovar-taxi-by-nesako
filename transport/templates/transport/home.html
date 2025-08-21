@@ -4,8 +4,14 @@
     <title>Home</title>
 </head>
 <body>
-    <h1>Welcome to Taxi Transport</h1>
-    <p><a href="{% url 'order_create' %}">Create Order</a></p>
-    <p><a href="{% url 'vehicle_create' %}">Add Vehicle</a></p>
+    <h2>Welcome {{ user.username }}</h2>
+    {% if user.is_authenticated %}
+        <p>Email: {{ user.email }}</p>
+        <p>Phone: {{ user.profile.phone_number }}</p>
+        <p>Address: {{ user.profile.address }}</p>
+    {% else %}
+        <a href="{% url 'signup' %}">Sign Up</a>
+        <a href="{% url 'login' %}">Login</a>
+    {% endif %}
 </body>
 </html>
