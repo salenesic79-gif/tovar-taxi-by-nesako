@@ -1,43 +1,20 @@
-# transport/models.py
-from django.db import models
-from django.contrib.auth.models import User
+#!/usr/bin/env python
+"""Django's command-line utility for administrative tasks."""
+import os
+import sys
 
-# Profil korisnika sa rolama
-class Profile(models.Model):
-    ROLE_CHOICES = (
-        ('client', 'Client'),
-        ('driver', 'Driver'),
-        ('admin', 'Admin'),
-    )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='client')
+def main():
+    """Run administrative tasks."""
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tovar_taxi.settings')
+    try:
+        from django.core.management import execute_from_command_line
+    except ImportError as exc:
+        raise ImportError(
+            "Couldn't import Django. Are you sure it's installed and "
+            "available on your PYTHONPATH environment variable? Did you "
+            "forget to activate a virtual environment?"
+        ) from exc
+    execute_from_command_line(sys.argv)
 
-    def __str__(self):
-        return f"{self.user.username} - {self.role}"
-
-
-# Vozila koja koriste vozači
- class Vehicle(models.Model):
-    driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    plate_number = models.CharField(max_length=20)
-    name = models.CharField(max_length=100)  # ime vozila
-    capacity = models.IntegerField()
-    available = models.IntegerField(default=0)  # koliko trenutno slobodno
-
-
-    def __str__(self):
-        return f"{self.make} {self.model} - {self.plate_number}"
-
-
-# Narudžbina transporta
-class Order(models.Model):
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True)
-    pickup_location = models.CharField(max_length=255)
-    dropoff_location = models.CharField(max_length=255)
-    cargo_description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_completed = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Order #{self.id} by {self.client.username}"
+if __name__ == '__main__':
+    main()
