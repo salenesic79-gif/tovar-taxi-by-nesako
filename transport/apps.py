@@ -5,4 +5,4 @@ class TransportConfig(AppConfig):
     name = 'transport'
 
     def ready(self):
-        import transport.signals  # samo uvoz, ne definicija signala
+        import transport.signals
