@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="sr">
 <head>
@@ -49,29 +50,9 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid px-0">
-            <div class="w-100 d-flex justify-content-center">
-                <svg width="100%" height="60" viewBox="0 0 1024 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="navbar-logo">
-                    <!-- Background -->
-                    <rect width="1024" height="100" fill="#212529"/>
-                    <!-- Truck body -->
-                    <rect x="300" y="25" width="300" height="50" fill="#FF0000" rx="8"/>
-                    <!-- Truck cab -->
-                    <rect x="200" y="30" width="100" height="45" fill="#FF0000" rx="8"/>
-                    <!-- Window -->
-                    <rect x="210" y="35" width="40" height="20" fill="#87CEFA"/>
-                    <!-- Wheels -->
-                    <circle cx="250" cy="80" r="12" fill="#333333"/>
-                    <circle cx="550" cy="80" r="12" fill="#333333"/>
-                    <!-- Speed lines -->
-                    <rect x="620" y="30" width="40" height="5" fill="#FF0000"/>
-                    <rect x="630" y="45" width="30" height="5" fill="#FF0000"/>
-                    <rect x="640" y="60" width="20" height="5" fill="#FF0000"/>
-                    <!-- Text -->
-                    <text x="350" y="55" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">Tovar</text>
-                    <text x="450" y="55" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#FFD700">axi</text>
-                    <text x="350" y="70" font-family="Arial, sans-serif" font-size="12" fill="#FFD700">by NESAKO</text>
-                </svg>
-            </div>
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 40px; width: auto;">
+            </a>
             <div class="navbar-nav position-absolute" style="right: 15px; top: 50%; transform: translateY(-50%);">
                 {% if user.is_authenticated %}
                     <span class="navbar-text me-3">Dobrodošli, {{ user.username }}!</span>
