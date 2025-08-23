@@ -11,18 +11,42 @@
             color: white;
             padding: 100px 0;
         }
+        .hero-title {
+            font-weight: bold;
+            text-shadow: 0 0 2px #FFD700, 0 0 4px #FFD700;
+        }
+        .hero-subtitle {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        .btn-custom {
+            background-color: #e9ecef;
+            border-color: #e9ecef;
+            color: #495057;
+        }
+        .btn-custom:hover {
+            background-color: #dee2e6;
+            border-color: #dee2e6;
+            color: #495057;
+        }
         .feature-card {
             transition: transform 0.3s;
         }
         .feature-card:hover {
             transform: translateY(-5px);
         }
+        .navbar-brand img {
+            height: 40px;
+            width: auto;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">🚛 Tovar Taxi</a>
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjgwIiB2aWV3Qm94PSIwIDAgMjAwIDgwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8IS0tIFRydWNrIGJvZHkgLS0+CjxyZWN0IHg9IjQwIiB5PSIyMCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSI0MCIgZmlsbD0iI0ZGMDAwMCIgcng9IjQiLz4KPCEtLSBUcnVjayBjYWIgLS0+CjxyZWN0IHg9IjEwIiB5PSIyNSIgd2lkdGg9IjQwIiBoZWlnaHQ9IjM1IiBmaWxsPSIjRkYwMDAwIiByeD0iNCIvPgo8IS0tIFdpbmRvdyAtLT4KPHJlY3QgeD0iMTUiIHk9IjMwIiB3aWR0aD0iMjAiIGhlaWdodD0iMTUiIGZpbGw9IiM4N0NFRkEiLz4KPCEtLSBXaGVlbHMgLS0+CjxjaXJjbGUgY3g9IjMwIiBjeT0iNjUiIHI9IjgiIGZpbGw9IiMzMzMzMzMiLz4KPGNpcmNsZSBjeD0iMTQwIiBjeT0iNjUiIHI9IjgiIGZpbGw9IiMzMzMzMzMiLz4KPCEtLSBTcGVlZCBsaW5lcyAtLT4KPHJlY3QgeD0iMTY1IiB5PSIyNSIgd2lkdGg9IjIwIiBoZWlnaHQ9IjMiIGZpbGw9IiNGRjAwMDAiLz4KPHJlY3QgeD0iMTcwIiB5PSIzNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjMiIGZpbGw9IiNGRjAwMDAiLz4KPHJlY3QgeD0iMTc1IiB5PSI0NSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjMiIGZpbGw9IiNGRjAwMDAiLz4KPCEtLSBUZXh0IC0tPgo8dGV4dCB4PSI2MCIgeT0iNDIiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIj5Ub3ZhcjwvdGV4dD4KPHRleHQgeD0iMTEwIiB5PSI0MiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iI0ZGRDcwMCI+YXhpPC90ZXh0Pgo8dGV4dCB4PSI2MCIgeT0iNTUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI4IiBmaWxsPSIjRkZENzAwIj5ieSBORVNBS088L3RleHQ+Cjwvc3ZnPgo=" alt="Tovar Taxi">
+            </a>
             <div class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
                     <span class="navbar-text me-3">Dobrodošli, {{ user.username }}!</span>
@@ -37,10 +61,11 @@
 
     <section class="hero-section text-center">
         <div class="container">
-            <h1 class="display-4 mb-4">Dobrodošli u Tovar Taxi</h1>
-            <p class="lead mb-4">Vaša pouzdana logistička aplikacija za transport robe</p>
+            <h1 class="display-4 mb-4 hero-title">Dobrodošli u Tovar Taxi</h1>
+            <p class="hero-subtitle mb-2">Vaša aplikacija za efikasniji transport.</p>
+            <p class="hero-subtitle mb-4">Sigurno.Brzo.Profitabilno.</p>
             {% if not user.is_authenticated %}
-                <a href="{% url 'signup' %}" class="btn btn-light btn-lg">Registruj se sada</a>
+                <a href="{% url 'signup' %}" class="btn btn-custom btn-lg">Registruj se sada</a>
             {% endif %}
         </div>
     </section>
@@ -54,8 +79,8 @@
                             <div class="mb-3">
                                 <i class="fas fa-truck fa-3x text-primary"></i>
                             </div>
-                            <h5 class="card-title">Brz Transport</h5>
-                            <p class="card-text">Organizujemo brz i siguran transport vaše robe na bilo koju destinaciju.</p>
+                            <h5 class="card-title">Transport</h5>
+                            <p class="card-text">Organizujemo brz i siguran transport Vaše robe na teritoriji cele Srbije</p>
                         </div>
                     </div>
                 </div>
@@ -66,7 +91,7 @@
                                 <i class="fas fa-shield-alt fa-3x text-success"></i>
                             </div>
                             <h5 class="card-title">Sigurnost</h5>
-                            <p class="card-text">Vaša roba je u sigurnim rukama sa našim profesionalnim vozačima.</p>
+                            <p class="card-text">Vaše pošiljke i bezbednost naših vozača – na prvom mestu.<br>Šaljete bez brige, vozači voze bez rizika</p>
                         </div>
                     </div>
                 </div>
@@ -76,8 +101,8 @@
                             <div class="mb-3">
                                 <i class="fas fa-clock fa-3x text-warning"></i>
                             </div>
-                            <h5 class="card-title">24/7 Dostupnost</h5>
-                            <p class="card-text">Dostupni smo 24 sata dnevno, 7 dana u nedelji za vaše potrebe.</p>
+                            <h5 class="card-title">Dostupnost</h5>
+                            <p class="card-text">Vozači su u pokretu,– Vaša pošiljka spremna,.<br>Brza i pouzdana isporuka već je na putu</p>
                         </div>
                     </div>
                 </div>
