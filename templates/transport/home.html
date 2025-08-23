@@ -32,6 +32,7 @@
         }
         .feature-card {
             transition: transform 0.3s;
+            border: 2px solid #FFD700;
         }
         .feature-card:hover {
             transform: translateY(-5px);
@@ -66,7 +67,7 @@
         <div class="container">
             <h1 class="display-4 mb-4 hero-title">Dobrodošli u Tovar Taxi</h1>
             <p class="hero-subtitle mb-2">Vaša aplikacija za efikasniji transport.</p>
-            <p class="hero-subtitle mb-4">Sigurno.Brzo.Profitabilno.</p>
+            <p class="hero-subtitle mb-4">Sigurno.  Brzo.  Profitabilno.</p>
             {% if not user.is_authenticated %}
                 <a href="{% url 'signup' %}" class="btn btn-custom btn-lg">Registruj se sada</a>
             {% endif %}
@@ -94,7 +95,7 @@
                                 <i class="fas fa-shield-alt fa-3x text-success"></i>
                             </div>
                             <h5 class="card-title">Sigurnost</h5>
-                            <p class="card-text">Vaše pošiljke i bezbednost naših vozača – na prvom mestu.<br>Šaljete bez brige, vozači voze bez rizika</p>
+                            <p class="card-text">Uzajamno poštovanje je temelj svake sigurne saradnje. Precizan opis tereta garantuje siguran transport, dok dosledno poštovanje dogovora osigurava bezbrižnu isporuku.</p>
                         </div>
                     </div>
                 </div>
@@ -105,7 +106,7 @@
                                 <i class="fas fa-clock fa-3x text-warning"></i>
                             </div>
                             <h5 class="card-title">Dostupnost</h5>
-                            <p class="card-text">Vozači su u pokretu,– Vaša pošiljka spremna,.<br>Brza i pouzdana isporuka već je na putu</p>
+                            <p class="card-text">Vozači su u pokretu– Vaša pošiljka spremna.<br>Brza i pouzdana isporuka već je na putu</p>
                         </div>
                     </div>
                 </div>
