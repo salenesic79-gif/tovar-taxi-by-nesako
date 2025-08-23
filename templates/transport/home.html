@@ -50,7 +50,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <span style="color: #FFD700; font-size: 32px; font-weight: bold;">TOVAR TAXI</span>
+                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 56px; width: auto;">
             </a>
             <div class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
