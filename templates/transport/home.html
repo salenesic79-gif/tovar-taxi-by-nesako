@@ -49,11 +49,11 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid px-0">
+        <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 40px; width: auto;">
+                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 56px; width: auto;">
             </a>
-            <div class="navbar-nav position-absolute" style="right: 15px; top: 50%; transform: translateY(-50%);">
+            <div class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
                     <span class="navbar-text me-3">Dobrodošli, {{ user.username }}!</span>
                     <a class="nav-link" href="{% url 'logout' %}">Odjavi se</a>
