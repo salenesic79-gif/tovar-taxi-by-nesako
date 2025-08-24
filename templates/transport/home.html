@@ -21,14 +21,14 @@
             font-weight: 600;
         }
         .btn-custom {
-            background-color: #adb5bd !important;
-            border-color: #adb5bd !important;
-            color: #495057 !important;
+            background-color: #e9ecef !important;
+            border: 2px solid #FFD700 !important;
+            color: #212529 !important;
         }
         .btn-custom:hover {
-            background-color: #868e96 !important;
-            border-color: #868e96 !important;
-            color: #495057 !important;
+            background-color: #dee2e6 !important;
+            border: 2px solid #FFD700 !important;
+            color: #212529 !important;
         }
         .feature-card {
             transition: transform 0.3s;
@@ -49,7 +49,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(0, 0, 0);">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
+            <a class="navbar-brand" href="{% url 'settings' %}">
                 <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 56px; width: auto;">
             </a>
             <div class="navbar-nav ms-auto">
@@ -57,7 +57,7 @@
                     <span class="navbar-text me-3">Dobrodošli, {{ user.username }}!</span>
                     <a class="nav-link" href="{% url 'logout' %}">Odjavi se</a>
                 {% else %}
-                    <a class="nav-link" href="{% url 'login' %}">Prijavi se</a>
+                    <a class="nav-link" href="{% url 'login' %}" style="color: white; border: 2px solid #FFD700; padding: 8px 16px; border-radius: 5px; text-decoration: none;">Prijavi se</a>
                 {% endif %}
             </div>
         </div>

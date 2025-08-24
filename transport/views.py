@@ -29,3 +29,6 @@ def signup_carrier_view(request):
 
 def home_view(request):
     return render(request, 'transport/home.html')
+
+def settings_view(request):
+    return render(request, 'transport/settings.html')

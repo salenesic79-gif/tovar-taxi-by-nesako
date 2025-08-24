@@ -20,14 +20,22 @@
             width: auto;
         }
         .main-title {
-            color: #FFD700;
+            color: white;
             font-size: 48px;
             font-weight: bold;
             text-align: center;
             margin: 40px 0;
-            text-decoration: underline;
-            text-decoration-color: #FFD700;
-            text-underline-offset: 10px;
+            text-shadow: 0 0 2px #FFD700, 0 0 4px #FFD700;
+            position: relative;
+        }
+        .main-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #FFD700;
         }
         .content-container {
             display: flex;
@@ -54,10 +62,10 @@
             margin-bottom: 15px;
         }
         .section-btn {
-            background-color: #6c757d;
-            color: black;
+            background-color: #e9ecef;
+            color: #212529;
             font-weight: bold;
-            border: none;
+            border: 2px solid #FFD700;
             padding: 12px 40px;
             font-size: 18px;
             border-radius: 5px;
@@ -65,7 +73,7 @@
             width: 200px;
         }
         .section-btn:hover {
-            background-color: #5a6268;
+            background-color: #dee2e6;
         }
         .info-grid {
             display: grid;
@@ -86,7 +94,7 @@
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(0, 0, 0);">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
+            <a class="navbar-brand" href="{% url 'settings' %}">
                 <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 56px; width: auto;">
             </a>
             <div class="navbar-nav ms-auto">
@@ -94,7 +102,7 @@
                     <span class="navbar-text me-3">Dobrodošli, {{ user.username }}!</span>
                     <a class="nav-link" href="{% url 'logout' %}">Odjavi se</a>
                 {% else %}
-                    <a class="nav-link" href="{% url 'login' %}">Prijavi se</a>
+                    <a class="nav-link" href="{% url 'login' %}" style="color: white; border: 2px solid #FFD700; padding: 8px 16px; border-radius: 5px; text-decoration: none;">Prijavi se</a>
                 {% endif %}
             </div>
         </div>
@@ -109,7 +117,7 @@
         <div class="left-section">
             <div class="section-header">
                 <p class="section-text">koristite usluge kao</p>
-                <button class="section-btn" onclick="window.location.href='{% url 'signup_sender' %}'">POŠALJILAC</button>
+                <button class="section-btn" onclick="window.location.href='{% url 'signup_sender' %}'">POŠILJILAC</button>
             </div>
             <div class="info-grid">
                 <div class="info-box" id="L1">
