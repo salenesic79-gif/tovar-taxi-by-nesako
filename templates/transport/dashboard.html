@@ -1,0 +1,348 @@
+{% extends 'transport/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Tovar Taxi{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>{{ profile.get_user_type_display }}</span>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'dashboard' %}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    {% if user_type == 'shipper' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'create_shipment' %}">
+                            <i class="fas fa-plus-circle"></i> Nova pošiljka
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'freight_exchange' %}">
+                            <i class="fas fa-exchange-alt"></i> Freight Exchange
+                        </a>
+                    </li>
+                    {% if user_type == 'carrier' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'manage_vehicles' %}">
+                            <i class="fas fa-truck"></i> Vozila
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'settings' %}">
+                            <i class="fas fa-cog"></i> Podešavanja
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Dashboard</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        {% if user_type == 'shipper' %}
+                        <a href="{% url 'create_shipment' %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-plus"></i> Nova pošiljka
+                        </a>
+                        {% elif user_type == 'carrier' %}
+                        <a href="{% url 'freight_exchange' %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-search"></i> Pronađi teret
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                {% if user_type == 'shipper' %}
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Ukupno pošiljki
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_shipments }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-box fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Aktivne pošiljke
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_shipments }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-shipping-fast fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% elif user_type == 'carrier' %}
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Vozila
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_vehicles }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-truck fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Aktivna vozila
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_vehicles }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Ukupno ponuda
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_offers }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-handshake fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Prihvaćene ponude
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ accepted_offers }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-star fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">Brze akcije</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                {% if user_type == 'shipper' %}
+                                <div class="col-md-4 mb-3">
+                                    <a href="{% url 'create_shipment' %}" class="btn btn-primary btn-lg w-100">
+                                        <i class="fas fa-plus-circle mb-2"></i><br>
+                                        Kreiraj pošiljku
+                                    </a>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <a href="{% url 'freight_exchange' %}" class="btn btn-info btn-lg w-100">
+                                        <i class="fas fa-search mb-2"></i><br>
+                                        Pretraži prevoznike
+                                    </a>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <a href="#" class="btn btn-success btn-lg w-100">
+                                        <i class="fas fa-chart-line mb-2"></i><br>
+                                        Izveštaji
+                                    </a>
+                                </div>
+                                {% elif user_type == 'carrier' %}
+                                <div class="col-md-4 mb-3">
+                                    <a href="{% url 'freight_exchange' %}" class="btn btn-primary btn-lg w-100">
+                                        <i class="fas fa-search mb-2"></i><br>
+                                        Pronađi teret
+                                    </a>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <a href="{% url 'manage_vehicles' %}" class="btn btn-info btn-lg w-100">
+                                        <i class="fas fa-truck mb-2"></i><br>
+                                        Upravljaj vozilima
+                                    </a>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <a href="#" class="btn btn-success btn-lg w-100">
+                                        <i class="fas fa-route mb-2"></i><br>
+                                        Moje rute
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="row">
+                {% if user_type == 'shipper' and recent_shipments %}
+                <div class="col-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Nedavne pošiljke</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Referentni broj</th>
+                                            <th>Ruta</th>
+                                            <th>Status</th>
+                                            <th>Cena</th>
+                                            <th>Datum</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for shipment in recent_shipments %}
+                                        <tr>
+                                            <td><a href="{% url 'shipment_detail' shipment.pk %}">{{ shipment.reference_number }}</a></td>
+                                            <td>📍 {{ shipment.pickup_city }} → 🎯 {{ shipment.delivery_city }}</td>
+                                            <td>
+                                                <span class="badge badge-{% if shipment.status == 'published' %}primary{% elif shipment.status == 'assigned' %}warning{% elif shipment.status == 'delivered' %}success{% else %}secondary{% endif %}">
+                                                    {{ shipment.get_status_display }}
+                                                </span>
+                                            </td>
+                                            <td>{{ shipment.offered_price }} RSD</td>
+                                            <td>{{ shipment.created_at|date:"d.m.Y" }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% elif user_type == 'carrier' and recent_offers %}
+                <div class="col-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Nedavne ponude</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Pošiljka</th>
+                                            <th>Ruta</th>
+                                            <th>Moja ponuda</th>
+                                            <th>Status</th>
+                                            <th>Datum</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for offer in recent_offers %}
+                                        <tr>
+                                            <td><a href="{% url 'shipment_detail' offer.shipment.pk %}">{{ offer.shipment.reference_number }}</a></td>
+                                            <td>📍 {{ offer.shipment.pickup_city }} → 🎯 {{ offer.shipment.delivery_city }}</td>
+                                            <td>{{ offer.offered_price }} RSD</td>
+                                            <td>
+                                                <span class="badge badge-{% if offer.is_accepted %}success{% else %}warning{% endif %}">
+                                                    {% if offer.is_accepted %}Prihvaćena{% else %}Na čekanju{% endif %}
+                                                </span>
+                                            </td>
+                                            <td>{{ offer.created_at|date:"d.m.Y" }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+.sidebar-heading {
+    font-size: .75rem;
+    text-transform: uppercase;
+}
+</style>
+{% endblock %}
