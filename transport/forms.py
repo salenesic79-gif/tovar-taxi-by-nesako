@@ -1,7 +1,7 @@
 from django import forms
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Profile, Shipment, Vehicle, ShipmentOffer
+from django.contrib.auth.models import User
+from .models import Shipment, Vehicle, ShipmentOffer, Profile, City, Highway
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -33,17 +33,52 @@ class ShipmentForm(forms.ModelForm):
         widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         help_text='📍 Datum i vreme preuzimanja'
     )
+    pickup_city = forms.ModelChoiceField(
+        queryset=City.objects.all(),
+        required=False,
+        empty_label="Izaberite grad preuzimanja...",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    pickup_region = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Oblast/Region preuzimanja'}))
+    pickup_address = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ulica i broj'}))
+    pickup_postal_code = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Poštanski broj'}))
+    pickup_country = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Država'}))
     delivery_date = forms.DateTimeField(
         widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         required=False,
         help_text='🎯 Datum i vreme dostave (opciono)'
     )
+    delivery_city = forms.ModelChoiceField(
+        queryset=City.objects.all(),
+        required=False,
+        empty_label="Izaberite grad dostave...",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    delivery_region = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Oblast/Region dostave'}))
+    delivery_address = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ulica i broj'}))
+    delivery_postal_code = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Poštanski broj'}))
+    delivery_country = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Država'}))
+    cargo_type = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tip tereta'}))
+    cargo_description = forms.CharField(max_length=255, required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Opis tereta...'}))
+    weight = forms.DecimalField(max_digits=10, decimal_places=2, required=False, widget=forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': 'kg'}))
+    volume = forms.DecimalField(max_digits=10, decimal_places=2, required=False, widget=forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': 'm³'}))
+    offered_price = forms.DecimalField(max_digits=10, decimal_places=2, required=False, widget=forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': 'RSD'}))
+    special_requirements = forms.CharField(max_length=255, required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Posebni zahtevi...'}))
+    contact_person = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ime i prezime'}))
+    contact_phone = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+381...'}))
+    
+    preferred_highways = forms.ModelMultipleChoiceField(
+        queryset=Highway.objects.filter(priority__lte=3).order_by('priority', 'highway_type'),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        help_text='Izaberite željene puteve (opciono)'
+    )
 
     class Meta:
         model = Shipment
         fields = [
-            'pickup_address', 'pickup_city', 'pickup_postal_code', 'pickup_country',
-            'delivery_address', 'delivery_city', 'delivery_postal_code', 'delivery_country',
+            'pickup_address', 'pickup_city', 'pickup_region', 'pickup_postal_code', 'pickup_country',
+            'delivery_address', 'delivery_city', 'delivery_region', 'delivery_postal_code', 'delivery_country',
             'cargo_type', 'cargo_description', 'weight', 'volume',
             'pickup_date', 'delivery_date', 'offered_price',
             'special_requirements', 'contact_person', 'contact_phone'

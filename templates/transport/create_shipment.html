@@ -1,0 +1,463 @@
+{% extends 'transport/base.html' %}
+{% load static %}
+
+{% block title %}Kreiranje pošiljke - Tovar Taxi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .route-preview {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 2rem 0;
+        border: 2px dashed var(--primary-color);
+    }
+    
+    .route-step {
+        display: flex;
+        align-items: center;
+        margin: 1rem 0;
+        padding: 1rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .route-step:hover {
+        transform: translateX(10px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    
+    .route-icon {
+        font-size: 2rem;
+        margin-right: 1rem;
+        color: var(--primary-color);
+    }
+    
+    .highway-selector {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .highway-option {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        margin: 0.5rem 0;
+        border: 2px solid transparent;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .highway-option:hover {
+        border-color: var(--primary-color);
+        background: rgba(102, 126, 234, 0.05);
+    }
+    
+    .highway-option.selected {
+        border-color: var(--success-color);
+        background: rgba(16, 185, 129, 0.1);
+    }
+    
+    .highway-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: auto;
+    }
+    
+    .highway-badge.highway {
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    .highway-badge.main_road {
+        background: var(--warning-color);
+        color: white;
+    }
+    
+    .highway-badge.regional {
+        background: var(--success-color);
+        color: white;
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+        border-left: 5px solid var(--primary-color);
+    }
+    
+    .section-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-title i {
+        margin-right: 0.75rem;
+        font-size: 1.2rem;
+    }
+    
+    .city-select-wrapper {
+        position: relative;
+    }
+    
+    .city-info {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        background: rgba(102, 126, 234, 0.05);
+        border-radius: 5px;
+        display: none;
+    }
+    
+    .city-info.show {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-gradient">📦 Kreiranje nove pošiljke</h1>
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Nazad na dashboard
+                </a>
+            </div>
+            
+            <form method="post" class="fade-in-up">
+                {% csrf_token %}
+                
+                <!-- Pickup Location Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-map-marker-alt"></i>📍 Lokacija preuzimanja
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.pickup_city.id_for_label }}" class="form-label">Grad preuzimanja</label>
+                                <div class="city-select-wrapper">
+                                    {{ form.pickup_city }}
+                                    <div class="city-info" id="pickup-city-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <span id="pickup-city-details"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.pickup_region.id_for_label }}" class="form-label">Oblast/Region</label>
+                                {{ form.pickup_region }}
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="{{ form.pickup_address.id_for_label }}" class="form-label">Adresa preuzimanja</label>
+                                {{ form.pickup_address }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.pickup_postal_code.id_for_label }}" class="form-label">Poštanski broj</label>
+                                {{ form.pickup_postal_code }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.pickup_date.id_for_label }}" class="form-label">Datum i vreme preuzimanja</label>
+                                {{ form.pickup_date }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Delivery Location Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-flag-checkered"></i>🎯 Lokacija dostave
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.delivery_city.id_for_label }}" class="form-label">Grad dostave</label>
+                                <div class="city-select-wrapper">
+                                    {{ form.delivery_city }}
+                                    <div class="city-info" id="delivery-city-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <span id="delivery-city-details"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.delivery_region.id_for_label }}" class="form-label">Oblast/Region</label>
+                                {{ form.delivery_region }}
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="{{ form.delivery_address.id_for_label }}" class="form-label">Adresa dostave</label>
+                                {{ form.delivery_address }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="{{ form.delivery_postal_code.id_for_label }}" class="form-label">Poštanski broj</label>
+                                {{ form.delivery_postal_code }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.delivery_date.id_for_label }}" class="form-label">Datum i vreme dostave (opciono)</label>
+                                {{ form.delivery_date }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Route Preview -->
+                <div class="route-preview" id="route-preview" style="display: none;">
+                    <h4 class="text-center mb-3">🛣️ Pregled rute</h4>
+                    <div id="route-steps"></div>
+                </div>
+                
+                <!-- Highway Selection -->
+                <div class="form-section highway-selector">
+                    <h3 class="section-title">
+                        <i class="fas fa-road"></i>🛣️ Preporučeni putevi
+                    </h3>
+                    <p class="text-muted mb-3">Izaberite puteve koje preferirate za ovu rutu (opciono)</p>
+                    <div class="row">
+                        {% for highway in form.preferred_highways %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="highway-option" data-highway="{{ highway.choice_value }}">
+                                    {{ highway.tag }}
+                                    <span class="highway-badge {{ highway.choice_label|slice:':8'|lower }}">
+                                        {% if 'Autoput' in highway.choice_label %}Autoput{% elif 'Magistralni' in highway.choice_label %}Magistralni{% else %}Regionalni{% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Cargo Details Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-boxes"></i>📦 Detalji tereta
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.cargo_type.id_for_label }}" class="form-label">Tip tereta</label>
+                                {{ form.cargo_type }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="{{ form.weight.id_for_label }}" class="form-label">Težina (kg)</label>
+                                {{ form.weight }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="{{ form.volume.id_for_label }}" class="form-label">Zapremina (m³)</label>
+                                {{ form.volume }}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label for="{{ form.cargo_description.id_for_label }}" class="form-label">Opis tereta</label>
+                                {{ form.cargo_description }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.offered_price.id_for_label }}" class="form-label">Ponuđena cena (RSD)</label>
+                                {{ form.offered_price }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact & Additional Info -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-address-book"></i>📞 Kontakt i dodatne informacije
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.contact_person.id_for_label }}" class="form-label">Kontakt osoba</label>
+                                {{ form.contact_person }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.contact_phone.id_for_label }}" class="form-label">Kontakt telefon</label>
+                                {{ form.contact_phone }}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label for="{{ form.special_requirements.id_for_label }}" class="form-label">Posebni zahtevi</label>
+                                {{ form.special_requirements }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit Buttons -->
+                <div class="text-center mt-4">
+                    <button type="submit" name="action" value="draft" class="btn btn-outline-primary btn-lg me-3">
+                        <i class="fas fa-save me-2"></i>Sačuvaj kao nacrt
+                    </button>
+                    <button type="submit" name="action" value="publish" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i>Objavi pošiljku
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pickupCitySelect = document.getElementById('{{ form.pickup_city.id_for_label }}');
+    const deliveryCitySelect = document.getElementById('{{ form.delivery_city.id_for_label }}');
+    const routePreview = document.getElementById('route-preview');
+    const routeSteps = document.getElementById('route-steps');
+    
+    // City selection handlers
+    function updateCityInfo(selectElement, infoElementId, detailsElementId) {
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const infoElement = document.getElementById(infoElementId);
+        const detailsElement = document.getElementById(detailsElementId);
+        
+        if (selectedOption.value) {
+            const cityText = selectedOption.text;
+            detailsElement.textContent = cityText;
+            infoElement.classList.add('show');
+        } else {
+            infoElement.classList.remove('show');
+        }
+    }
+    
+    pickupCitySelect.addEventListener('change', function() {
+        updateCityInfo(this, 'pickup-city-info', 'pickup-city-details');
+        updateRoutePreview();
+    });
+    
+    deliveryCitySelect.addEventListener('change', function() {
+        updateCityInfo(this, 'delivery-city-info', 'delivery-city-details');
+        updateRoutePreview();
+    });
+    
+    // Route preview
+    function updateRoutePreview() {
+        const pickupCity = pickupCitySelect.options[pickupCitySelect.selectedIndex];
+        const deliveryCity = deliveryCitySelect.options[deliveryCitySelect.selectedIndex];
+        
+        if (pickupCity.value && deliveryCity.value) {
+            routeSteps.innerHTML = `
+                <div class="route-step">
+                    <div class="route-icon">📍</div>
+                    <div>
+                        <strong>Start:</strong> ${pickupCity.text}
+                    </div>
+                </div>
+                <div class="route-step">
+                    <div class="route-icon">🛣️</div>
+                    <div>
+                        <strong>Ruta:</strong> Automatski će biti predloženo 3-5 najboljih opcija
+                    </div>
+                </div>
+                <div class="route-step">
+                    <div class="route-icon">🎯</div>
+                    <div>
+                        <strong>Cilj:</strong> ${deliveryCity.text}
+                    </div>
+                </div>
+            `;
+            routePreview.style.display = 'block';
+        } else {
+            routePreview.style.display = 'none';
+        }
+    }
+    
+    // Highway selection
+    const highwayOptions = document.querySelectorAll('.highway-option');
+    highwayOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const checkbox = this.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                this.classList.toggle('selected', checkbox.checked);
+            }
+        });
+    });
+    
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const requiredFields = ['pickup_city', 'delivery_city', 'pickup_address', 'delivery_address'];
+        let isValid = true;
+        
+        requiredFields.forEach(fieldName => {
+            const field = document.querySelector(`[name="${fieldName}"]`);
+            if (field && !field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else if (field) {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Molimo popunite sva obavezna polja.');
+        }
+    });
+    
+    // Auto-populate region based on city selection
+    function autoPopulateRegion(citySelect, regionInput) {
+        citySelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                const cityText = selectedOption.text;
+                const regionMatch = cityText.match(/- (.+)$/);
+                if (regionMatch && regionInput) {
+                    regionInput.value = regionMatch[1];
+                }
+            }
+        });
+    }
+    
+    const pickupRegionInput = document.querySelector('[name="pickup_region"]');
+    const deliveryRegionInput = document.querySelector('[name="delivery_region"]');
+    
+    autoPopulateRegion(pickupCitySelect, pickupRegionInput);
+    autoPopulateRegion(deliveryCitySelect, deliveryRegionInput);
+});
+</script>
+{% endblock %}

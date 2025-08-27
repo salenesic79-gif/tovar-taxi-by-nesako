@@ -1,0 +1,486 @@
+{% extends 'transport/base.html' %}
+{% load static %}
+
+{% block title %}Freight Exchange - Tovar Taxi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .freight-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    
+    .freight-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 35px rgba(0,0,0,0.15);
+    }
+    
+    .freight-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 1.5rem;
+        position: relative;
+    }
+    
+    .freight-header::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-top: 10px solid var(--secondary-color);
+    }
+    
+    .route-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 1rem 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .route-arrow {
+        margin: 0 1rem;
+        font-size: 1.5rem;
+        color: var(--accent-color);
+    }
+    
+    .freight-details {
+        padding: 2rem;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+    }
+    
+    .detail-label i {
+        margin-right: 0.5rem;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .detail-value {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+    
+    .price-highlight {
+        background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+    
+    .status-published {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+        border: 2px solid var(--success-color);
+    }
+    
+    .status-assigned {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning-color);
+        border: 2px solid var(--warning-color);
+    }
+    
+    .filters-panel {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border-left: 5px solid var(--primary-color);
+    }
+    
+    .filter-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .filter-group:last-child {
+        margin-bottom: 0;
+    }
+    
+    .search-stats {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 10px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .quick-filters {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .quick-filter-btn {
+        padding: 0.5rem 1.5rem;
+        border: 2px solid var(--border-color);
+        background: white;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .quick-filter-btn:hover,
+    .quick-filter-btn.active {
+        border-color: var(--primary-color);
+        background: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+    }
+    
+    .no-results i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3">
+            <div class="filters-panel">
+                <h4 class="text-gradient mb-3">
+                    <i class="fas fa-filter me-2"></i>Filteri
+                </h4>
+                
+                <form method="get" id="filter-form">
+                    <div class="filter-group">
+                        <label class="form-label">📍 Grad polaska</label>
+                        <select name="pickup_city" class="form-select">
+                            <option value="">Svi gradovi</option>
+                            {% for city in cities %}
+                                <option value="{{ city.id }}" {% if request.GET.pickup_city == city.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ city.name }} ({{ city.postal_code }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="form-label">🎯 Grad odredišta</label>
+                        <select name="delivery_city" class="form-select">
+                            <option value="">Svi gradovi</option>
+                            {% for city in cities %}
+                                <option value="{{ city.id }}" {% if request.GET.delivery_city == city.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ city.name }} ({{ city.postal_code }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="form-label">📦 Tip tereta</label>
+                        <select name="cargo_type" class="form-select">
+                            <option value="">Svi tipovi</option>
+                            <option value="general" {% if request.GET.cargo_type == "general" %}selected{% endif %}>Opšti teret</option>
+                            <option value="fragile" {% if request.GET.cargo_type == "fragile" %}selected{% endif %}>Krhki teret</option>
+                            <option value="hazardous" {% if request.GET.cargo_type == "hazardous" %}selected{% endif %}>Opasni teret</option>
+                            <option value="refrigerated" {% if request.GET.cargo_type == "refrigerated" %}selected{% endif %}>Rashladni teret</option>
+                            <option value="oversized" {% if request.GET.cargo_type == "oversized" %}selected{% endif %}>Nadgabaritni teret</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="form-label">⚖️ Maksimalna težina (kg)</label>
+                        <input type="number" name="max_weight" class="form-control" value="{{ request.GET.max_weight }}" placeholder="npr. 1000">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="form-label">💰 Minimalna cena (RSD)</label>
+                        <input type="number" name="min_price" class="form-control" value="{{ request.GET.min_price }}" placeholder="npr. 10000">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="form-label">📅 Datum preuzimanja</label>
+                        <input type="date" name="pickup_date" class="form-control" value="{{ request.GET.pickup_date }}">
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Primeni filtere
+                        </button>
+                        <a href="{% url 'freight_exchange' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Obriši filtere
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-gradient">
+                    {% if user.profile.user_type == 'carrier' %}
+                        🚛 Moja ugovorena tura
+                    {% else %}
+                        🔄 Freight Exchange
+                    {% endif %}
+                </h1>
+                <div class="d-flex gap-2">
+                    {% if user.profile.user_type == 'shipper' %}
+                        <a href="{% url 'create_shipment' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nova pošiljka
+                        </a>
+                    {% endif %}
+                    <button class="btn btn-outline-primary" onclick="location.reload()">
+                        <i class="fas fa-sync-alt me-2"></i>Osveži
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Quick Filters -->
+            <div class="quick-filters">
+                <div class="quick-filter-btn {% if not request.GET.status %}active{% endif %}" onclick="filterByStatus('')">
+                    Sve pošiljke
+                </div>
+                <div class="quick-filter-btn {% if request.GET.status == 'published' %}active{% endif %}" onclick="filterByStatus('published')">
+                    Dostupne
+                </div>
+                <div class="quick-filter-btn {% if request.GET.status == 'assigned' %}active{% endif %}" onclick="filterByStatus('assigned')">
+                    Dodeljene
+                </div>
+                {% if user.profile.user_type == 'carrier' %}
+                <div class="quick-filter-btn" onclick="filterByMyOffers()">
+                    Moje ponude
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Search Stats -->
+            <div class="search-stats">
+                <div class="row">
+                    <div class="col-md-8">
+                        <strong>{{ shipments|length }}</strong> pošiljki pronađeno
+                        {% if request.GET.pickup_city or request.GET.delivery_city %}
+                            za rutu
+                            {% if pickup_city_name %}{{ pickup_city_name }}{% endif %}
+                            {% if pickup_city_name and delivery_city_name %} → {% endif %}
+                            {% if delivery_city_name %}{{ delivery_city_name }}{% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>Poslednje ažuriranje: {{ last_updated|date:"H:i" }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Shipments List -->
+            {% if shipments %}
+                <div class="row">
+                    {% for shipment in shipments %}
+                        <div class="col-12">
+                            <div class="freight-card">
+                                <div class="freight-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-1">{{ shipment.reference_number }}</h5>
+                                            <small class="opacity-75">{{ shipment.shipper.username }}</small>
+                                        </div>
+                                        <div class="status-badge status-{{ shipment.status }}">
+                                            {{ shipment.get_status_display }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="route-display">
+                                        <span>📍 {{ shipment.pickup_city|default:shipment.pickup_region|default:"Nepoznato" }}</span>
+                                        <span class="route-arrow">→</span>
+                                        <span>🎯 {{ shipment.delivery_city|default:shipment.delivery_region|default:"Nepoznato" }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="freight-details">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="detail-row">
+                                                <div class="detail-label">
+                                                    <i class="fas fa-boxes"></i>Teret
+                                                </div>
+                                                <div class="detail-value">{{ shipment.cargo_description|truncatechars:50 }}</div>
+                                            </div>
+                                            
+                                            <div class="detail-row">
+                                                <div class="detail-label">
+                                                    <i class="fas fa-weight-hanging"></i>Težina
+                                                </div>
+                                                <div class="detail-value">{{ shipment.weight|floatformat:0 }} kg</div>
+                                            </div>
+                                            
+                                            <div class="detail-row">
+                                                <div class="detail-label">
+                                                    <i class="fas fa-calendar-alt"></i>Preuzimanje
+                                                </div>
+                                                <div class="detail-value">{{ shipment.pickup_date|date:"d.m.Y H:i" }}</div>
+                                            </div>
+                                            
+                                            {% if shipment.special_requirements %}
+                                            <div class="detail-row">
+                                                <div class="detail-label">
+                                                    <i class="fas fa-exclamation-circle"></i>Zahtevi
+                                                </div>
+                                                <div class="detail-value">{{ shipment.special_requirements|truncatechars:40 }}</div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="col-md-4 text-center">
+                                            <div class="price-highlight mb-3">
+                                                {{ shipment.offered_price|floatformat:0 }} RSD
+                                            </div>
+                                            
+                                            {% if user.profile.user_type == 'carrier' and shipment.status == 'published' %}
+                                                <a href="{% url 'make_offer' shipment.pk %}" class="btn btn-success w-100 mb-2">
+                                                    <i class="fas fa-handshake me-2"></i>Pošalji ponudu
+                                                </a>
+                                            {% endif %}
+                                            
+                                            <a href="{% url 'shipment_detail' shipment.pk %}" class="btn btn-outline-primary w-100">
+                                                <i class="fas fa-eye me-2"></i>Detalji
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.pickup_city %}&pickup_city={{ request.GET.pickup_city }}{% endif %}{% if request.GET.delivery_city %}&delivery_city={{ request.GET.delivery_city }}{% endif %}">Prva</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.pickup_city %}&pickup_city={{ request.GET.pickup_city }}{% endif %}{% if request.GET.delivery_city %}&delivery_city={{ request.GET.delivery_city }}{% endif %}">Prethodna</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_obj.number }} od {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.pickup_city %}&pickup_city={{ request.GET.pickup_city }}{% endif %}{% if request.GET.delivery_city %}&delivery_city={{ request.GET.delivery_city }}{% endif %}">Sledeća</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.pickup_city %}&pickup_city={{ request.GET.pickup_city }}{% endif %}{% if request.GET.delivery_city %}&delivery_city={{ request.GET.delivery_city }}{% endif %}">Poslednja</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                
+            {% else %}
+                <div class="no-results">
+                    <i class="fas fa-search"></i>
+                    <h3>Nema dostupnih pošiljki</h3>
+                    <p>Pokušajte sa drugačijim filterima ili se vratite kasnije.</p>
+                    {% if user.profile.user_type == 'shipper' %}
+                        <a href="{% url 'create_shipment' %}" class="btn btn-primary mt-3">
+                            <i class="fas fa-plus me-2"></i>Kreiraj prvu pošiljku
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterByStatus(status) {
+    const url = new URL(window.location);
+    if (status) {
+        url.searchParams.set('status', status);
+    } else {
+        url.searchParams.delete('status');
+    }
+    window.location = url;
+}
+
+function filterByMyOffers() {
+    const url = new URL(window.location);
+    url.searchParams.set('my_offers', 'true');
+    window.location = url;
+}
+
+// Auto-submit form on filter change
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filter-form');
+    const selects = filterForm.querySelectorAll('select, input[type="date"]');
+    
+    selects.forEach(select => {
+        select.addEventListener('change', function() {
+            filterForm.submit();
+        });
+    });
+    
+    // Real-time search for number inputs
+    const numberInputs = filterForm.querySelectorAll('input[type="number"]');
+    numberInputs.forEach(input => {
+        let timeout;
+        input.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                filterForm.submit();
+            }, 1000);
+        });
+    });
+});
+</script>
+{% endblock %}

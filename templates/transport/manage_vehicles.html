@@ -1,0 +1,573 @@
+{% extends 'transport/base.html' %}
+{% load static %}
+
+{% block title %}Upravljanje vozilima - Tovar Taxi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .vehicle-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .vehicle-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 35px rgba(0,0,0,0.15);
+    }
+    
+    .vehicle-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 1.5rem;
+        position: relative;
+    }
+    
+    .vehicle-type-icon {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 2rem;
+        opacity: 0.3;
+    }
+    
+    .vehicle-plate {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .vehicle-type {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .vehicle-details {
+        padding: 2rem;
+    }
+    
+    .spec-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .spec-item:last-child {
+        border-bottom: none;
+    }
+    
+    .spec-label {
+        font-weight: 600;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+    }
+    
+    .spec-label i {
+        margin-right: 0.5rem;
+        width: 20px;
+        text-align: center;
+        color: var(--primary-color);
+    }
+    
+    .spec-value {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+    
+    .status-indicator {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+    
+    .status-active {
+        background: var(--success-color);
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    }
+    
+    .status-inactive {
+        background: var(--danger-color);
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+    }
+    
+    .vehicle-actions {
+        padding: 1rem 2rem;
+        background: rgba(248, 249, 250, 0.5);
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .add-vehicle-card {
+        border: 3px dashed var(--primary-color);
+        background: rgba(102, 126, 234, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .add-vehicle-card:hover {
+        background: rgba(102, 126, 234, 0.1);
+        border-color: var(--secondary-color);
+    }
+    
+    .add-vehicle-content {
+        text-align: center;
+        color: var(--primary-color);
+    }
+    
+    .add-vehicle-content i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .vehicle-form-modal .modal-content {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    
+    .vehicle-form-modal .modal-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        border: none;
+    }
+    
+    .vehicle-stats {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-gradient">
+                    <i class="fas fa-truck me-3"></i>Upravljanje vozilima
+                </h1>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVehicleModal">
+                    <i class="fas fa-plus me-2"></i>Dodaj vozilo
+                </button>
+            </div>
+            
+            <!-- Vehicle Stats -->
+            <div class="vehicle-stats">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ total_vehicles }}</div>
+                            <div class="stat-label">Ukupno vozila</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ active_vehicles }}</div>
+                            <div class="stat-label">Aktivna vozila</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ total_capacity|floatformat:0 }}</div>
+                            <div class="stat-label">Ukupna nosivost (kg)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ assigned_vehicles }}</div>
+                            <div class="stat-label">Na ruti</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Vehicles Grid -->
+            <div class="row">
+                {% for vehicle in vehicles %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="vehicle-card">
+                            <div class="vehicle-header">
+                                <div class="status-indicator {% if vehicle.is_active %}status-active{% else %}status-inactive{% endif %}"></div>
+                                <div class="vehicle-type-icon">
+                                    {% if vehicle.vehicle_type == 'van' %}🚐
+                                    {% elif vehicle.vehicle_type == 'truck' %}🚚
+                                    {% elif vehicle.vehicle_type == 'semi_truck' %}🚛
+                                    {% elif vehicle.vehicle_type == 'mega_trailer' %}🚛
+                                    {% else %}🚐{% endif %}
+                                </div>
+                                <div class="vehicle-plate">{{ vehicle.license_plate }}</div>
+                                <div class="vehicle-type">{{ vehicle.get_vehicle_type_display }}</div>
+                            </div>
+                            
+                            <div class="vehicle-details">
+                                <div class="spec-item">
+                                    <div class="spec-label">
+                                        <i class="fas fa-weight-hanging"></i>Nosivost
+                                    </div>
+                                    <div class="spec-value">{{ vehicle.max_weight|floatformat:0 }} kg</div>
+                                </div>
+                                
+                                <div class="spec-item">
+                                    <div class="spec-label">
+                                        <i class="fas fa-cube"></i>Zapremina
+                                    </div>
+                                    <div class="spec-value">{{ vehicle.max_volume|floatformat:1 }} m³</div>
+                                </div>
+                                
+                                {% if vehicle.length %}
+                                <div class="spec-item">
+                                    <div class="spec-label">
+                                        <i class="fas fa-ruler-horizontal"></i>Dimenzije
+                                    </div>
+                                    <div class="spec-value">
+                                        {{ vehicle.length }}×{{ vehicle.width }}×{{ vehicle.height }}m
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="spec-item">
+                                    <div class="spec-label">
+                                        <i class="fas fa-calendar-plus"></i>Dodato
+                                    </div>
+                                    <div class="spec-value">{{ vehicle.created_at|date:"d.m.Y" }}</div>
+                                </div>
+                                
+                                <div class="spec-item">
+                                    <div class="spec-label">
+                                        <i class="fas fa-circle"></i>Status
+                                    </div>
+                                    <div class="spec-value">
+                                        {% if vehicle.is_active %}
+                                            <span class="badge bg-success">Aktivno</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Neaktivno</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="vehicle-actions">
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm flex-fill edit-vehicle-btn" data-vehicle-id="{{ vehicle.id }}">
+                                        <i class="fas fa-edit me-1"></i>Uredi
+                                    </button>
+                                    {% if vehicle.is_active %}
+                                        <button class="btn btn-outline-warning btn-sm toggle-vehicle-btn" data-vehicle-id="{{ vehicle.id }}" data-active="false">
+                                            <i class="fas fa-pause me-1"></i>Deaktiviraj
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-outline-success btn-sm toggle-vehicle-btn" data-vehicle-id="{{ vehicle.id }}" data-active="true">
+                                            <i class="fas fa-play me-1"></i>Aktiviraj
+                                        </button>
+                                    {% endif %}
+                                    <button class="btn btn-outline-danger btn-sm delete-vehicle-btn" data-vehicle-id="{{ vehicle.id }}">
+                                        <i class="fas fa-trash me-1"></i>Obriši
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="vehicle-card add-vehicle-card" data-bs-toggle="modal" data-bs-target="#addVehicleModal">
+                            <div class="add-vehicle-content">
+                                <i class="fas fa-plus-circle"></i>
+                                <h4>Dodaj prvo vozilo</h4>
+                                <p class="mb-0">Kliknite da dodate vozilo u vašu flotu</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                {% if vehicles %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="vehicle-card add-vehicle-card" data-bs-toggle="modal" data-bs-target="#addVehicleModal">
+                            <div class="add-vehicle-content">
+                                <i class="fas fa-plus-circle"></i>
+                                <h4>Dodaj novo vozilo</h4>
+                                <p class="mb-0">Proširite vašu flotu</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Vehicle Modal -->
+<div class="modal fade vehicle-form-modal" id="addVehicleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-truck me-2"></i>Dodaj novo vozilo
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="vehicleForm" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Tip vozila</label>
+                                <select name="vehicle_type" class="form-select" required>
+                                    <option value="">Izaberite tip vozila</option>
+                                    <option value="van">🚐 Kombi</option>
+                                    <option value="truck">🚚 Kamion</option>
+                                    <option value="semi_truck">🚛 Šleper</option>
+                                    <option value="mega_trailer">🚛 Mega trailer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Registarske tablice</label>
+                                <input type="text" name="license_plate" class="form-control" placeholder="BG-123-AB" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Maksimalna nosivost (kg)</label>
+                                <input type="number" name="max_weight" class="form-control" placeholder="1000" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Maksimalna zapremina (m³)</label>
+                                <input type="number" name="max_volume" class="form-control" placeholder="10.5" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Dužina (m)</label>
+                                <input type="number" name="length" class="form-control" placeholder="6.0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Širina (m)</label>
+                                <input type="number" name="width" class="form-control" placeholder="2.5" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Visina (m)</label>
+                                <input type="number" name="height" class="form-control" placeholder="3.0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input type="checkbox" name="is_active" class="form-check-input" id="is_active" checked>
+                                <label class="form-check-label" for="is_active">
+                                    Vozilo je aktivno i dostupno za korišćenje
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Otkaži</button>
+                <button type="submit" form="vehicleForm" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Sačuvaj vozilo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function editVehicle(vehicleId) {
+    // Load vehicle data and populate form
+    fetch(`/transport/vehicle/${vehicleId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const form = document.getElementById('vehicleForm');
+            form.action = `/transport/vehicle/${vehicleId}/edit/`;
+            
+            // Populate form fields
+            Object.keys(data).forEach(key => {
+                const field = form.querySelector(`[name="${key}"]`);
+                if (field) {
+                    if (field.type === 'checkbox') {
+                        field.checked = data[key];
+                    } else {
+                        field.value = data[key];
+                    }
+                }
+            });
+            
+            // Update modal title
+            document.querySelector('#addVehicleModal .modal-title').innerHTML = 
+                '<i class="fas fa-edit me-2"></i>Uredi vozilo';
+            
+            // Show modal
+            new bootstrap.Modal(document.getElementById('addVehicleModal')).show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Greška pri učitavanju podataka o vozilu.');
+        });
+}
+
+function toggleVehicleStatus(vehicleId, isActive) {
+    const action = isActive ? 'aktivirati' : 'deaktivirati';
+    
+    if (confirm(`Da li ste sigurni da želite da ${action} ovo vozilo?`)) {
+        fetch(`/transport/vehicle/${vehicleId}/toggle/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ is_active: isActive })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Greška pri ažuriranju statusa vozila.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Greška pri ažuriranju statusa vozila.');
+        });
+    }
+}
+
+function deleteVehicle(vehicleId) {
+    if (confirm('Da li ste sigurni da želite da obrišete ovo vozilo? Ova akcija se ne može poništiti.')) {
+        fetch(`/transport/vehicle/${vehicleId}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Greška pri brisanju vozila.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Greška pri brisanju vozila.');
+        });
+    }
+}
+
+// Event listeners for vehicle actions
+document.addEventListener('DOMContentLoaded', function() {
+    // Edit vehicle buttons
+    document.querySelectorAll('.edit-vehicle-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const vehicleId = this.getAttribute('data-vehicle-id');
+            editVehicle(vehicleId);
+        });
+    });
+    
+    // Toggle vehicle status buttons
+    document.querySelectorAll('.toggle-vehicle-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const vehicleId = this.getAttribute('data-vehicle-id');
+            const isActive = this.getAttribute('data-active') === 'true';
+            toggleVehicleStatus(vehicleId, isActive);
+        });
+    });
+    
+    // Delete vehicle buttons
+    document.querySelectorAll('.delete-vehicle-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const vehicleId = this.getAttribute('data-vehicle-id');
+            deleteVehicle(vehicleId);
+        });
+    });
+});
+
+// Reset form when modal is closed
+document.getElementById('addVehicleModal').addEventListener('hidden.bs.modal', function () {
+    const form = document.getElementById('vehicleForm');
+    form.reset();
+    form.action = '';
+    document.querySelector('#addVehicleModal .modal-title').innerHTML = 
+        '<i class="fas fa-truck me-2"></i>Dodaj novo vozilo';
+});
+
+// Form submission
+document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const url = this.action || '/transport/vehicle/add/';
+    
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Greška pri čuvanju vozila: ' + (data.error || 'Nepoznata greška'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Greška pri čuvanju vozila.');
+    });
+});
+</script>
+{% endblock %}

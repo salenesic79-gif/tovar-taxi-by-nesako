@@ -65,11 +65,51 @@
 
     <section class="hero-section text-center">
         <div class="container">
-            <h1 class="display-4 mb-4 hero-title">Dobrodošli u Tovar Taxi</h1>
-            <p class="hero-subtitle mb-2">Vaša aplikacija za efikasniji transport.</p>
-            <p class="hero-subtitle mb-4">Sigurno.  Brzo.  Profitabilno.</p>
-            {% if not user.is_authenticated %}
-                <a href="{% url 'signup' %}" class="btn btn-custom btn-lg">Registruj se sada</a>
+            <h1 class="hero-title display-3 mb-4">Tovar Taxi</h1>
+            <p class="hero-subtitle mb-3">Profesionalna B2B logistička platforma za Srbiju</p>
+            <p class="lead mb-5">Povezujemo naručioce transporta sa pouzdanim prevoznicima kroz celu zemlju</p>
+            
+            {% if user.is_authenticated %}
+                {% if user.profile.user_type == 'shipper' %}
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="{% url 'create_shipment' %}" class="btn btn-custom btn-lg px-4 py-3">
+                            <i class="fas fa-shipping-fast me-2"></i>Pošalji teret
+                        </a>
+                        <a href="{% url 'freight_exchange' %}" class="btn btn-custom btn-lg px-4 py-3">
+                            <i class="fas fa-search me-2"></i>Pronađi prevoznike
+                        </a>
+                        <a href="{% url 'dashboard' %}" class="btn btn-custom btn-lg px-4 py-3">
+                            <i class="fas fa-tachometer-alt me-2"></i>Kontrolna tabla
+                        </a>
+                    </div>
+                {% elif user.profile.user_type == 'carrier' %}
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="{% url 'freight_exchange' %}" class="btn btn-custom btn-lg px-4 py-3">
+                            <i class="fas fa-truck me-2"></i>Dostupni tereti
+                        </a>
+                        <a href="{% url 'manage_vehicles' %}" class="btn btn-custom btn-lg px-4 py-3">
+                            <i class="fas fa-cogs me-2"></i>Moja vozila
+                        </a>
+                        <a href="{% url 'dashboard' %}" class="btn btn-custom btn-lg px-4 py-3">
+                            <i class="fas fa-tachometer-alt me-2"></i>Kontrolna tabla
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="{% url 'dashboard' %}" class="btn btn-custom btn-lg px-4 py-3">
+                            <i class="fas fa-tachometer-alt me-2"></i>Kontrolna tabla
+                        </a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{% url 'signup_sender' %}" class="btn btn-custom btn-lg px-4 py-3">
+                        <i class="fas fa-user-plus me-2"></i>Registruj se kao Naručilac
+                    </a>
+                    <a href="{% url 'signup_carrier' %}" class="btn btn-custom btn-lg px-4 py-3">
+                        <i class="fas fa-truck me-2"></i>Registruj se kao Prevoznik
+                    </a>
+                </div>
             {% endif %}
         </div>
     </section>
