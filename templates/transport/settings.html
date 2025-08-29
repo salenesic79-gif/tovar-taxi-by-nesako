@@ -1,74 +1,371 @@
+{% extends 'transport/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="sr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Podešavanja - Tovar Taxi</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            margin: 0;
-        }
-        .navbar-brand {
-            margin-left: 7.5px;
-        }
-        .navbar-brand img {
-            height: 56px;
-            width: auto;
-        }
-        .settings-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 40px;
-        }
-        .main-title {
-            color: #FFD700;
-            font-size: 36px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 30px;
-            text-shadow: 0 0 2px #FFD700, 0 0 4px #FFD700;
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(0, 0, 0);">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 56px; width: auto;">
-            </a>
-            <div class="navbar-nav ms-auto">
-                {% if user.is_authenticated %}
-                    <span class="navbar-text me-3">Dobrodošli, {{ user.username }}!</span>
-                    <a class="nav-link" href="{% url 'logout' %}">Odjavi se</a>
-                {% else %}
-                    <a class="nav-link" href="{% url 'login' %}" style="color: white; border: 2px solid #FFD700; padding: 8px 16px; border-radius: 5px; text-decoration: none;">Prijavi se</a>
-                {% endif %}
-            </div>
-        </div>
-    </nav>
 
-    <!-- Settings Content -->
-    <div class="settings-container">
-        <h1 class="main-title">Podešavanja</h1>
-        
-        <div class="text-center">
-            <p class="lead">Ova stranica će biti nadograđena u budućnosti.</p>
-            <p>Ovde ćete moći da upravljate svojim nalogom i podešavanjima aplikacije.</p>
+{% block title %}Podešavanja - Tovar Taxi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    
+    .settings-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .settings-body {
+        padding: 2rem;
+    }
+    
+    .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .setting-item:last-child {
+        border-bottom: none;
+    }
+    
+    .setting-label {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+    
+    .setting-description {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+    }
+    
+    .notification-badge {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .notification-count {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: var(--danger-color);
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-gradient">
+                    <i class="fas fa-cog me-3"></i>Podešavanja
+                </h1>
+            </div>
             
-            <div class="mt-4">
-                <a href="{% url 'home' %}" class="btn btn-primary btn-lg">Nazad na početnu</a>
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Profil Settings -->
+                    <div class="settings-section">
+                        <div class="settings-header">
+                            <i class="fas fa-user me-2"></i>Profil korisnika
+                        </div>
+                        <div class="settings-body">
+                            <form method="post" action="{% url 'settings' %}">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Ime</label>
+                                            <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}" placeholder="Vaše ime">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Prezime</label>
+                                            <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}" placeholder="Vaše prezime">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" name="email" value="{{ user.email }}" placeholder="vaš@email.com">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Telefon</label>
+                                            <input type="text" class="form-control" name="phone_number" value="{{ user.profile.phone_number|default:'' }}" placeholder="+381 60 123 4567">
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Adresa</label>
+                                            <input type="text" class="form-control" name="address" value="{{ user.profile.address|default:'' }}" placeholder="Ulica i broj, grad">
+                                        </div>
+                                    </div>
+                                    {% if user.profile.user_type == 'carrier' or user.profile.user_type == 'shipper' %}
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Naziv kompanije</label>
+                                            <input type="text" class="form-control" name="company_name" value="{{ user.profile.company_name|default:'' }}" placeholder="Naziv vaše kompanije">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">PIB</label>
+                                            <input type="text" class="form-control" name="tax_number" value="{{ user.profile.tax_number|default:'' }}" placeholder="123456789">
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Sačuvaj promene
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Notification Settings -->
+                    <div class="settings-section">
+                        <div class="settings-header">
+                            <i class="fas fa-bell me-2"></i>Notifikacije
+                        </div>
+                        <div class="settings-body">
+                            <div class="setting-item">
+                                <div>
+                                    <div class="setting-label">Email notifikacije</div>
+                                    <div class="setting-description">Primajte obaveštenja na email adresu</div>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div>
+                                    <div class="setting-label">SMS notifikacije</div>
+                                    <div class="setting-description">Primajte obaveštenja na telefon</div>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="smsNotifications">
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div>
+                                    <div class="setting-label">Push notifikacije</div>
+                                    <div class="setting-description">Obaveštenja u browseru</div>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="pushNotifications" checked>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div>
+                                    <div class="setting-label">Nove ponude</div>
+                                    <div class="setting-description">Obaveštenja o novim ponudama za vaše pošiljke</div>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="offerNotifications" checked>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div>
+                                    <div class="setting-label">Status pošiljke</div>
+                                    <div class="setting-description">Obaveštenja o promeni statusa pošiljke</div>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="statusNotifications" checked>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Privacy Settings -->
+                    <div class="settings-section">
+                        <div class="settings-header">
+                            <i class="fas fa-shield-alt me-2"></i>Privatnost i bezbednost
+                        </div>
+                        <div class="settings-body">
+                            <div class="setting-item">
+                                <div>
+                                    <div class="setting-label">Javni profil</div>
+                                    <div class="setting-description">Omogući drugim korisnicima da vide vaš profil</div>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="publicProfile" checked>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div>
+                                    <div class="setting-label">Prikaži kontakt informacije</div>
+                                    <div class="setting-description">Prikaži telefon i email u ponudama</div>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="showContact" checked>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-outline-warning">
+                                    <i class="fas fa-key me-2"></i>Promeni lozinku
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <!-- Account Info -->
+                    <div class="settings-section">
+                        <div class="settings-header">
+                            <i class="fas fa-info-circle me-2"></i>Informacije o nalogu
+                        </div>
+                        <div class="settings-body">
+                            <div class="setting-item">
+                                <div class="setting-label">Tip korisnika</div>
+                                <div>
+                                    <span class="badge bg-primary">{{ user.profile.get_user_type_display|default:"Nepoznato" }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-label">Status verifikacije</div>
+                                <div>
+                                    {% if user.profile.is_verified %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>Verifikovan
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-clock me-1"></i>Čeka verifikaciju
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-label">Član od</div>
+                                <div class="text-muted">{{ user.date_joined|date:"d.m.Y" }}</div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-label">Poslednja aktivnost</div>
+                                <div class="text-muted">{{ user.last_login|date:"d.m.Y H:i"|default:"Nikad" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    {% if user.profile.user_type == 'shipper' %}
+                    <div class="settings-section">
+                        <div class="settings-header">
+                            <i class="fas fa-chart-bar me-2"></i>Vaša statistika
+                        </div>
+                        <div class="settings-body">
+                            <div class="setting-item">
+                                <div class="setting-label">Ukupno pošiljki</div>
+                                <div class="fw-bold text-primary">{{ user.shipments.count }}</div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-label">Aktivne pošiljke</div>
+                                <div class="fw-bold text-success">{{ user.shipments.filter.status__in:'published,assigned,in_transit'.count }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif user.profile.user_type == 'carrier' %}
+                    <div class="settings-section">
+                        <div class="settings-header">
+                            <i class="fas fa-chart-bar me-2"></i>Vaša statistika
+                        </div>
+                        <div class="settings-body">
+                            <div class="setting-item">
+                                <div class="setting-label">Ukupno vozila</div>
+                                <div class="fw-bold text-primary">{{ user.vehicles.count }}</div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-label">Aktivna vozila</div>
+                                <div class="fw-bold text-success">{{ user.vehicles.filter.is_active:True.count }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Support -->
+                    <div class="settings-section">
+                        <div class="settings-header">
+                            <i class="fas fa-life-ring me-2"></i>Podrška
+                        </div>
+                        <div class="settings-body">
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-outline-primary">
+                                    <i class="fas fa-question-circle me-2"></i>Česta pitanja
+                                </button>
+                                <button type="button" class="btn btn-outline-success">
+                                    <i class="fas fa-envelope me-2"></i>Kontaktiraj podršku
+                                </button>
+                                <button type="button" class="btn btn-outline-info">
+                                    <i class="fas fa-book me-2"></i>Uputstvo za korišćenje
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Save notification settings
+    const switches = document.querySelectorAll('.form-check-input');
+    switches.forEach(function(switchElement) {
+        switchElement.addEventListener('change', function() {
+            const setting = this.id;
+            const enabled = this.checked;
+            
+            // Save to localStorage for now (in production, send to server)
+            localStorage.setItem(setting, enabled);
+            
+            // Show feedback
+            const toast = document.createElement('div');
+            toast.className = 'alert alert-success position-fixed';
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
+            toast.innerHTML = '<i class="fas fa-check me-2"></i>Podešavanje sačuvano!';
+            document.body.appendChild(toast);
+            
+            setTimeout(function() { toast.remove(); }, 2000);
+        });
+        
+        // Load saved settings
+        const saved = localStorage.getItem(switchElement.id);
+        if (saved !== null) {
+            switchElement.checked = saved === 'true';
+        }
+    });
+});
+</script>
+{% endblock %}

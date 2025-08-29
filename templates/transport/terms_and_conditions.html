@@ -1,0 +1,376 @@
+{% extends 'transport/base.html' %}
+{% load static %}
+
+{% block title %}Pravila i uslovi korišćenja - Tovar Taxi{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-contract me-2"></i>
+                        Pravila i uslovi korišćenja
+                    </h1>
+                    <p class="mb-0 mt-2">Tovar Taxi - B2B Logistička platforma</p>
+                </div>
+                
+                <div class="card-body p-5">
+                    <!-- Opšte informacije -->
+                    <section class="mb-5">
+                        <h2 class="h4 text-primary border-bottom pb-2 mb-3">
+                            <i class="fas fa-info-circle me-2"></i>O platformi
+                        </h2>
+                        <p class="lead">
+                            Tovar Taxi je digitalna B2B logistička platforma koja povezuje naručioce transporta sa pouzdanim prevoznicima širom Srbije. 
+                            Naša misija je da omogućimo efikasan, siguran i transparentan transport tereta kroz modernu tehnologiju.
+                        </p>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="bg-light rounded p-3">
+                                    <i class="fas fa-shield-alt fa-2x text-success mb-2"></i>
+                                    <h5>Bezbednost</h5>
+                                    <p class="small">Verifikovani korisnici i sigurne transakcije</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="bg-light rounded p-3">
+                                    <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                                    <h5>Brzina</h5>
+                                    <p class="small">Brzo pronalaženje prevoznika i realizacija</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="bg-light rounded p-3">
+                                    <i class="fas fa-handshake fa-2x text-primary mb-2"></i>
+                                    <h5>Pouzdanost</h5>
+                                    <p class="small">Sistem ocenjivanja i garancije kvaliteta</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Uslovi za naručioce -->
+                    <section class="mb-5">
+                        <h2 class="h4 text-success border-bottom pb-2 mb-3">
+                            <i class="fas fa-user-tie me-2"></i>Uslovi za naručioce transporta
+                        </h2>
+                        
+                        <div class="alert alert-success" role="alert">
+                            <h5 class="alert-heading">
+                                <i class="fas fa-check-circle me-2"></i>Vaše obaveze kao naručilac:
+                            </h5>
+                        </div>
+                        
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item d-flex align-items-start">
+                                <i class="fas fa-clipboard-list text-primary me-3 mt-1"></i>
+                                <div>
+                                    <strong>Tačno opisivanje tereta:</strong> Obavezni ste da navedete tačnu težinu, dimenzije, tip tereta i sve posebne zahteve za transport
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex align-items-start">
+                                <i class="fas fa-clock text-warning me-3 mt-1"></i>
+                                <div>
+                                    <strong>Pravovremena priprema:</strong> Teret mora biti spreman za preuzimanje u dogovoreno vreme. Kašnjenje se naplaćuje 500 RSD po svakih 15 minuta
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex align-items-start">
+                                <i class="fas fa-road text-info me-3 mt-1"></i>
+                                <div>
+                                    <strong>Pristup za utovar:</strong> Obezbeđivanje pristupa vozilu za utovar/istovar i sve potrebne dokumentacije
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex align-items-start">
+                                <i class="fas fa-credit-card text-success me-3 mt-1"></i>
+                                <div>
+                                    <strong>Plaćanje u roku:</strong> Dogovorena cena se plaća u roku od 7 dana od završetka transporta
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex align-items-start">
+                                <i class="fas fa-star text-warning me-3 mt-1"></i>
+                                <div>
+                                    <strong>Ocenjivanje prevoznika:</strong> Obavezno ocenjivanje kvaliteta usluge radi održavanja standarda platforme
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="alert alert-warning" role="alert">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>Penali za naručioce:</h6>
+                            <ul class="mb-0">
+                                <li>Netačne informacije o teretu: do 10% vrednosti pošiljke</li>
+                                <li>Otkazivanje u poslednjem trenutku: 20% dogovorene cene</li>
+                                <li>Kašnjenje u pripremi tereta: 500 RSD po svakih 15 minuta</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- Uslovi za prevoznike -->
+                    <section class="mb-5">
+                        <h2 class="h4 text-info border-bottom pb-2 mb-3">
+                            <i class="fas fa-truck me-2"></i>Uslovi za prevoznike
+                        </h2>
+                        
+                        <div class="alert alert-info" role="alert">
+                            <h5 class="alert-heading">
+                                <i class="fas fa-check-circle me-2"></i>Vaše obaveze kao prevoznik:
+                            </h5>
+                        </div>
+                        
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item d-flex align-items-start">
+                                <i class="fas fa-shield-alt text-success me-3 mt-1"></i>
+                                <div>
+                                    <strong>Bezbedna manipulacija:</strong> Pažljivo rukovanje teretom i odgovornost za njegovu bezbednost tokom transporta
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex align-items-start">
+                                <i class="fas fa-calendar-check text-primary me-3 mt-1"></i>
+                                <div>
+                                    <strong>Poštovanje rokova:</strong> Dostava u dogovoreno vreme. Kašnjenje se penalizuje sa 500 RSD po svakih 15 minuta
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex align-items-start">
+                                <i class="fas fa-map-marker-alt text-danger me-3 mt-1"></i>
+                                <div>
+                                    <strong>Praćenje lokacije:</strong> Omogućavanje GPS praćenja tokom transporta za transparentnost
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex align-items-start">
+                                <i class="fas fa-tools text-warning me-3 mt-1"></i>
+                                <div>
+                                    <strong>Ispravnost vozila:</strong> Održavanje vozila u ispravnom stanju i posedovanje svih potrebnih dozvola
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex align-items-start">
+                                <i class="fas fa-user-check text-info me-3 mt-1"></i>
+                                <div>
+                                    <strong>Profesionalnost:</strong> Kulturno ponašanje prema klijentima i poštovanje poslovnih standarda
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="alert alert-danger" role="alert">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>Penali za prevoznike:</h6>
+                            <ul class="mb-0">
+                                <li>Kašnjenje u dostavi: 500 RSD po svakih 15 minuta</li>
+                                <li>Oštećenje tereta: puna vrednost štete</li>
+                                <li>Neprofesionalno ponašanje: suspenzija naloga</li>
+                                <li>Neažuriranje statusa: upozorenje, zatim suspenzija</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-success" role="alert">
+                            <h6><i class="fas fa-money-bill-wave me-2"></i>Zarada i isplata:</h6>
+                            <ul class="mb-0">
+                                <li>Platforma zadržava 5% od svake uspešne transakcije</li>
+                                <li>Isplata se vrši u roku od 3 radna dana</li>
+                                <li>Bonusi za visoke ocene i pouzdanost</li>
+                                <li>Dodatni bonusi za redovne korisnike</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- Ograničenja odgovornosti -->
+                    <section class="mb-5">
+                        <h2 class="h4 text-warning border-bottom pb-2 mb-3">
+                            <i class="fas fa-balance-scale me-2"></i>Ograničenja odgovornosti
+                        </h2>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 border-warning">
+                                    <div class="card-header bg-warning text-dark">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-building me-2"></i>Odgovornost platforme
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled">
+                                            <li><i class="fas fa-check text-success me-2"></i>Maksimalno 50.000 RSD po pošiljci</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Samo za greške platforme</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Medijacija u sporovima</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Tehnička podrška 24/7</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 border-info">
+                                    <div class="card-header bg-info text-white">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-truck me-2"></i>Odgovornost prevoznika
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled">
+                                            <li><i class="fas fa-check text-success me-2"></i>100 RSD po kilogramu tereta</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Maksimalno 500.000 RSD po pošiljci</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Obavezno osiguranje vozila</li>
+                                            <li><i class="fas fa-check text-success me-2"></i>Dodatno osiguranje za vredan teret</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-3" role="alert">
+                            <h6><i class="fas fa-info-circle me-2"></i>Preporučeno osiguranje:</h6>
+                            <p class="mb-0">Za pošiljke veće od 100.000 RSD preporučuje se dodatno osiguranje tereta kroz osiguravajuće kuće.</p>
+                        </div>
+                    </section>
+
+                    <!-- Sistem ocenjivanja -->
+                    <section class="mb-5">
+                        <h2 class="h4 text-primary border-bottom pb-2 mb-3">
+                            <i class="fas fa-star me-2"></i>Sistem ocenjivanja i povratnih informacija
+                        </h2>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p>Naš sistem ocenjivanja omogućava transparentnost i kontinuirano poboljšanje kvaliteta usluga:</p>
+                                
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <i class="fas fa-star text-warning me-2"></i>
+                                        <strong>Obavezno ocenjivanje:</strong> Nakon svake transakcije obe strane se ocenjuju
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-comment text-info me-2"></i>
+                                        <strong>Komentari:</strong> Mogućnost ostavljanja detaljnih komentara
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-chart-line text-success me-2"></i>
+                                        <strong>Prosečna ocena:</strong> Javno dostupna prosečna ocena svih korisnika
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-award text-warning me-2"></i>
+                                        <strong>Bonusi:</strong> Korisnici sa visokim ocenama dobijaju prednost i bonuse
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5>Minimalne ocene</h5>
+                                        <div class="mb-2">
+                                            <span class="badge bg-success fs-6">4.0+ ⭐</span>
+                                            <p class="small mb-0">Preporučeni korisnici</p>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="badge bg-warning fs-6">3.0-3.9 ⭐</span>
+                                            <p class="small mb-0">Standardni korisnici</p>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-danger fs-6">&lt;3.0 ⭐</span>
+                                            <p class="small mb-0">Upozorenje/Suspenzija</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Privatnost i bezbednost -->
+                    <section class="mb-5">
+                        <h2 class="h4 text-success border-bottom pb-2 mb-3">
+                            <i class="fas fa-user-shield me-2"></i>Privatnost i bezbednost podataka
+                        </h2>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-lock text-success me-2"></i>Zaštićeni podaci:</h5>
+                                <ul>
+                                    <li>Lični podaci korisnika</li>
+                                    <li>Finansijski podaci</li>
+                                    <li>Lokacije i rute</li>
+                                    <li>Poslovni podaci</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-eye text-info me-2"></i>Javni podaci:</h5>
+                                <ul>
+                                    <li>Ime i prezime/Naziv kompanije</li>
+                                    <li>Prosečna ocena</li>
+                                    <li>Broj završenih transakcija</li>
+                                    <li>Tip vozila (za prevoznike)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-success" role="alert">
+                            <h6><i class="fas fa-shield-alt me-2"></i>Naše garancije:</h6>
+                            <ul class="mb-0">
+                                <li>Podaci se čuvaju u skladu sa GDPR propisima</li>
+                                <li>SSL enkripcija svih komunikacija</li>
+                                <li>Redovne bezbednosne provere</li>
+                                <li>Mogućnost brisanja naloga i podataka</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- Kontakt i podrška -->
+                    <section class="mb-4">
+                        <h2 class="h4 text-info border-bottom pb-2 mb-3">
+                            <i class="fas fa-headset me-2"></i>Podrška i kontakt
+                        </h2>
+                        
+                        <div class="row">
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="bg-light rounded p-3">
+                                    <i class="fas fa-phone fa-2x text-success mb-2"></i>
+                                    <h6>Telefonska podrška</h6>
+                                    <p class="mb-0">+381 11 123 4567</p>
+                                    <small class="text-muted">24/7 dostupno</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="bg-light rounded p-3">
+                                    <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                                    <h6>Email podrška</h6>
+                                    <p class="mb-0">podrska@tovartaxi.rs</p>
+                                    <small class="text-muted">Odgovor u roku od 2h</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="bg-light rounded p-3">
+                                    <i class="fas fa-comments fa-2x text-warning mb-2"></i>
+                                    <h6>Live Chat</h6>
+                                    <p class="mb-0">Direktno na platformi</p>
+                                    <small class="text-muted">Radnim danima 8-20h</small>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Potvrda prihvatanja -->
+                    <section class="text-center">
+                        <div class="alert alert-primary" role="alert">
+                            <h5 class="alert-heading">
+                                <i class="fas fa-handshake me-2"></i>Prihvatanje uslova
+                            </h5>
+                            <p>Registracijom i korišćenjem Tovar Taxi platforme prihvatate sve navedene uslove i obaveze.</p>
+                            <hr>
+                            <p class="mb-0">
+                                <strong>Poslednja izmena:</strong> {{ "now"|date:"d.m.Y" }} | 
+                                <strong>Verzija:</strong> 2.1
+                            </p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <a href="{% url 'home' %}" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-check me-2"></i>Prihvatam uslove
+                            </a>
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>Nazad na početnu
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

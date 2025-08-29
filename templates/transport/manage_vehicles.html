@@ -232,8 +232,8 @@
                                 <div class="vehicle-type-icon">
                                     {% if vehicle.vehicle_type == 'van' %}🚐
                                     {% elif vehicle.vehicle_type == 'truck' %}🚚
-                                    {% elif vehicle.vehicle_type == 'semi_truck' %}🚛
-                                    {% elif vehicle.vehicle_type == 'mega_trailer' %}🚛
+                                    {% elif vehicle.vehicle_type == 'trailer' %}🚛
+                                    {% elif vehicle.vehicle_type == 'mega' %}🚛
                                     {% else %}🚐{% endif %}
                                 </div>
                                 <div class="vehicle-plate">{{ vehicle.license_plate }}</div>
@@ -357,8 +357,8 @@
                                     <option value="">Izaberite tip vozila</option>
                                     <option value="van">🚐 Kombi</option>
                                     <option value="truck">🚚 Kamion</option>
-                                    <option value="semi_truck">🚛 Šleper</option>
-                                    <option value="mega_trailer">🚛 Mega trailer</option>
+                                    <option value="trailer">🚛 Šleper</option>
+                                    <option value="mega">🚛 Mega trailer</option>
                                 </select>
                             </div>
                         </div>

@@ -15,35 +15,35 @@
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a class="nav-link active" href="{% url 'dashboard' %}">
-                            <i class="fas fa-tachometer-alt"></i> Kontrolna tabla
+                            <i class="fas fa-tachometer-alt me-2"></i>Kontrolna tabla
                         </a>
                     </li>
                     {% if user_type == 'shipper' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'create_shipment' %}">
-                            <i class="fas fa-plus-circle"></i> Pošalji teret
+                            <i class="fas fa-plus-circle me-2"></i>Pošalji teret
                         </a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'freight_exchange' %}">
                             {% if user_type == 'shipper' %}
-                                <i class="fas fa-search"></i> Pronađi prevoznike
+                                <i class="fas fa-search me-2"></i>Pronađi prevoznike
                             {% else %}
-                                <i class="fas fa-truck"></i> Dostupni tereti
+                                <i class="fas fa-truck me-2"></i>Dostupni tereti
                             {% endif %}
                         </a>
                     </li>
                     {% if user_type == 'carrier' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'manage_vehicles' %}">
-                            <i class="fas fa-truck"></i> Moja vozila
+                            <i class="fas fa-truck me-2"></i>Moja vozila
                         </a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'settings' %}">
-                            <i class="fas fa-cog"></i> Podešavanja
+                            <i class="fas fa-cog me-2"></i>Podešavanja
                         </a>
                     </li>
                 </ul>
@@ -62,7 +62,7 @@
                         </a>
                         {% elif user_type == 'carrier' %}
                         <a href="{% url 'freight_exchange' %}" class="btn btn-sm btn-outline-secondary">
-                            <i class="fas fa-truck"></i> Moja ugovorena tura
+                            <i class="fas fa-truck"></i> Dostupni tereti
                         </a>
                         {% endif %}
                     </div>

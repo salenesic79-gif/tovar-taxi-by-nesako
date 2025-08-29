@@ -1,0 +1,658 @@
+{% extends 'transport/base.html' %}
+{% load static %}
+
+{% block title %}Tura #{{ tura.id }} - Tovar Taxi{% endblock %}
+
+{% block extra_css %}
+<style>
+.tura-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.tura-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 30px;
+    color: white;
+    margin-bottom: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.tura-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+.tura-status {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-kreirana { background: #ffc107; color: #000; }
+.status-potvrdjena { background: #28a745; color: #fff; }
+.status-u_toku { background: #17a2b8; color: #fff; }
+.status-preuzeto { background: #fd7e14; color: #fff; }
+.status-isporuceno { background: #6f42c1; color: #fff; }
+.status-otkazana { background: #dc3545; color: #fff; }
+
+.route-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.route-arrow {
+    margin: 0 20px;
+    font-size: 32px;
+    opacity: 0.8;
+}
+
+.tura-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.info-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.info-card h5 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.info-value {
+    font-weight: bold;
+    color: #495057;
+}
+
+.timeline-container {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+    padding-left: 40px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #e9ecef;
+    border: 3px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.timeline-item.completed::before {
+    background: #28a745;
+}
+
+.timeline-item.current::before {
+    background: #007bff;
+    animation: pulse 2s infinite;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    padding: 15px 20px;
+    border-radius: 10px;
+    border-left: 4px solid #e9ecef;
+}
+
+.timeline-item.completed .timeline-content {
+    border-left-color: #28a745;
+}
+
+.timeline-item.current .timeline-content {
+    border-left-color: #007bff;
+}
+
+.timeline-title {
+    font-weight: bold;
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+.timeline-time {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.btn-action {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.btn-chat {
+    background: #25D366;
+    color: white;
+}
+
+.btn-confirm {
+    background: #28a745;
+    color: white;
+}
+
+.btn-reject {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-call {
+    background: #007bff;
+    color: white;
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.transaction-table {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    background: #667eea;
+    color: white;
+    border: none;
+    font-weight: bold;
+    padding: 15px;
+}
+
+.table td {
+    padding: 15px;
+    vertical-align: middle;
+}
+
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-rezervisano { background: #ffc107; color: #000; }
+.status-naplaceno { background: #17a2b8; color: #fff; }
+.status-isplaceno { background: #28a745; color: #fff; }
+.status-refundirano { background: #6c757d; color: #fff; }
+.status-otkazano { background: #dc3545; color: #fff; }
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+    .route-display {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .route-arrow {
+        transform: rotate(90deg);
+        margin: 10px 0;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .tura-status {
+        position: static;
+        margin-bottom: 20px;
+        display: inline-block;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="tura-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="fas fa-route me-2"></i>
+                Tura #{{ tura.id }}
+            </h1>
+            <a href="{% url 'ture_list' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Nazad na ture
+            </a>
+        </div>
+
+        <!-- Tura Header -->
+        <div class="tura-header">
+            <div class="tura-status status-{{ tura.status }}">
+                {{ tura.get_status_display }}
+            </div>
+
+            <div class="route-display">
+                <div class="text-center">
+                    <i class="fas fa-map-marker-alt mb-2"></i><br>
+                    <strong>{{ tura.pocetna_adresa }}</strong>
+                </div>
+                <div class="route-arrow">→</div>
+                <div class="text-center">
+                    <i class="fas fa-flag mb-2"></i><br>
+                    <strong>{{ tura.odredisna_adresa }}</strong>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <h4>{{ tura.cena }} RSD</h4>
+                <p class="mb-0">{{ tura.kolicina_tereta }} t • {{ tura.datum_polaska|date:"d.m.Y H:i" }}</p>
+            </div>
+        </div>
+
+        <!-- Informacije o turi -->
+        <div class="tura-info">
+            <div class="info-card">
+                <h5><i class="fas fa-info-circle"></i>Osnovne informacije</h5>
+                <div class="info-item">
+                    <span class="info-label">Tip tereta:</span>
+                    <span class="info-value">{{ tura.tip_tereta|default:"Nije specificiran" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Vozilo:</span>
+                    <span class="info-value">{{ tura.vehicle.vehicle_type }} - {{ tura.vehicle.license_plate }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Kreirana:</span>
+                    <span class="info-value">{{ tura.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h5><i class="fas fa-users"></i>Učesnici</h5>
+                <div class="info-item">
+                    <span class="info-label">Vozač:</span>
+                    <span class="info-value">{{ tura.vozac.get_full_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Naručilac:</span>
+                    <span class="info-value">{{ tura.narucilac.get_full_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Kontakt:</span>
+                    <span class="info-value">{{ tura.kontakt_narucioca|default:"Nije dostupan" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline-container">
+            <h5><i class="fas fa-clock me-2"></i>Status ture</h5>
+            <div class="timeline">
+                <div class="timeline-item {% if tura.status != 'kreirana' %}completed{% else %}current{% endif %}">
+                    <div class="timeline-content">
+                        <div class="timeline-title">Tura kreirana</div>
+                        <div class="timeline-time">{{ tura.created_at|date:"d.m.Y H:i" }}</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item {% if tura.status == 'potvrdjena' or tura.status == 'preuzeto' or tura.status == 'isporuceno' %}completed{% elif tura.status == 'kreirana' %}current{% endif %}">
+                    <div class="timeline-content">
+                        <div class="timeline-title">Tura potvrđena</div>
+                        <div class="timeline-time">
+                            {% if tura.status != 'kreirana' %}
+                                {{ tura.updated_at|date:"d.m.Y H:i" }}
+                            {% else %}
+                                Čeka se potvrda
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item {% if tura.preuzimanje_potvrdjeno %}completed{% elif tura.status == 'potvrdjena' %}current{% endif %}">
+                    <div class="timeline-content">
+                        <div class="timeline-title">Teret preuzet</div>
+                        <div class="timeline-time">
+                            {% if tura.preuzimanje_vreme %}
+                                {{ tura.preuzimanje_vreme|date:"d.m.Y H:i" }}
+                            {% else %}
+                                Čeka se preuzimanje
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item {% if tura.isporuka_potvrdjena %}completed{% elif tura.status == 'preuzeto' %}current{% endif %}">
+                    <div class="timeline-content">
+                        <div class="timeline-title">Teret isporučen</div>
+                        <div class="timeline-time">
+                            {% if tura.isporuka_vreme %}
+                                {{ tura.isporuka_vreme|date:"d.m.Y H:i" }}
+                            {% else %}
+                                Čeka se isporuka
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transakcije -->
+        {% if transakcije %}
+        <div class="transaction-table">
+            <h5 class="p-3 mb-0 bg-light"><i class="fas fa-money-bill-wave me-2"></i>Transakcije</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Iznos</th>
+                        <th>Status</th>
+                        <th>Provizija</th>
+                        <th>Datum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transakcija in transakcije %}
+                    <tr>
+                        <td>#{{ transakcija.id }}</td>
+                        <td><strong>{{ transakcija.iznos }} RSD</strong></td>
+                        <td>
+                            <span class="status-badge status-{{ transakcija.status }}">
+                                {{ transakcija.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ transakcija.provizija_iznos }} RSD ({{ transakcija.provizija_procenat }}%)</td>
+                        <td>{{ transakcija.datum_transakcije|date:"d.m.Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- Napomene -->
+        {% if tura.napomene %}
+        <div class="info-card mt-4">
+            <h5><i class="fas fa-sticky-note me-2"></i>Napomene</h5>
+            <p class="mb-0">{{ tura.napomene }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Action buttons -->
+        <div class="action-buttons">
+            {% if tura.status != 'kreirana' and tura.status != 'otkazana' %}
+            <a href="{% url 'chat_view' tura.id %}" class="btn-action btn-chat">
+                <i class="fas fa-comments"></i>
+                Otvori chat
+            </a>
+            {% endif %}
+
+            {% if is_vozac and tura.status == 'kreirana' %}
+            <button onclick="potvrdiTuru({{ tura.id }})" class="btn-action btn-confirm">
+                <i class="fas fa-check"></i>
+                Potvrdi turu
+            </button>
+            <button onclick="odbijTuru({{ tura.id }})" class="btn-action btn-reject">
+                <i class="fas fa-times"></i>
+                Odbij turu
+            </button>
+            {% endif %}
+
+            {% if is_vozac and tura.status == 'potvrdjena' %}
+            <button onclick="potvrdiPreuzimanje({{ tura.id }})" class="btn-action btn-confirm">
+                <i class="fas fa-box"></i>
+                Potvrdi preuzimanje
+            </button>
+            {% endif %}
+
+            {% if is_vozac and tura.status == 'preuzeto' %}
+            <button onclick="potvrdiIsporuku({{ tura.id }})" class="btn-action btn-confirm">
+                <i class="fas fa-check-double"></i>
+                Potvrdi isporuku
+            </button>
+            {% endif %}
+
+            <button onclick="initiateCall()" class="btn-action btn-call">
+                <i class="fas fa-phone"></i>
+                Pozovi
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// API pozivi za akcije
+function potvrdiTuru(turaId) {
+    if (!confirm('Da li ste sigurni da želite da potvrdite ovu turu?')) return;
+    
+    fetch(`/api/ture/${turaId}/potvrdi/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Tura je uspešno potvrđena!', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification('Greška: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Greška:', error);
+        showNotification('Greška pri potvrđivanju ture', 'error');
+    });
+}
+
+function odbijTuru(turaId) {
+    const razlog = prompt('Unesite razlog odbijanja ture:');
+    if (!razlog) return;
+    
+    fetch(`/api/ture/${turaId}/odbij/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ razlog: razlog })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Tura je odbijena', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification('Greška: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Greška:', error);
+        showNotification('Greška pri odbijanju ture', 'error');
+    });
+}
+
+function potvrdiPreuzimanje(turaId) {
+    if (!confirm('Da li ste preuzeli teret?')) return;
+    
+    fetch(`/api/ture/${turaId}/preuzeto/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Preuzimanje je potvrđeno!', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification('Greška: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Greška:', error);
+        showNotification('Greška pri potvrđivanju preuzimanja', 'error');
+    });
+}
+
+function potvrdiIsporuku(turaId) {
+    if (!confirm('Da li ste isporučili teret?')) return;
+    
+    fetch(`/api/ture/${turaId}/isporuceno/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Isporuka je potvrđena! Sredstva su isplaćena.', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification('Greška: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Greška:', error);
+        showNotification('Greška pri potvrđivanju isporuke', 'error');
+    });
+}
+
+function initiateCall() {
+    showNotification('Pozivanje će biti implementirano uskoro', 'info');
+}
+
+// Utility funkcije
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function showNotification(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+        ${message}
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

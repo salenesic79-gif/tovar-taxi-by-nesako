@@ -1,0 +1,521 @@
+{% extends 'transport/base.html' %}
+{% load static %}
+
+{% block title %}Moje Ture - Tovar Taxi{% endblock %}
+
+{% block extra_css %}
+<style>
+.tour-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.tour-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+.tour-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.tour-status {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-kreirana { background: #ffc107; color: #000; }
+.status-potvrdjena { background: #28a745; color: #fff; }
+.status-u_toku { background: #17a2b8; color: #fff; }
+.status-preuzeto { background: #fd7e14; color: #fff; }
+.status-isporuceno { background: #6f42c1; color: #fff; }
+.status-otkazana { background: #dc3545; color: #fff; }
+
+.route-info {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    font-size: 18px;
+}
+
+.route-arrow {
+    margin: 0 15px;
+    font-size: 24px;
+    opacity: 0.8;
+}
+
+.tour-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.detail-item {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.detail-label {
+    font-size: 12px;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.detail-value {
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.action-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-chat {
+    background: #25D366;
+    color: white;
+}
+
+.btn-details {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.btn-confirm {
+    background: #28a745;
+    color: white;
+}
+
+.btn-reject {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.notification-badge {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #ff4757;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 1000;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.filter-tab {
+    padding: 10px 20px;
+    border: 2px solid #e9ecef;
+    border-radius: 25px;
+    background: white;
+    color: #495057;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.filter-tab.active,
+.filter-tab:hover {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-route me-2"></i>
+                    {% if user_type == 'carrier' %}
+                        Moje Ture - Vozač
+                    {% else %}
+                        Moje Ture - Naručilac
+                    {% endif %}
+                </h1>
+                <a href="{% url 'notifikacije' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-bell me-2"></i>Notifikacije
+                </a>
+            </div>
+
+            <!-- Filter tabs -->
+            <div class="filter-tabs">
+                <a href="?status=all" class="filter-tab active">
+                    <i class="fas fa-list me-2"></i>Sve ture
+                </a>
+                <a href="?status=kreirana" class="filter-tab">
+                    <i class="fas fa-clock me-2"></i>Kreirana
+                </a>
+                <a href="?status=potvrdjena" class="filter-tab">
+                    <i class="fas fa-check me-2"></i>Potvrđena
+                </a>
+                <a href="?status=u_toku" class="filter-tab">
+                    <i class="fas fa-truck me-2"></i>U toku
+                </a>
+                <a href="?status=isporuceno" class="filter-tab">
+                    <i class="fas fa-flag-checkered me-2"></i>Isporučeno
+                </a>
+            </div>
+
+            {% if ture %}
+                {% for tura in ture %}
+                <div class="tour-card">
+                    <div class="tour-status status-{{ tura.status }}">
+                        {{ tura.get_status_display }}
+                    </div>
+
+                    <div class="route-info">
+                        <div>
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            <strong>{{ tura.pocetna_adresa }}</strong>
+                        </div>
+                        <div class="route-arrow">→</div>
+                        <div>
+                            <i class="fas fa-flag me-2"></i>
+                            <strong>{{ tura.odredisna_adresa }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="tour-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Datum polaska</div>
+                            <div class="detail-value">
+                                <i class="fas fa-calendar me-2"></i>
+                                {{ tura.datum_polaska|date:"d.m.Y H:i" }}
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Količina tereta</div>
+                            <div class="detail-value">
+                                <i class="fas fa-weight me-2"></i>
+                                {{ tura.kolicina_tereta }} t
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Cena</div>
+                            <div class="detail-value">
+                                <i class="fas fa-money-bill-wave me-2"></i>
+                                {{ tura.cena }} RSD
+                            </div>
+                        </div>
+                        {% if user_type == 'carrier' %}
+                        <div class="detail-item">
+                            <div class="detail-label">Naručilac</div>
+                            <div class="detail-value">
+                                <i class="fas fa-user me-2"></i>
+                                {{ tura.narucilac.get_full_name }}
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="detail-item">
+                            <div class="detail-label">Vozač</div>
+                            <div class="detail-value">
+                                <i class="fas fa-user-tie me-2"></i>
+                                {{ tura.vozac.get_full_name }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="action-buttons">
+                        <a href="{% url 'tura_detail' tura.id %}" class="btn-action btn-details">
+                            <i class="fas fa-info-circle"></i>
+                            Detalji
+                        </a>
+                        
+                        {% if tura.status != 'kreirana' and tura.status != 'otkazana' %}
+                        <a href="{% url 'chat_view' tura.id %}" class="btn-action btn-chat">
+                            <i class="fas fa-comments"></i>
+                            Chat
+                        </a>
+                        {% endif %}
+
+                        {% if user_type == 'carrier' and tura.status == 'kreirana' %}
+                        <button onclick="potvrdiTuru({{ tura.id }})" class="btn-action btn-confirm">
+                            <i class="fas fa-check"></i>
+                            Potvrdi
+                        </button>
+                        <button onclick="odbijTuru({{ tura.id }})" class="btn-action btn-reject">
+                            <i class="fas fa-times"></i>
+                            Odbij
+                        </button>
+                        {% endif %}
+
+                        {% if user_type == 'carrier' and tura.status == 'potvrdjena' %}
+                        <button onclick="potvrdiPreuzimanje({{ tura.id }})" class="btn-action btn-confirm">
+                            <i class="fas fa-box"></i>
+                            Preuzeto
+                        </button>
+                        {% endif %}
+
+                        {% if user_type == 'carrier' and tura.status == 'preuzeto' %}
+                        <button onclick="potvrdiIsporuku({{ tura.id }})" class="btn-action btn-confirm">
+                            <i class="fas fa-check-double"></i>
+                            Isporučeno
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-route"></i>
+                    <h3>Nema tura</h3>
+                    <p>
+                        {% if user_type == 'carrier' %}
+                            Trenutno nemate dodeljenih tura. Čekajte da vam sistem dodeli novu turu.
+                        {% else %}
+                            Nemate kreiran nijednu turu. Idite na Freight Exchange da biste kreirali novu pošiljku.
+                        {% endif %}
+                    </p>
+                    {% if user_type != 'carrier' %}
+                    <a href="{% url 'freight_exchange' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus me-2"></i>Kreiraj novu pošiljku
+                    </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Notification badge -->
+<div id="notificationBadge" class="notification-badge" style="display: none;">
+    <i class="fas fa-bell me-2"></i>
+    <span id="notificationCount">0</span> novih notifikacija
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Real-time notifikacije
+function loadNotifications() {
+    fetch('/api/notifikacije/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.count > 0) {
+                document.getElementById('notificationCount').textContent = data.count;
+                document.getElementById('notificationBadge').style.display = 'block';
+            } else {
+                document.getElementById('notificationBadge').style.display = 'none';
+            }
+        })
+        .catch(error => console.error('Greška pri učitavanju notifikacija:', error));
+}
+
+// API pozivi za akcije
+function potvrdiTuru(turaId) {
+    if (!confirm('Da li ste sigurni da želite da potvrdite ovu turu?')) return;
+    
+    fetch(`/api/ture/${turaId}/potvrdi/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Tura je uspešno potvrđena!', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification('Greška: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Greška:', error);
+        showNotification('Greška pri potvrđivanju ture', 'error');
+    });
+}
+
+function odbijTuru(turaId) {
+    const razlog = prompt('Unesite razlog odbijanja ture:');
+    if (!razlog) return;
+    
+    fetch(`/api/ture/${turaId}/odbij/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ razlog: razlog })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Tura je odbijena', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification('Greška: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Greška:', error);
+        showNotification('Greška pri odbijanju ture', 'error');
+    });
+}
+
+function potvrdiPreuzimanje(turaId) {
+    if (!confirm('Da li ste preuzeli teret?')) return;
+    
+    fetch(`/api/ture/${turaId}/preuzeto/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Preuzimanje je potvrđeno!', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification('Greška: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Greška:', error);
+        showNotification('Greška pri potvrđivanju preuzimanja', 'error');
+    });
+}
+
+function potvrdiIsporuku(turaId) {
+    if (!confirm('Da li ste isporučili teret?')) return;
+    
+    fetch(`/api/ture/${turaId}/isporuceno/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Isporuka je potvrđena! Sredstva su isplaćena.', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification('Greška: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Greška:', error);
+        showNotification('Greška pri potvrđivanju isporuke', 'error');
+    });
+}
+
+// Utility funkcije
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function showNotification(message, type) {
+    // Kreiranje toast notifikacije
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+    toast.style.cssText = 'top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+        ${message}
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Učitaj notifikacije na početku i svakih 30 sekundi
+loadNotifications();
+setInterval(loadNotifications, 30000);
+</script>
+{% endblock %}

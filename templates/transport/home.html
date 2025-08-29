@@ -15,10 +15,12 @@
         .hero-title {
             font-weight: bold;
             text-shadow: 0 0 2px #FFD700, 0 0 4px #FFD700;
+            word-wrap: break-word;
         }
         .hero-subtitle {
             font-size: 1.4rem;
             font-weight: 600;
+            word-wrap: break-word;
         }
         .btn-custom {
             background-color: #e9ecef !important;
@@ -33,9 +35,26 @@
         .feature-card {
             transition: transform 0.3s;
             border: 2px solid #FFD700;
+            overflow: hidden;
         }
         .feature-card:hover {
             transform: translateY(-5px);
+        }
+        .feature-card .card-body {
+            padding: 1.5rem;
+        }
+        .feature-card .card-title {
+            font-size: 1.25rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .feature-card .card-text {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .feature-card i {
+            vertical-align: middle;
+            margin-right: 0.5rem;
         }
         .navbar-brand {
             margin-left: 7.5px;
@@ -43,6 +62,19 @@
         .navbar-brand img {
             height: 56px;
             width: auto;
+        }
+        
+        /* Icon and text alignment */
+        .btn i, .card-title i, .list-group-item i {
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+        
+        /* Text overflow prevention */
+        .card-text, .list-group-item {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
     </style>
 </head>
@@ -116,39 +148,73 @@
 
     <section class="py-5">
         <div class="container">
+            <!-- Zlatna horizontalna linija -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <hr style="border: 2px solid #FFD700; margin: 2rem 0; box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);">
+                </div>
+            </div>
+            
             <div class="row text-center">
-                <div class="col-md-4 mb-4">
-                    <div class="card feature-card h-100">
-                        <div class="card-body">
+                <!-- Naručilac sekcija - levo -->
+                <div class="col-md-6 mb-4">
+                    <div class="card feature-card h-100" style="border-left: 4px solid #FFD700;">
+                        <div class="card-header bg-primary text-white">
+                            <h4><i class="fas fa-user-tie me-2"></i>Za Naručioce Transporta</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column">
                             <div class="mb-3">
-                                <i class="fas fa-truck fa-3x text-primary"></i>
+                                <i class="fas fa-shipping-fast fa-4x text-primary"></i>
                             </div>
-                            <h5 class="card-title">Transport</h5>
-                            <p class="card-text">Organizujemo brz i siguran transport Vaše robe na teritoriji cele Srbije</p>
+                            <h5 class="card-title">Pošaljite Teret Brzo i Sigurno</h5>
+                            <p class="card-text flex-grow-1">
+                                • Jednostavno kreiranje pošiljki<br>
+                                • Automatski predlozi ruta<br>
+                                • Praćenje u realnom vremenu<br>
+                                • Dinamičko formiranje cena<br>
+                                • Ocenjivanje prevoznika
+                            </p>
+                            <div class="mt-auto">
+                                <a href="{% url 'signup_sender' %}" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-user-plus me-2"></i>Registruj se kao Naručilac
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card feature-card h-100">
-                        <div class="card-body">
+                
+                <!-- Prevoznik sekcija - desno -->
+                <div class="col-md-6 mb-4">
+                    <div class="card feature-card h-100" style="border-right: 4px solid #FFD700;">
+                        <div class="card-header bg-success text-white">
+                            <h4><i class="fas fa-truck me-2"></i>Za Prevoznike</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column">
                             <div class="mb-3">
-                                <i class="fas fa-shield-alt fa-3x text-success"></i>
+                                <i class="fas fa-route fa-4x text-success"></i>
                             </div>
-                            <h5 class="card-title">Sigurnost</h5>
-                            <p class="card-text">Uzajamno poštovanje je temelj svake sigurne saradnje. Precizan opis tereta garantuje siguran transport, dok dosledno poštovanje dogovora osigurava bezbrižnu isporuku.</p>
+                            <h5 class="card-title">Optimizujte Svoje Rute</h5>
+                            <p class="card-text flex-grow-1">
+                                • Notifikacije za nove tereti<br>
+                                • Upravljanje voznim parkom<br>
+                                • GPS praćenje lokacije<br>
+                                • Automatski obračun zarade<br>
+                                • Sistem vremenskih bonusa
+                            </p>
+                            <div class="mt-auto">
+                                <a href="{% url 'signup_carrier' %}" class="btn btn-success btn-lg w-100">
+                                    <i class="fas fa-truck me-2"></i>Registruj se kao Prevoznik
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card feature-card h-100">
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <i class="fas fa-clock fa-3x text-warning"></i>
-                            </div>
-                            <h5 class="card-title">Dostupnost</h5>
-                            <p class="card-text">Vozači su u pokretu– Vaša pošiljka spremna.<br>Brza i pouzdana isporuka već je na putu</p>
-                        </div>
-                    </div>
+            </div>
+            
+            <!-- Dodatna zlatna linija na dnu -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <hr style="border: 2px solid #FFD700; margin: 2rem 0; box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);">
                 </div>
             </div>
         </div>

@@ -10,7 +10,7 @@ SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
 # DEBUG mod
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Aplikacije
 INSTALLED_APPS = [

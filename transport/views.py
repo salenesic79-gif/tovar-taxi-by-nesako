@@ -1,20 +1,30 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth import login
 from django.contrib import messages
+from django.contrib.auth.views import LogoutView
 from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods, require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
-from django.db.models import Q, Count
+from django.db.models import Q
+from django.utils import timezone
+import json
+from .models import (
+    Profile, Shipment, Vehicle, ShipmentOffer, City, Route,
+    Tour, Transaction, ChatMessage, TourNotification
+)
+from .forms import SignUpForm, ShipmentForm, VehicleForm, ShipmentOfferForm
+from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView
 from django.utils.decorators import method_decorator
-from django.contrib.auth.mixins import LoginRequiredMixin
-import json
-from .models import Profile, Shipment, Vehicle, ShipmentOffer, City, Highway, Route, RouteHighway
-from .forms import SignUpForm, ShipmentForm, VehicleForm, ShipmentOfferForm
-import json
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LogoutView
+
+def terms_and_conditions(request):
+    return render(request, 'transport/terms_and_conditions.html')
 
 def signup_view(request):
     return render(request, 'transport/signup.html')
@@ -24,17 +34,17 @@ def signup_sender_view(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Create profile with shipper type
             Profile.objects.create(
                 user=user,
                 user_type='shipper',
-                phone_number=form.cleaned_data.get('phone_number', ''),
-                address=form.cleaned_data.get('address', ''),
-                company_name=form.cleaned_data.get('company_name', ''),
-                tax_number=form.cleaned_data.get('tax_number', '')
+                phone_number=form.cleaned_data.get('phone_number'),
+                address=form.cleaned_data.get('address')
             )
             login(request, user)
+            messages.success(request, 'Uspešno ste se registrovali kao Naručilac transporta!')
             return redirect('dashboard')
+        else:
+            messages.error(request, 'Molimo ispravite greške u formi.')
     else:
         form = SignUpForm()
     return render(request, 'transport/signup_sender.html', {'form': form})
@@ -54,7 +64,10 @@ def signup_carrier_view(request):
                 tax_number=form.cleaned_data.get('tax_number', '')
             )
             login(request, user)
+            messages.success(request, 'Uspešno ste se registrovali kao Prevoznik!')
             return redirect('dashboard')
+        else:
+            messages.error(request, 'Molimo ispravite greške u formi.')
     else:
         form = SignUpForm()
     return render(request, 'transport/signup_carrier.html', {'form': form})
@@ -305,8 +318,109 @@ def manage_vehicles(request):
     
     return render(request, 'transport/manage_vehicles.html', context)
 
+@login_required
 def settings_view(request):
+    if request.method == 'POST':
+        # Update user profile
+        user = request.user
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.email = request.POST.get('email', '')
+        user.save()
+        
+        # Update profile
+        profile = user.profile
+        profile.phone_number = request.POST.get('phone_number', '')
+        profile.address = request.POST.get('address', '')
+        profile.company_name = request.POST.get('company_name', '')
+        profile.tax_number = request.POST.get('tax_number', '')
+        profile.save()
+        
+        messages.success(request, 'Podešavanja su uspešno sačuvana!')
+        return redirect('settings')
+    
     return render(request, 'transport/settings.html')
+
+
+# ==================== TURE I CHAT VIEWS ====================
+
+@login_required
+def ture_list(request):
+    """Prikaz svih tura korisnika"""
+    try:
+        profile = request.user.profile
+    except Profile.DoesNotExist:
+        Profile.objects.create(user=request.user)
+        profile = request.user.profile
+    
+    if profile.user_type == 'carrier':
+        ture = Tour.objects.filter(vozac=request.user).order_by('-created_at')
+    else:
+        ture = Tour.objects.filter(narucilac=request.user).order_by('-created_at')
+    
+    context = {
+        'ture': ture,
+        'user_type': profile.user_type
+    }
+    return render(request, 'transport/ture_list.html', context)
+
+
+@login_required
+def tura_detail(request, tura_id):
+    """Detaljan prikaz ture"""
+    tura = get_object_or_404(Tour, id=tura_id)
+    
+    # Proveri dozvole
+    if request.user not in [tura.vozac, tura.narucilac]:
+        messages.error(request, 'Nemate dozvolu za pristup ovoj turi.')
+        return redirect('ture_list')
+    
+    transakcije = tura.transakcije.all()
+    
+    context = {
+        'tura': tura,
+        'transakcije': transakcije,
+        'is_vozac': request.user == tura.vozac,
+        'is_narucilac': request.user == tura.narucilac
+    }
+    return render(request, 'transport/tura_detail.html', context)
+
+
+@login_required
+def chat_view(request, tura_id):
+    """Chat između vozača i naručioca"""
+    tura = get_object_or_404(Tour, id=tura_id)
+    
+    # Proveri dozvole
+    if request.user not in [tura.vozac, tura.narucilac]:
+        messages.error(request, 'Nemate dozvolu za pristup ovom chatu.')
+        return redirect('ture_list')
+    
+    # Označi poruke kao pročitane
+    tura.chat_poruke.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+    
+    poruke = tura.chat_poruke.all().select_related('sender')
+    
+    context = {
+        'tura': tura,
+        'poruke': poruke,
+        'other_user': tura.narucilac if request.user == tura.vozac else tura.vozac
+    }
+    return render(request, 'transport/chat.html', context)
+
+
+@login_required
+def notifikacije_view(request):
+    """Prikaz notifikacija korisnika"""
+    notifikacije = request.user.tour_notifications.all().order_by('-created_at')[:50]
+    
+    # Označi kao pročitane kada korisnik otvori stranicu
+    request.user.tour_notifications.filter(is_read=False).update(is_read=True)
+    
+    context = {
+        'notifikacije': notifikacije
+    }
+    return render(request, 'transport/notifikacije.html', context)
 
 def generate_route_suggestions(shipment):
     """Generate 3-5 route suggestions for a shipment"""
