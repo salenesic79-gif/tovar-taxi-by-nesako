@@ -1,0 +1,187 @@
+{% extends 'transport/base.html' %}
+{% load static %}
+
+{% block title %}WebSocket Test - Tovar Taxi{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">🔧 WebSocket Test Interface</h1>
+            
+            <div class="alert alert-info">
+                <strong>Info:</strong> Ova stranica je namenjena za testiranje WebSocket funkcionalnosti tokom razvoja.
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📍 Location Tracking Test</h5>
+                </div>
+                <div class="card-body">
+                    <button id="startLocationTest" class="btn btn-primary">Start Location Test</button>
+                    <button id="stopLocationTest" class="btn btn-danger">Stop Location Test</button>
+                    <div id="locationStatus" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>🔔 Notifications Test</h5>
+                </div>
+                <div class="card-body">
+                    <button id="testNotification" class="btn btn-success">Send Test Notification</button>
+                    <div id="notificationStatus" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📊 WebSocket Connection Status</h5>
+                </div>
+                <div class="card-body">
+                    <div id="connectionStatus" class="alert alert-secondary">
+                        Disconnected
+                    </div>
+                    <div id="messageLog" style="height: 300px; overflow-y: scroll; border: 1px solid #ddd; padding: 10px;">
+                        <!-- Messages will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let locationSocket = null;
+    let notificationSocket = null;
+    let locationInterval = null;
+    
+    const connectionStatus = document.getElementById('connectionStatus');
+    const messageLog = document.getElementById('messageLog');
+    
+    function logMessage(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        messageLog.innerHTML += `<div><strong>[${timestamp}]</strong> ${message}</div>`;
+        messageLog.scrollTop = messageLog.scrollHeight;
+    }
+    
+    function updateConnectionStatus(status, type) {
+        if (status === 'connected') {
+            connectionStatus.className = 'alert alert-success';
+            connectionStatus.textContent = `Connected (${type})`;
+        } else {
+            connectionStatus.className = 'alert alert-danger';
+            connectionStatus.textContent = 'Disconnected';
+        }
+    }
+    
+    // Location tracking test
+    document.getElementById('startLocationTest').addEventListener('click', function() {
+        if (locationSocket) {
+            locationSocket.close();
+        }
+        
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/location/`;
+        
+        locationSocket = new WebSocket(wsUrl);
+        
+        locationSocket.onopen = function(e) {
+            logMessage('Location WebSocket connected');
+            updateConnectionStatus('connected', 'Location');
+            
+            // Start sending fake GPS coordinates
+            locationInterval = setInterval(function() {
+                const fakeLocation = {
+                    latitude: 44.7866 + (Math.random() - 0.5) * 0.01,
+                    longitude: 20.4489 + (Math.random() - 0.5) * 0.01,
+                    accuracy: Math.random() * 10 + 5,
+                    shipment_id: 1
+                };
+                
+                locationSocket.send(JSON.stringify(fakeLocation));
+                logMessage(`Sent location: ${fakeLocation.latitude.toFixed(6)}, ${fakeLocation.longitude.toFixed(6)}`);
+            }, 2000);
+        };
+        
+        locationSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            logMessage(`Location response: ${data.message || JSON.stringify(data)}`);
+        };
+        
+        locationSocket.onclose = function(e) {
+            logMessage('Location WebSocket disconnected');
+            updateConnectionStatus('disconnected');
+            if (locationInterval) {
+                clearInterval(locationInterval);
+            }
+        };
+        
+        locationSocket.onerror = function(e) {
+            logMessage('Location WebSocket error: ' + e);
+        };
+    });
+    
+    document.getElementById('stopLocationTest').addEventListener('click', function() {
+        if (locationSocket) {
+            locationSocket.close();
+        }
+        if (locationInterval) {
+            clearInterval(locationInterval);
+        }
+    });
+    
+    // Notification test
+    document.getElementById('testNotification').addEventListener('click', function() {
+        if (notificationSocket) {
+            notificationSocket.close();
+        }
+        
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/notifications/`;
+        
+        notificationSocket = new WebSocket(wsUrl);
+        
+        notificationSocket.onopen = function(e) {
+            logMessage('Notification WebSocket connected');
+            updateConnectionStatus('connected', 'Notifications');
+            
+            // Send test notification
+            const testNotification = {
+                type: 'test_notification',
+                title: 'Test Notification',
+                message: 'This is a test notification from WebSocket',
+                user_id: {{ user.id }}
+            };
+            
+            notificationSocket.send(JSON.stringify(testNotification));
+        };
+        
+        notificationSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            logMessage(`Notification received: ${data.title || JSON.stringify(data)}`);
+        };
+        
+        notificationSocket.onclose = function(e) {
+            logMessage('Notification WebSocket disconnected');
+            updateConnectionStatus('disconnected');
+        };
+        
+        notificationSocket.onerror = function(e) {
+            logMessage('Notification WebSocket error: ' + e);
+        };
+    });
+});
+</script>
+{% endblock %}

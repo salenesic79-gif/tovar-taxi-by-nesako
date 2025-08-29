@@ -1,0 +1,113 @@
+{% extends 'transport/base.html' %}
+{% load static %}
+
+{% block title %}Pošaljite ponudu - Tovar Taxi{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">📝 Pošaljite ponudu za pošiljku #{{ shipment.reference_number }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="{{ form.vehicle.id_for_label }}">🚛 Izaberite vozilo:</label>
+                            {{ form.vehicle }}
+                            {% if form.vehicle.errors %}
+                                <div class="text-danger">{{ form.vehicle.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.price.id_for_label }}">💰 Vaša cena (RSD):</label>
+                            {{ form.price }}
+                            {% if form.price.errors %}
+                                <div class="text-danger">{{ form.price.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Ponuđena cena naručioca: <strong>{{ shipment.offered_price|floatformat:0 }} RSD</strong>
+                            </small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.message.id_for_label }}">💬 Poruka naručiocu (opciono):</label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                                <div class="text-danger">{{ form.message.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane"></i> Pošaljite ponudu
+                            </button>
+                            <a href="{% url 'shipment_detail' shipment.pk %}" class="btn btn-secondary btn-lg ml-2">
+                                <i class="fas fa-arrow-left"></i> Nazad
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">📦 Detalji pošiljke</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Ruta:</strong></p>
+                    <p class="mb-2">
+                        📍 {{ shipment.pickup_city }}<br>
+                        🎯 {{ shipment.delivery_city }}
+                    </p>
+                    
+                    <p><strong>Teret:</strong></p>
+                    <p class="mb-2">
+                        {{ shipment.get_cargo_type_display }}<br>
+                        {{ shipment.weight }} kg
+                        {% if shipment.volume %} / {{ shipment.volume }} m³{% endif %}
+                    </p>
+                    
+                    <p><strong>Datum preuzimanja:</strong></p>
+                    <p class="mb-2">{{ shipment.pickup_date|date:"d.m.Y H:i" }}</p>
+                    
+                    <p><strong>Ponuđena cena:</strong></p>
+                    <h5 class="text-success">{{ shipment.offered_price|floatformat:0 }} RSD</h5>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">💡 Saveti za ponudu</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Budite realni sa cenom
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Navedite dodatne usluge
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Budite profesionalni
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Odgovorite brzo
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

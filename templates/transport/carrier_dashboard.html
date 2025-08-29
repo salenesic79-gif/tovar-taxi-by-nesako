@@ -1,0 +1,205 @@
+{% extends 'transport/base.html' %}
+{% load static %}
+
+{% block title %}Prevoznik Dashboard - Tovar Taxi{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">🚛 Prevoznik Dashboard</h1>
+                <div class="text-muted">
+                    Dobrodošli, {{ user.get_full_name|default:user.username }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ total_vehicles }}</h4>
+                            <p class="card-text">Ukupno vozila</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-truck fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ active_vehicles }}</h4>
+                            <p class="card-text">Aktivna vozila</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ total_offers }}</h4>
+                            <p class="card-text">Ukupno ponuda</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-handshake fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ accepted_offers }}</h4>
+                            <p class="card-text">Prihvaćene ponude</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-thumbs-up fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">🚀 Brze akcije</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'freight_exchange' %}" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-search mb-2"></i><br>
+                                Pretraži ture
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'manage_vehicles' %}" class="btn btn-success btn-lg w-100">
+                                <i class="fas fa-truck mb-2"></i><br>
+                                Upravljaj vozilima
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'ture_list' %}" class="btn btn-info btn-lg w-100">
+                                <i class="fas fa-route mb-2"></i><br>
+                                Moje ture
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'notifikacije' %}" class="btn btn-warning btn-lg w-100">
+                                <i class="fas fa-bell mb-2"></i><br>
+                                Notifikacije
+                                {% if notifications.count > 0 %}
+                                <span class="badge badge-danger">{{ notifications.count }}</span>
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Tours and Notifications -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">📋 Poslednje ture</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_tours %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Ruta</th>
+                                        <th>Status</th>
+                                        <th>Cena</th>
+                                        <th>Datum</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tura in recent_tours %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'tura_detail' tura.id %}" class="text-decoration-none">
+                                                #{{ tura.id }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                📍 {{ tura.pocetna_adresa|truncatechars:20 }}<br>
+                                                🎯 {{ tura.odredisna_adresa|truncatechars:20 }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-{% if tura.status == 'potvrdjena' %}success{% elif tura.status == 'u_toku' %}primary{% elif tura.status == 'isporuceno' %}info{% else %}secondary{% endif %}">
+                                                {{ tura.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ tura.cena|floatformat:0 }} RSD</td>
+                                        <td>{{ tura.datum_polaska|date:"d.m.Y" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Nemate još uvek tura.</p>
+                        <a href="{% url 'freight_exchange' %}" class="btn btn-primary">Pretraži dostupne ture</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">🔔 Notifikacije</h5>
+                </div>
+                <div class="card-body">
+                    {% if notifications %}
+                        {% for notif in notifications %}
+                        <div class="alert alert-{% if notif.notification_type == 'nova_tura' %}primary{% elif notif.notification_type == 'tura_potvrdjena' %}success{% else %}info{% endif %} alert-sm">
+                            <strong>{{ notif.title }}</strong><br>
+                            <small>{{ notif.message }}</small><br>
+                            <small class="text-muted">{{ notif.created_at|timesince }} ago</small>
+                        </div>
+                        {% endfor %}
+                        <a href="{% url 'notifikacije' %}" class="btn btn-sm btn-outline-primary">Sve notifikacije</a>
+                    {% else %}
+                        <p class="text-muted">Nemate novih notifikacija.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

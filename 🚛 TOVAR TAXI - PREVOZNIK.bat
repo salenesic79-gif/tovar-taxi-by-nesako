@@ -1,28 +1,31 @@
 @echo off
-title TOVAR TAXI - Prevoznik
-color 0D
+chcp 65001 >nul
+title 🚛 TOVAR TAXI - Prevoznik
+
 echo.
 echo ===============================================
-echo    🚛 TOVAR TAXI - PREVOZNIK (VOZAČ)
+echo    🚛 TOVAR TAXI - PREVOZNIK
 echo ===============================================
 echo.
-echo Pokretanje aplikacije za prevoznike...
+echo 🔄 Pokretanje Django servera...
+start /min python manage.py runserver 0.0.0.0:8000
+
+echo ⏳ Čekanje da se server pokrene...
+timeout /t 3 /nobreak >nul
+
 echo.
-echo 🏠 Dashboard:        http://localhost:8000/
-echo 🚛 Moja vozila:      http://localhost:8000/vehicles/
-echo 📋 Moje ture:        http://localhost:8000/ture/
-echo 💬 Chat sistem:      http://localhost:8000/ture/
-echo 🔔 Notifikacije:     http://localhost:8000/notifikacije/
-echo ⚙️  Podešavanja:     http://localhost:8000/settings/
+echo 🌐 Otvaranje stranice za prevoznik...
+echo 📋 Pristupni podaci:
+echo    👤 Korisničko ime: prevoz
+echo    🔑 Lozinka: pass123
 echo.
-echo 🌐 Pristup sa drugih uređaja: http://[VAŠA_IP]:8000
-echo.
-echo 👤 Test nalog - Korisničko ime: prevoznik
-echo 🔑 Lozinka: test123
+echo 💡 Stranica će se otvoriti automatski u browser-u
+echo ⚠️  Ne zatvarajte ovaj prozor dok koristite aplikaciju!
 echo.
 
-cd /d "%~dp0"
-start "" "http://localhost:8000/"
-python manage.py runserver 0.0.0.0:8000
+start http://localhost:8000/carrier-dashboard/
 
+echo 🎯 Aplikacija je pokrenuta!
+echo 🚛 Dashboard za prevoznik je otvoren
+echo.
 pause

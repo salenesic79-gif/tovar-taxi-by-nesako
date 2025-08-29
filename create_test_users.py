@@ -32,20 +32,18 @@ def create_test_users():
         naruci = User.objects.create_user(
             username='naruci',
             email='naruci@test.rs',
-            password='test123',
+            password='pass123',
             first_name='Marko',
             last_name='Petrović'
         )
         Profile.objects.create(
             user=naruci,
-            user_type='shipper',
+            role='naručilac',
             phone_number='+381641234567',
             address='Knez Mihailova 42, Beograd',
-            company_name='Petrović Transport DOO',
-            tax_number='123456789',
-            is_verified=True
+            company_name='Petrović Transport DOO'
         )
-        print("✅ Naručilac transporta kreiran: username=naruci, password=test123")
+        print("✅ Naručilac transporta kreiran: username=naruci, password=pass123")
     else:
         print("ℹ️ Naručilac transporta već postoji")
     
@@ -54,18 +52,16 @@ def create_test_users():
         prevoz = User.objects.create_user(
             username='prevoz',
             email='prevoz@test.rs',
-            password='test123',
+            password='pass123',
             first_name='Stefan',
             last_name='Nikolić'
         )
         profile = Profile.objects.create(
             user=prevoz,
-            user_type='carrier',
+            role='prevoznik',
             phone_number='+381651234567',
             address='Bulevar Oslobođenja 15, Novi Sad',
-            company_name='Nikolić Prevoz DOO',
-            tax_number='987654321',
-            is_verified=True
+            company_name='Nikolić Prevoz DOO'
         )
         
         # Add test vehicle for prevoznik
@@ -73,14 +69,14 @@ def create_test_users():
             owner=prevoz,
             vehicle_type='truck',
             license_plate='BG-123-AB',
-            max_weight=5000.00,
+            capacity=5000.00,
             max_volume=25.00,
             length=6.00,
             width=2.50,
             height=2.80,
-            is_active=True
+            is_available=True
         )
-        print("✅ Prevoznik kreiran: username=prevoz, password=test123")
+        print("✅ Prevoznik kreiran: username=prevoz, password=pass123")
         print("✅ Test vozilo dodato za prevoznika")
     else:
         print("ℹ️ Prevoznik već postoji")
@@ -88,8 +84,8 @@ def create_test_users():
     print("\n🎉 SVI TEST KORISNICI KREIRANI!")
     print("\n📋 PRISTUPNI PODACI:")
     print("👨‍💼 Admin: username=admin, password=admin123")
-    print("📦 Naručilac: username=naruci, password=test123")
-    print("🚛 Prevoznik: username=prevoz, password=test123")
+    print("📦 Naručilac: username=naruci, password=pass123")
+    print("🚛 Prevoznik: username=prevoz, password=pass123")
 
 if __name__ == '__main__':
     create_test_users()

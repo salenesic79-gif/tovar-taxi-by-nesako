@@ -1,32 +1,33 @@
-import os
-from pathlib import Path
+"""
+Django settings for tovar_taxi project.
+"""
 
-# Osnovna putanja projekta
+from pathlib import Path
+import os
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
 
-# DEBUG mod
+# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-# Aplikacije
+# Application definition
 INSTALLED_APPS = [
-    # Django default
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Tvoje aplikacije
-    'transport.apps.TransportConfig',
+    'channels',
+    'transport',
 ]
 
-# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -39,7 +40,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'tovar_taxi.urls'
 
-# Template podešavanja
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -57,8 +57,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'tovar_taxi.wsgi.application'
+ASGI_APPLICATION = 'tovar_taxi.asgi.application'
 
-# Baza podataka
+# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -66,7 +67,7 @@ DATABASES = {
     }
 }
 
-# Lozinke (password validators)
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -82,22 +83,34 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internacionalizacija
-LANGUAGE_CODE = 'sr'
+# Internationalization
+LANGUAGE_CODE = 'sr-rs'
 TIME_ZONE = 'Europe/Belgrade'
 USE_I18N = True
 USE_TZ = True
 
-# Statika i mediji
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Default auto field
+# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Login/Logout redirect URLs
+# Login/Logout URLs
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Channels configuration
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
