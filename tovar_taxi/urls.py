@@ -10,8 +10,10 @@ from transport.views import home_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name='home'),
-    path('', include('transport.urls')),
+    path('transport/', include('transport.urls', namespace='transport')),
     path('accounts/', include('django.contrib.auth.urls')),
+    # Override accounts/profile/ redirect
+    path('accounts/profile/', home_view, name='profile_redirect'),
 ]
 
 if settings.DEBUG:

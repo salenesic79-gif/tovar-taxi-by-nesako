@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Profile, Shipment, Vehicle, ShipmentOffer
-
+from .models import Profile, Shipment, Vehicle, ShipmentOffer, Tour
 
 class SignupForm(UserCreationForm):
     ROLE_CHOICES = [
@@ -75,18 +74,26 @@ class ShipmentForm(forms.ModelForm):
 class VehicleForm(forms.ModelForm):
     class Meta:
         model = Vehicle
-        fields = ['vehicle_type', 'license_plate', 'capacity', 'volume']
+        fields = ['vehicle_type', 'vehicle_brand', 'vehicle_color', 'license_plate', 'transport_license', 'capacity', 'volume', 'loading_height']
         widgets = {
             'vehicle_type': forms.Select(attrs={'class': 'form-control'}),
-            'license_plate': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Registarske tablice'}),
+            'vehicle_brand': forms.Select(attrs={'class': 'form-control'}),
+            'vehicle_color': forms.Select(attrs={'class': 'form-control'}),
+            'license_plate': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'BG 123-AB'}),
+            'transport_license': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Broj dozvole za prevoz tereta'}),
             'capacity': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': 'Kapacitet u tonama'}),
             'volume': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': 'Zapremina u m³'}),
+            'loading_height': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'npr. 250', 'min': '100', 'max': '400'}),
         }
         labels = {
             'vehicle_type': 'Tip vozila',
-            'license_plate': 'Registarske tablice',
+            'vehicle_brand': 'Marka vozila',
+            'vehicle_color': 'Boja vozila',
+            'license_plate': 'Registarski broj vozila',
+            'transport_license': 'Broj dozvole za prevoz tereta',
             'capacity': 'Kapacitet (tone)',
             'volume': 'Zapremina (m³)',
+            'loading_height': 'Visina utovarnog dela (cm)',
         }
 
 
@@ -110,3 +117,106 @@ class ShipmentOfferForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if user:
             self.fields['vehicle'].queryset = Vehicle.objects.filter(owner=user, is_available=True)
+
+
+class TourForm(forms.ModelForm):
+    CARGO_TYPE_CHOICES = [
+        ('paleta', 'Paleta 120x80'),
+        ('paketna_roba', 'Paketna roba'),
+        ('paleta_paketna_roba', 'Paleta ili paketna roba'),
+        ('rasuti_teret', 'Rasuti teret'),
+        ('tečni_teret', 'Tečni teret'),
+    ]
+    
+    ROUTE_CHOICES = [
+        ('', 'Izaberite putanju'),
+        ('a1_beograd_novi_sad', 'A1 - Beograd - Novi Sad'),
+        ('a1_novi_sad_subotica', 'A1 - Novi Sad - Subotica'),
+        ('a2_beograd_obrenovac', 'A2 - Beograd - Obrenovac'),
+        ('a3_beograd_nis', 'A3 - Beograd - Niš'),
+        ('a4_nis_dimitrovgrad', 'A4 - Niš - Dimitrovgrad'),
+        ('m1_beograd_pancevo', 'M1 - Beograd - Pančevo'),
+        ('m22_beograd_cacak', 'M22 - Beograd - Čačak'),
+        ('ostalo', 'Ostala putanja'),
+    ]
+    
+    polaziste = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Unesite polazište',
+            'id': 'polaziste'
+        }),
+        label='Polazište'
+    )
+    
+    odrediste = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Unesite odredište'
+        }),
+        label='Odredište'
+    )
+    
+    planirana_putanja = forms.ChoiceField(
+        choices=ROUTE_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label='Planirana putanja'
+    )
+    
+    dostupno_za_dotovar = forms.ChoiceField(
+        choices=CARGO_TYPE_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label='Dostupno za dotovar'
+    )
+    
+    kapacitet = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Kapacitet',
+            'step': '0.01'
+        }),
+        label='Kapacitet (tone)'
+    )
+    
+    slobodna_kilaza = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Slobodna kilaža',
+            'step': '0.01'
+        }),
+        label='Slobodna kilaža (kg)'
+    )
+    
+    vehicle = forms.ModelChoiceField(
+        queryset=Vehicle.objects.none(),
+        widget=forms.HiddenInput(),
+        required=False
+    )
+    
+    class Meta:
+        model = Tour
+        fields = ['polaziste', 'odrediste', 'planirana_putanja', 'dostupno_za_dotovar', 'kapacitet', 'slobodna_kilaza']
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        vehicle_license = kwargs.pop('vehicle_license', None)
+        super().__init__(*args, **kwargs)
+        
+        if user:
+            self.fields['vehicle'].queryset = Vehicle.objects.filter(owner=user, is_available=True)
+            
+        if vehicle_license:
+            try:
+                vehicle = Vehicle.objects.get(license_plate=vehicle_license, owner=user)
+                self.fields['vehicle'].initial = vehicle
+                # Popuni kapacitet na osnovu vozila
+                self.fields['kapacitet'].initial = vehicle.capacity
+            except Vehicle.DoesNotExist:
+                pass

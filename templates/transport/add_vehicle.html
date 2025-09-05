@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dodaj Vozilo - Tovar Taxi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    {% load static %}
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #000000;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .vehicle-form {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .form-title {
+            color: #667eea;
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .license-plate-preview {
+            background: #FFD700;
+            border: 3px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+            margin: 20px 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-back {
+            background: #6c757d;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .btn-back:hover {
+            background: #5a6268;
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'transport:carrier_dashboard' %}" class="btn-back">← Nazad na Dashboard</a>
+        
+        <div class="vehicle-form">
+            <h1 class="form-title">Dodaj Novo Vozilo</h1>
+            
+            <div class="license-plate-preview" id="licensePlatePreview">
+                Unesite registarski broj
+            </div>
+            
+            <form method="post" id="vehicleForm">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="license_plate" class="form-label">Registarski broj vozila:</label>
+                        <input type="text" class="form-control" id="license_plate" name="license_plate" 
+                               placeholder="BG 123-AB" required onkeyup="updateLicensePlate()">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="vehicle_brand" class="form-label">Marka vozila:</label>
+                        <select class="form-select" id="vehicle_brand" name="vehicle_brand" required>
+                            <option value="">Izaberite marku</option>
+                            <option value="mercedes">🚛 Mercedes-Benz</option>
+                            <option value="volvo">🚛 Volvo</option>
+                            <option value="scania">🚛 Scania</option>
+                            <option value="man">🚛 MAN</option>
+                            <option value="daf">🚛 DAF</option>
+                            <option value="iveco">🚛 Iveco</option>
+                            <option value="renault">🚛 Renault Trucks</option>
+                            <option value="ford">🚛 Ford</option>
+                            <option value="isuzu">🚛 Isuzu</option>
+                            <option value="fiat">🚛 Fiat</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="vehicle_color" class="form-label">Boja vozila:</label>
+                        <select class="form-select" id="vehicle_color" name="vehicle_color" required>
+                            <option value="">Izaberite boju</option>
+                            <option value="bela">Bela</option>
+                            <option value="crna">Crna</option>
+                            <option value="siva">Siva</option>
+                            <option value="plava">Plava</option>
+                            <option value="crvena">Crvena</option>
+                            <option value="zelena">Zelena</option>
+                            <option value="zuta">Žuta</option>
+                            <option value="narandzasta">Narandžasta</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="transport_license" class="form-label">Broj dozvole za prevoz tereta:</label>
+                        <input type="text" class="form-control" id="transport_license" name="transport_license" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="insurance_policy" class="form-label">Broj police osiguranja (opciono):</label>
+                        <input type="text" class="form-control" id="insurance_policy" name="insurance_policy">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="insurance_amount" class="form-label">Suma osiguranja (EUR) (opciono):</label>
+                        <select class="form-select" id="insurance_amount" name="insurance_amount">
+                            <option value="">Izaberite sumu</option>
+                            <option value="50000">50.000 EUR</option>
+                            <option value="100000">100.000 EUR</option>
+                            <option value="250000">250.000 EUR</option>
+                            <option value="500000">500.000 EUR</option>
+                            <option value="1000000">1.000.000 EUR</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="vehicle_type" class="form-label">Tip vozila:</label>
+                        <select class="form-select" id="vehicle_type" name="vehicle_type" required>
+                            <option value="">Izaberite tip vozila</option>
+                            <option value="kombi">Kombi (do 3.5t)</option>
+                            <option value="mali_kamion">Mali kamion (3.5-7.5t)</option>
+                            <option value="srednji_kamion">Srednji kamion (7.5-18t)</option>
+                            <option value="veliki_kamion">Veliki kamion (18-26t)</option>
+                            <option value="sleper">Šleper (26-40t)</option>
+                            <option value="mega">Mega trailer</option>
+                            <option value="hladnjaca">Hladnjača</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="loading_height" class="form-label">Visina utovarnog dela (cm):</label>
+                        <input type="number" class="form-control" id="loading_height" name="loading_height" 
+                               placeholder="npr. 250" min="100" max="400" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="payload_capacity" class="form-label">Tovarna nosivost (kg):</label>
+                        <input type="number" class="form-control" id="payload_capacity" name="payload_capacity" 
+                               min="100" max="40000" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="fleet_size" class="form-label">Broj vozila u floti:</label>
+                        <select class="form-select" id="fleet_size" name="fleet_size" required>
+                            <option value="">Izaberite broj vozila</option>
+                            <option value="1">1 vozilo</option>
+                            <option value="2-5">2-5 vozila</option>
+                            <option value="6-10">6-10 vozila</option>
+                            <option value="vise-od-10">Više od 10 vozila</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Specijalizacije:</label>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="spec_adr" name="specializations" value="adr">
+                                <label class="form-check-label" for="spec_adr">ADR (opasni teret)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="spec_hladnjaca" name="specializations" value="hladnjaca">
+                                <label class="form-check-label" for="spec_hladnjaca">Hladnjača</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="spec_nadgabarit" name="specializations" value="nadgabarit">
+                                <label class="form-check-label" for="spec_nadgabarit">Nadgabaritni teret</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Područja rada:</label>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="area_regionalno" name="coverage_areas" value="regionalno">
+                                <label class="form-check-label" for="area_regionalno">Regionalno (Srbija)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="area_balkan" name="coverage_areas" value="balkan">
+                                <label class="form-check-label" for="area_balkan">Balkan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="area_eu" name="coverage_areas" value="eu">
+                                <label class="form-check-label" for="area_eu">Evropska unija</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-save">Sačuvaj Vozilo</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function updateLicensePlate() {
+            const input = document.getElementById('license_plate');
+            const preview = document.getElementById('licensePlatePreview');
+            
+            if (input.value.trim()) {
+                preview.textContent = input.value.toUpperCase();
+            } else {
+                preview.textContent = 'Unesite registarski broj';
+            }
+        }
+
+        // Form submission handling
+        document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = new FormData(this);
+            
+            // Add specializations as array
+            const specializations = [];
+            document.querySelectorAll('input[name="specializations"]:checked').forEach(cb => {
+                specializations.push(cb.value);
+            });
+            
+            // Add coverage areas as array
+            const coverageAreas = [];
+            document.querySelectorAll('input[name="coverage_areas"]:checked').forEach(cb => {
+                coverageAreas.push(cb.value);
+            });
+            
+            // Submit via AJAX
+            fetch('{% url "transport:add_vehicle" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect back to carrier dashboard with success message
+                    window.location.href = '{% url "transport:carrier_dashboard" %}?vehicle_added=1';
+                } else {
+                    // Show error message
+                    alert('Greška pri dodavanju vozila: ' + (data.error || 'Nepoznata greška'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Greška pri dodavanju vozila. Molimo pokušajte ponovo.');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kreiraj upit za prevoz - Tovar Taxi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    {% load static %}
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            background-color: #000;
+            padding: 15px 0;
+            border-bottom: 3px solid #FFD700;
+        }
+        
+        .header img {
+            height: 60px;
+        }
+        
+        .main-container {
+            margin-top: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .form-title {
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            color: #34495e;
+            font-weight: 600;
+            font-size: 18px;
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #FFD700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: #FFD700;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-label i {
+            margin-right: 8px;
+            color: #7f8c8d;
+            width: 16px;
+        }
+        
+        .form-control {
+            background-color: #ffffff;
+            border: 2px solid #e9ecef;
+            color: #2c3e50;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            background-color: #ffffff;
+            border-color: #FFD700;
+            box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .form-select {
+            background-color: #ffffff;
+            border: 2px solid #e9ecef;
+            color: #2c3e50;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+        
+        .form-select:focus {
+            border-color: #FFD700;
+            box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #FFD700, #FFC107);
+            border: none;
+            color: #000;
+            font-weight: 600;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #FFC107, #FFB300);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #5a6268);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, #5a6268, #495057);
+            color: #fff;
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+        
+        .welcome-message {
+            background: linear-gradient(45deg, #d4edda, #c3e6cb);
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .alert {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cargo-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .cargo-type-option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .cargo-type-option:hover {
+            border-color: #FFD700;
+            background: #fff;
+            transform: translateY(-2px);
+        }
+        
+        .cargo-type-option.selected {
+            border-color: #FFD700;
+            background: #fff8dc;
+        }
+        
+        .cargo-type-option i {
+            font-size: 24px;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+        
+        .priority-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .priority-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid #e9ecef;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .priority-badge:hover {
+            border-color: #FFD700;
+            background: #fff;
+        }
+        
+        .priority-badge.selected {
+            border-color: #FFD700;
+            background: #FFD700;
+            color: #000;
+        }
+        
+        .footer {
+            background-color: #2c3e50;
+            color: #fff;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: auto;
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px 0 0 10px;
+            color: #6c757d;
+        }
+        
+        .input-group .form-control {
+            border-radius: 0 10px 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" class="img-fluid">
+                </div>
+                <div class="col-md-6 text-end">
+                    <span style="color: #FFD700; font-weight: 600;">
+                        <i class="fas fa-user"></i> Dobrodošli, {{ user.username }}!
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container main-container">
+        {% if is_first_request %}
+        <div class="welcome-message">
+            <h5><strong><i class="fas fa-check-circle"></i> Dobrodošli u Tovar Taxi!</strong></h5>
+            <p>Vaša registracija je uspešno završena. Sada možete kreirati svoj prvi upit za prevoz robe.</p>
+        </div>
+        {% endif %}
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle"></i> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="form-container">
+                    <h2 class="form-title">
+                        <i class="fas fa-shipping-fast"></i> {{ title }}
+                    </h2>
+                    
+                    <form method="post" id="shipmentForm">
+                        {% csrf_token %}
+                        
+                        <!-- Osnovne informacije -->
+                        <div class="section-title">
+                            <i class="fas fa-info-circle"></i> Osnovne informacije
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-tag"></i> Naziv pošiljke:
+                                    </label>
+                                    {{ form.title }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-dollar-sign"></i> Budžet (RSD):
+                                    </label>
+                                    {{ form.budget }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-align-left"></i> Opis tereta:
+                            </label>
+                            {{ form.description }}
+                        </div>
+                        
+                        <!-- Lokacije -->
+                        <div class="section-title">
+                            <i class="fas fa-map-marker-alt"></i> Lokacije
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-arrow-up"></i> Grad preuzimanja:
+                                    </label>
+                                    {{ form.pickup_city }}
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-home"></i> Adresa preuzimanja:
+                                    </label>
+                                    {{ form.pickup_address }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-arrow-down"></i> Grad dostave:
+                                    </label>
+                                    {{ form.delivery_city }}
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-map-pin"></i> Adresa dostave:
+                                    </label>
+                                    {{ form.delivery_address }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Karakteristike tereta -->
+                        <div class="section-title">
+                            <i class="fas fa-boxes"></i> Karakteristike tereta
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-weight-hanging"></i> Težina (tone):
+                                    </label>
+                                    {{ form.cargo_weight }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-cube"></i> Zapremina (m³):
+                                    </label>
+                                    {{ form.cargo_volume }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-industry"></i> Tip tereta:
+                                    </label>
+                                    {{ form.cargo_type }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tip tereta - vizuelni izbor -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-list"></i> Kategorija tereta:
+                            </label>
+                            <div class="cargo-type-grid">
+                                <div class="cargo-type-option" data-type="palete">
+                                    <i class="fas fa-pallet"></i>
+                                    <div>Palete</div>
+                                </div>
+                                <div class="cargo-type-option" data-type="kontejneri">
+                                    <i class="fas fa-shipping-fast"></i>
+                                    <div>Kontejneri</div>
+                                </div>
+                                <div class="cargo-type-option" data-type="vozila">
+                                    <i class="fas fa-car"></i>
+                                    <div>Vozila</div>
+                                </div>
+                                <div class="cargo-type-option" data-type="masinerija">
+                                    <i class="fas fa-cogs"></i>
+                                    <div>Mašinerija</div>
+                                </div>
+                                <div class="cargo-type-option" data-type="hrana">
+                                    <i class="fas fa-apple-alt"></i>
+                                    <div>Hrana</div>
+                                </div>
+                                <div class="cargo-type-option" data-type="hemikalije">
+                                    <i class="fas fa-flask"></i>
+                                    <div>Hemikalije</div>
+                                </div>
+                                <div class="cargo-type-option" data-type="ostalo">
+                                    <i class="fas fa-box"></i>
+                                    <div>Ostalo</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Datumi -->
+                        <div class="section-title">
+                            <i class="fas fa-calendar-alt"></i> Vremenski okvir
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-calendar-plus"></i> Datum preuzimanja:
+                                    </label>
+                                    {{ form.pickup_date }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-calendar-check"></i> Datum dostave:
+                                    </label>
+                                    {{ form.delivery_date }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Prioritet -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-exclamation-triangle"></i> Prioritet:
+                            </label>
+                            <div class="priority-badges">
+                                <div class="priority-badge" data-priority="standard">
+                                    <i class="fas fa-clock"></i> Standard
+                                </div>
+                                <div class="priority-badge" data-priority="hitno">
+                                    <i class="fas fa-bolt"></i> Hitno
+                                </div>
+                                <div class="priority-badge" data-priority="express">
+                                    <i class="fas fa-rocket"></i> Express
+                                </div>
+                            </div>
+                            <input type="hidden" name="priority" id="priority" value="standard">
+                        </div>
+                        
+                        <div class="row mt-5">
+                            <div class="col-md-6">
+                                <a href="{% url 'transport:shipper_dashboard' %}" class="btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Nazad na dashboard
+                                </a>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Kreiraj upit za prevoz
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <p><i class="fas fa-copyright"></i> 2024 Tovar Taxi. Sva prava zadržana.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Cargo type selection
+        document.querySelectorAll('.cargo-type-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.cargo-type-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('id_cargo_type').value = this.dataset.type;
+            });
+        });
+        
+        // Priority selection
+        document.querySelectorAll('.priority-badge').forEach(badge => {
+            badge.addEventListener('click', function() {
+                document.querySelectorAll('.priority-badge').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('priority').value = this.dataset.priority;
+            });
+        });
+        
+        // Form validation
+        document.getElementById('shipmentForm').addEventListener('submit', function(e) {
+            const requiredFields = ['id_title', 'id_pickup_city', 'id_delivery_city', 'id_cargo_weight'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#dc3545';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#e9ecef';
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Molimo popunite sva obavezna polja.');
+            }
+        });
+    </script>
+</body>
+</html>

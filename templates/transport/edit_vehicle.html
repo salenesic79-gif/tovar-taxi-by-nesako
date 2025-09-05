@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Izmeni Vozilo - Tovar Taxi</title>
+    <link rel="icon" type="image/x-icon" href="{% load static %}{% static 'images/TTaxi.ico' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{% load static %}{% static 'css/animations.css' %}" rel="stylesheet">
+    <link href="{% load static %}{% static 'css/popup-styles.css' %}" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #FFD700;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #FFD700;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 100px;
+            padding: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Form Container */
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #FFD700;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .required {
+            color: #E74C3C;
+        }
+
+        .optional {
+            color: #7F8C8D;
+            font-weight: 400;
+            font-size: 0.85rem;
+        }
+
+        input, select {
+            padding: 0.8rem 1rem;
+            border: 2px solid #DDD;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        /* License Plate Preview */
+        .license-plate-preview {
+            background: #FFD700;
+            color: #000;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            text-align: center;
+            margin-top: 1rem;
+            border: 2px solid #000;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Checkbox Groups */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: #F8F9FA;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .checkbox-item:hover {
+            background: #E9ECEF;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Action Buttons */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2ECC71, #27AE60);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95A5A6, #7F8C8D);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(149, 165, 166, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .form-container {
+                padding: 2rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% load static %}
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="{% url 'transport:index' %}" class="logo">
+                <img src="{% static 'images/TTaxi.png' %}" alt="TTaxi Logo">
+                TOVAR TAXI
+            </a>
+            <nav class="nav-links">
+                <a href="{% url 'transport:carrier_dashboard' %}">Dashboard</a>
+                <a href="{% url 'transport:manage_vehicles' %}">Moja Vozila</a>
+                <a href="{% url 'transport:shipment_detail' vehicle.id %}">Nazad na Detalje</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">IZMENI VOZILO</h1>
+            <p class="page-subtitle">Ažurirajte podatke o vašem vozilu</p>
+        </div>
+
+        <div class="form-container">
+            <form id="editVehicleForm" method="post">
+                {% csrf_token %}
+                
+                <!-- Osnovni podaci -->
+                <div class="form-section">
+                    <h3 class="section-title">Osnovni podaci vozila</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="license_plate">Registarski broj <span class="required">*</span></label>
+                            <input type="text" id="license_plate" name="license_plate" 
+                                   value="{{ vehicle.license_plate }}" 
+                                   placeholder="BG 123-AB" required maxlength="10">
+                            <div class="license-plate-preview" id="platePreview">
+                                {{ vehicle.license_plate|default:"BG 123-AB" }}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="brand">Marka vozila <span class="required">*</span></label>
+                            <select id="brand" name="brand" required>
+                                <option value="">Izaberite marku</option>
+                                <option value="Mercedes-Benz" {% if vehicle.brand == "Mercedes-Benz" %}selected{% endif %}>🚛 Mercedes-Benz</option>
+                                <option value="Volvo" {% if vehicle.brand == "Volvo" %}selected{% endif %}>🚛 Volvo</option>
+                                <option value="Scania" {% if vehicle.brand == "Scania" %}selected{% endif %}>🚛 Scania</option>
+                                <option value="MAN" {% if vehicle.brand == "MAN" %}selected{% endif %}>🚛 MAN</option>
+                                <option value="DAF" {% if vehicle.brand == "DAF" %}selected{% endif %}>🚛 DAF</option>
+                                <option value="Iveco" {% if vehicle.brand == "Iveco" %}selected{% endif %}>🚛 Iveco</option>
+                                <option value="Renault Trucks" {% if vehicle.brand == "Renault Trucks" %}selected{% endif %}>🚛 Renault Trucks</option>
+                                <option value="Ford" {% if vehicle.brand == "Ford" %}selected{% endif %}>🚛 Ford</option>
+                                <option value="Isuzu" {% if vehicle.brand == "Isuzu" %}selected{% endif %}>🚛 Isuzu</option>
+                                <option value="Fiat" {% if vehicle.brand == "Fiat" %}selected{% endif %}>🚛 Fiat</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="color">Boja vozila <span class="required">*</span></label>
+                            <select id="color" name="color" required>
+                                <option value="">Izaberite boju</option>
+                                <option value="Bela" {% if vehicle.color == "Bela" %}selected{% endif %}>Bela</option>
+                                <option value="Crna" {% if vehicle.color == "Crna" %}selected{% endif %}>Crna</option>
+                                <option value="Siva" {% if vehicle.color == "Siva" %}selected{% endif %}>Siva</option>
+                                <option value="Plava" {% if vehicle.color == "Plava" %}selected{% endif %}>Plava</option>
+                                <option value="Crvena" {% if vehicle.color == "Crvena" %}selected{% endif %}>Crvena</option>
+                                <option value="Zelena" {% if vehicle.color == "Zelena" %}selected{% endif %}>Zelena</option>
+                                <option value="Žuta" {% if vehicle.color == "Žuta" %}selected{% endif %}>Žuta</option>
+                                <option value="Narandžasta" {% if vehicle.color == "Narandžasta" %}selected{% endif %}>Narandžasta</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="vehicle_type">Tip vozila <span class="required">*</span></label>
+                            <select id="vehicle_type" name="vehicle_type" required>
+                                <option value="">Izaberite tip</option>
+                                <option value="kamion" {% if vehicle.vehicle_type == "kamion" %}selected{% endif %}>Kamion</option>
+                                <option value="kombi" {% if vehicle.vehicle_type == "kombi" %}selected{% endif %}>Kombi</option>
+                                <option value="prikolica" {% if vehicle.vehicle_type == "prikolica" %}selected{% endif %}>Prikolica</option>
+                                <option value="poluprikolica" {% if vehicle.vehicle_type == "poluprikolica" %}selected{% endif %}>Poluprikolica</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tehnički podaci -->
+                <div class="form-section">
+                    <h3 class="section-title">Tehnički podaci</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="capacity">Nosivost (tone) <span class="required">*</span></label>
+                            <input type="number" id="capacity" name="capacity" 
+                                   value="{{ vehicle.capacity }}" 
+                                   min="0.5" max="50" step="0.5" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="height">Visina utovarnog dela (cm) <span class="required">*</span></label>
+                            <input type="number" id="height" name="height" 
+                                   value="{{ vehicle.height }}" 
+                                   min="100" max="400" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Osiguranje -->
+                <div class="form-section">
+                    <h3 class="section-title">Osiguranje i dozvole</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="insurance_number">Broj police osiguranja <span class="optional">(opciono)</span></label>
+                            <input type="text" id="insurance_number" name="insurance_number" 
+                                   value="{{ vehicle.insurance_number }}" 
+                                   placeholder="12345678">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="insurance_amount">Suma osiguranja (RSD) <span class="optional">(opciono)</span></label>
+                            <input type="number" id="insurance_amount" name="insurance_amount" 
+                                   value="{{ vehicle.insurance_amount }}" 
+                                   placeholder="1000000">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flota -->
+                <div class="form-section">
+                    <h3 class="section-title">Informacije o floti</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fleet_size">Broj vozila u floti <span class="required">*</span></label>
+                            <select id="fleet_size" name="fleet_size" required>
+                                <option value="">Izaberite broj vozila</option>
+                                <option value="1" {% if vehicle.fleet_size == "1" %}selected{% endif %}>1 vozilo</option>
+                                <option value="2-5" {% if vehicle.fleet_size == "2-5" %}selected{% endif %}>2-5 vozila</option>
+                                <option value="6-10" {% if vehicle.fleet_size == "6-10" %}selected{% endif %}>6-10 vozila</option>
+                                <option value="10+" {% if vehicle.fleet_size == "10+" %}selected{% endif %}>Više od 10 vozila</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Specijalizacije -->
+                <div class="form-section">
+                    <h3 class="section-title">Specijalizacije</h3>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="adr" name="specializations" value="ADR (opasni teret)"
+                                   {% if "ADR (opasni teret)" in vehicle.specializations %}checked{% endif %}>
+                            <label for="adr">ADR (opasni teret)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="refrigerated" name="specializations" value="Hladnjača"
+                                   {% if "Hladnjača" in vehicle.specializations %}checked{% endif %}>
+                            <label for="refrigerated">Hladnjača</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="oversized" name="specializations" value="Nadgabaritni teret"
+                                   {% if "Nadgabaritni teret" in vehicle.specializations %}checked{% endif %}>
+                            <label for="oversized">Nadgabaritni teret</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Područja rada -->
+                <div class="form-section">
+                    <h3 class="section-title">Područja rada</h3>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="regional" name="work_areas" value="Regionalno (Srbija)"
+                                   {% if "Regionalno (Srbija)" in vehicle.work_areas %}checked{% endif %}>
+                            <label for="regional">Regionalno (Srbija)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="balkan" name="work_areas" value="Balkan"
+                                   {% if "Balkan" in vehicle.work_areas %}checked{% endif %}>
+                            <label for="balkan">Balkan</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="eu" name="work_areas" value="Evropska unija"
+                                   {% if "Evropska unija" in vehicle.work_areas %}checked{% endif %}>
+                            <label for="eu">Evropska unija</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Sačuvaj Izmene
+                    </button>
+                    <a href="{% url 'transport:vehicle_details' vehicle.id %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Otkaži
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/modern-effects.js' %}"></script>
+    <script>
+        // License plate live preview
+        document.getElementById('license_plate').addEventListener('input', function() {
+            const preview = document.getElementById('platePreview');
+            const value = this.value.trim();
+            preview.textContent = value || 'BG 123-AB';
+        });
+
+        // Form submission
+        document.getElementById('editVehicleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = new FormData(this);
+            
+            // Submit via AJAX
+            fetch('{% url "transport:edit_vehicle" vehicle.id %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '{% url "transport:vehicle_details" vehicle.id %}?updated=1';
+                } else {
+                    alert('Greška pri ažuriranju vozila: ' + (data.error || 'Nepoznata greška'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Greška pri ažuriranju vozila. Molimo pokušajte ponovo.');
+            });
+        });
+    </script>
+</body>
+</html>

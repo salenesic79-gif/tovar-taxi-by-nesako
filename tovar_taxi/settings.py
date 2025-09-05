@@ -43,7 +43,7 @@ ROOT_URLCONF = 'tovar_taxi.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [r'C:\Users\PC\Desktop\tovar-taxi-by-nesako\templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,10 +84,16 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-LANGUAGE_CODE = 'sr-rs'
+LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/Belgrade'
 USE_I18N = True
+USE_L10N = True
 USE_TZ = True
+
+# Locale paths
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
@@ -105,7 +111,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Login/Logout URLs
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
+# LOGIN_REDIRECT_URL = '/transport/create-shipment-request/'  # Ukloniti da custom_login_view može da radi role-based redirect
 LOGOUT_REDIRECT_URL = '/'
 
 # Channels configuration

@@ -5,367 +5,702 @@
 
 {% block extra_css %}
 <style>
-    .settings-section {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        margin-bottom: 2rem;
-        overflow: hidden;
+    /* Header */
+    .header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        transition: all 0.3s ease;
     }
-    
-    .settings-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        color: white;
-        padding: 1.5rem;
-        font-weight: 600;
+
+    body.dark-mode .header {
+        background: rgba(44, 62, 80, 0.95);
+        color: #ecf0f1;
     }
-    
-    .settings-body {
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: #FFD700;
+        font-weight: 700;
+        font-size: 1.5rem;
+    }
+
+    .logo img {
+        height: 40px;
+        width: auto;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .nav-links a {
+        color: #333;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+
+    body.dark-mode .nav-links a {
+        color: #ecf0f1;
+    }
+
+    .nav-links a:hover {
+        color: #FFD700;
+    }
+
+    /* Main Content */
+    .main-content {
+        margin-top: 100px;
         padding: 2rem;
+        max-width: 1000px;
+        margin-left: auto;
+        margin-right: auto;
     }
-    
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .page-title {
+        font-size: 3rem;
+        font-weight: 700;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        margin-bottom: 1rem;
+    }
+
+    .page-subtitle {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.9);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Settings Sections */
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+    }
+
+    .settings-section {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    body.dark-mode .settings-section {
+        background: rgba(52, 73, 94, 0.95);
+        color: #ecf0f1;
+    }
+
+    .settings-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #FFD700;
+    }
+
+    .section-icon {
+        font-size: 1.5rem;
+        color: #FFD700;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    body.dark-mode .section-title {
+        color: #ecf0f1;
+    }
+
+    /* Setting Items */
     .setting-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 1rem 0;
-        border-bottom: 1px solid var(--border-color);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
-    
+
+    body.dark-mode .setting-item {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
     .setting-item:last-child {
         border-bottom: none;
     }
-    
-    .setting-label {
-        font-weight: 500;
-        color: var(--text-primary);
+
+    .setting-info {
+        flex: 1;
     }
-    
+
+    .setting-label {
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        color: #333;
+    }
+
+    body.dark-mode .setting-label {
+        color: #ecf0f1;
+    }
+
     .setting-description {
         font-size: 0.9rem;
-        color: var(--text-secondary);
-        margin-top: 0.25rem;
+        color: #666;
+        line-height: 1.4;
     }
-    
-    .notification-badge {
+
+    body.dark-mode .setting-description {
+        color: #bdc3c7;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
         position: relative;
-        display: inline-block;
+        width: 60px;
+        height: 30px;
+        background: #ccc;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
     }
-    
-    .notification-count {
+
+    .toggle-switch.active {
+        background: #2ECC71;
+    }
+
+    .toggle-slider {
         position: absolute;
-        top: -8px;
-        right: -8px;
-        background: var(--danger-color);
-        color: white;
+        top: 3px;
+        left: 3px;
+        width: 24px;
+        height: 24px;
+        background: white;
         border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        font-size: 0.75rem;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch.active .toggle-slider {
+        transform: translateX(30px);
+    }
+
+    /* Select Dropdown */
+    .setting-select {
+        padding: 0.5rem 1rem;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        background: white;
+        font-size: 0.9rem;
+        min-width: 150px;
+        transition: all 0.3s;
+    }
+
+    body.dark-mode .setting-select {
+        background: #34495e;
+        border-color: #5a6c7d;
+        color: #ecf0f1;
+    }
+
+    .setting-select:focus {
+        outline: none;
+        border-color: #FFD700;
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+    }
+
+    /* Sound Test Button */
+    .sound-test-btn {
+        background: linear-gradient(135deg, #3498DB, #2980B9);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: all 0.3s;
+        margin-left: 0.5rem;
+    }
+
+    .sound-test-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 3rem;
+    }
+
+    .btn {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 25px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2ECC71, #27AE60);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(46, 204, 113, 0.3);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #95A5A6, #7F8C8D);
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(149, 165, 166, 0.3);
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .quick-action {
+        background: linear-gradient(135deg, #FFD700, #FFA500);
+        color: #000;
+        padding: 1rem;
+        border-radius: 15px;
+        text-decoration: none;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.3s;
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .quick-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 1rem;
+        }
+
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-title {
+            font-size: 2rem;
+        }
+
+        .setting-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .quick-actions {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="text-gradient">
-                    <i class="fas fa-cog me-3"></i>Podešavanja
-                </h1>
-            </div>
-            
-            <div class="row">
-                <div class="col-lg-8">
-                    <!-- Profil Settings -->
-                    <div class="settings-section">
-                        <div class="settings-header">
-                            <i class="fas fa-user me-2"></i>Profil korisnika
-                        </div>
-                        <div class="settings-body">
-                            <form method="post" action="{% url 'settings' %}">
-                                {% csrf_token %}
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Ime</label>
-                                            <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}" placeholder="Vaše ime">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Prezime</label>
-                                            <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}" placeholder="Vaše prezime">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Email</label>
-                                            <input type="email" class="form-control" name="email" value="{{ user.email }}" placeholder="vaš@email.com">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Telefon</label>
-                                            <input type="text" class="form-control" name="phone_number" value="{{ user.profile.phone_number|default:'' }}" placeholder="+381 60 123 4567">
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="mb-3">
-                                            <label class="form-label">Adresa</label>
-                                            <input type="text" class="form-control" name="address" value="{{ user.profile.address|default:'' }}" placeholder="Ulica i broj, grad">
-                                        </div>
-                                    </div>
-                                    {% if user.profile.user_type == 'carrier' or user.profile.user_type == 'shipper' %}
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Naziv kompanije</label>
-                                            <input type="text" class="form-control" name="company_name" value="{{ user.profile.company_name|default:'' }}" placeholder="Naziv vaše kompanije">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">PIB</label>
-                                            <input type="text" class="form-control" name="tax_number" value="{{ user.profile.tax_number|default:'' }}" placeholder="123456789">
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-2"></i>Sačuvaj promene
-                                </button>
-                            </form>
-                        </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="{% url 'transport:index' %}" class="logo">
+                <img src="{% static 'images/TTaxi.png' %}" alt="TTaxi Logo">
+                TOVAR TAXI
+            </a>
+            <nav class="nav-links">
+                <a href="{% url 'transport:carrier_dashboard' %}">Dashboard</a>
+                <a href="{% url 'transport:manage_vehicles' %}">Moja Vozila</a>
+                <a href="{% url 'transport:notifications' %}" style="color: #FFD700;">Podešavanja</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">PODEŠAVANJA</h1>
+            <p class="page-subtitle">Prilagodite aplikaciju prema vašim potrebama</p>
+        </div>
+
+        <div class="settings-grid">
+            <!-- Opšta podešavanja -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <i class="fas fa-cog section-icon"></i>
+                    <h3 class="section-title">Opšta podešavanja</h3>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Noćni režim</div>
+                        <div class="setting-description">Aktivirajte tamnu temu za lakše korišćenje u mraku</div>
                     </div>
-                    
-                    <!-- Notification Settings -->
-                    <div class="settings-section">
-                        <div class="settings-header">
-                            <i class="fas fa-bell me-2"></i>Notifikacije
-                        </div>
-                        <div class="settings-body">
-                            <div class="setting-item">
-                                <div>
-                                    <div class="setting-label">Email notifikacije</div>
-                                    <div class="setting-description">Primajte obaveštenja na email adresu</div>
-                                </div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
-                                </div>
-                            </div>
-                            
-                            <div class="setting-item">
-                                <div>
-                                    <div class="setting-label">SMS notifikacije</div>
-                                    <div class="setting-description">Primajte obaveštenja na telefon</div>
-                                </div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="smsNotifications">
-                                </div>
-                            </div>
-                            
-                            <div class="setting-item">
-                                <div>
-                                    <div class="setting-label">Push notifikacije</div>
-                                    <div class="setting-description">Obaveštenja u browseru</div>
-                                </div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="pushNotifications" checked>
-                                </div>
-                            </div>
-                            
-                            <div class="setting-item">
-                                <div>
-                                    <div class="setting-label">Nove ponude</div>
-                                    <div class="setting-description">Obaveštenja o novim ponudama za vaše pošiljke</div>
-                                </div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="offerNotifications" checked>
-                                </div>
-                            </div>
-                            
-                            <div class="setting-item">
-                                <div>
-                                    <div class="setting-label">Status pošiljke</div>
-                                    <div class="setting-description">Obaveštenja o promeni statusa pošiljke</div>
-                                </div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="statusNotifications" checked>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Privacy Settings -->
-                    <div class="settings-section">
-                        <div class="settings-header">
-                            <i class="fas fa-shield-alt me-2"></i>Privatnost i bezbednost
-                        </div>
-                        <div class="settings-body">
-                            <div class="setting-item">
-                                <div>
-                                    <div class="setting-label">Javni profil</div>
-                                    <div class="setting-description">Omogući drugim korisnicima da vide vaš profil</div>
-                                </div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="publicProfile" checked>
-                                </div>
-                            </div>
-                            
-                            <div class="setting-item">
-                                <div>
-                                    <div class="setting-label">Prikaži kontakt informacije</div>
-                                    <div class="setting-description">Prikaži telefon i email u ponudama</div>
-                                </div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="showContact" checked>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-3">
-                                <button type="button" class="btn btn-outline-warning">
-                                    <i class="fas fa-key me-2"></i>Promeni lozinku
-                                </button>
-                            </div>
-                        </div>
+                    <div class="toggle-switch" id="darkModeToggle">
+                        <div class="toggle-slider"></div>
                     </div>
                 </div>
-                
-                <div class="col-lg-4">
-                    <!-- Account Info -->
-                    <div class="settings-section">
-                        <div class="settings-header">
-                            <i class="fas fa-info-circle me-2"></i>Informacije o nalogu
-                        </div>
-                        <div class="settings-body">
-                            <div class="setting-item">
-                                <div class="setting-label">Tip korisnika</div>
-                                <div>
-                                    <span class="badge bg-primary">{{ user.profile.get_user_type_display|default:"Nepoznato" }}</span>
-                                </div>
-                            </div>
-                            
-                            <div class="setting-item">
-                                <div class="setting-label">Status verifikacije</div>
-                                <div>
-                                    {% if user.profile.is_verified %}
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-check me-1"></i>Verifikovan
-                                        </span>
-                                    {% else %}
-                                        <span class="badge bg-warning">
-                                            <i class="fas fa-clock me-1"></i>Čeka verifikaciju
-                                        </span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            <div class="setting-item">
-                                <div class="setting-label">Član od</div>
-                                <div class="text-muted">{{ user.date_joined|date:"d.m.Y" }}</div>
-                            </div>
-                            
-                            <div class="setting-item">
-                                <div class="setting-label">Poslednja aktivnost</div>
-                                <div class="text-muted">{{ user.last_login|date:"d.m.Y H:i"|default:"Nikad" }}</div>
-                            </div>
-                        </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Jezik aplikacije</div>
+                        <div class="setting-description">Izaberite željeni jezik interfejsa</div>
                     </div>
-                    
-                    <!-- Quick Stats -->
-                    {% if user.profile.user_type == 'shipper' %}
-                    <div class="settings-section">
-                        <div class="settings-header">
-                            <i class="fas fa-chart-bar me-2"></i>Vaša statistika
-                        </div>
-                        <div class="settings-body">
-                            <div class="setting-item">
-                                <div class="setting-label">Ukupno pošiljki</div>
-                                <div class="fw-bold text-primary">{{ user.shipments.count }}</div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-label">Aktivne pošiljke</div>
-                                <div class="fw-bold text-success">{{ user.shipments.filter.status__in:'published,assigned,in_transit'.count }}</div>
-                            </div>
-                        </div>
+                    <select class="setting-select" id="languageSelect">
+                        <option value="sr">Srpski</option>
+                        <option value="en">English</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Automatsko osvežavanje</div>
+                        <div class="setting-description">Automatski osvežavaj podatke o turama</div>
                     </div>
-                    {% elif user.profile.user_type == 'carrier' %}
-                    <div class="settings-section">
-                        <div class="settings-header">
-                            <i class="fas fa-chart-bar me-2"></i>Vaša statistika
-                        </div>
-                        <div class="settings-body">
-                            <div class="setting-item">
-                                <div class="setting-label">Ukupno vozila</div>
-                                <div class="fw-bold text-primary">{{ user.vehicles.count }}</div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-label">Aktivna vozila</div>
-                                <div class="fw-bold text-success">{{ user.vehicles.filter.is_active:True.count }}</div>
-                            </div>
-                        </div>
+                    <div class="toggle-switch active" id="autoRefreshToggle">
+                        <div class="toggle-slider"></div>
                     </div>
-                    {% endif %}
-                    
-                    <!-- Support -->
-                    <div class="settings-section">
-                        <div class="settings-header">
-                            <i class="fas fa-life-ring me-2"></i>Podrška
-                        </div>
-                        <div class="settings-body">
-                            <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-outline-primary">
-                                    <i class="fas fa-question-circle me-2"></i>Česta pitanja
-                                </button>
-                                <button type="button" class="btn btn-outline-success">
-                                    <i class="fas fa-envelope me-2"></i>Kontaktiraj podršku
-                                </button>
-                                <button type="button" class="btn btn-outline-info">
-                                    <i class="fas fa-book me-2"></i>Uputstvo za korišćenje
-                                </button>
-                            </div>
-                        </div>
+                </div>
+            </div>
+
+            <!-- Notifikacije -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <i class="fas fa-bell section-icon"></i>
+                    <h3 class="section-title">Notifikacije</h3>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Zvučne notifikacije</div>
+                        <div class="setting-description">Omogući zvučne signale za obaveštenja</div>
                     </div>
+                    <div class="toggle-switch active" id="soundNotificationsToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Jačina zvuka</div>
+                        <div class="setting-description">Podesite jačinu zvučnih notifikacija</div>
+                    </div>
+                    <select class="setting-select" id="soundVolumeSelect">
+                        <option value="low">Tiho</option>
+                        <option value="medium" selected>Srednje</option>
+                        <option value="high">Glasno</option>
+                    </select>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Tip zvučne notifikacije</div>
+                        <div class="setting-description">Izaberite zvuk za obaveštenja</div>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <select class="setting-select" id="soundTypeSelect">
+                            <option value="default" selected>Standardni</option>
+                            <option value="chime">Zvonce</option>
+                            <option value="beep">Pištanje</option>
+                            <option value="notification">Obaveštenje</option>
+                        </select>
+                        <button class="sound-test-btn" onclick="testSound()">
+                            <i class="fas fa-play"></i> Test
+                        </button>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Push notifikacije</div>
+                        <div class="setting-description">Prikazuj obaveštenja na desktop-u</div>
+                    </div>
+                    <div class="toggle-switch active" id="pushNotificationsToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prevoznik specifične opcije -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <i class="fas fa-truck section-icon"></i>
+                    <h3 class="section-title">Prevoznik opcije</h3>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">GPS navigacija</div>
+                        <div class="setting-description">Koristi GPS za navigaciju tokom tura</div>
+                    </div>
+                    <div class="toggle-switch active" id="gpsNavigationToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Automatsko osvetljenje</div>
+                        <div class="setting-description">Prilagodi osvetljenje ekrana prema vremenu dana</div>
+                    </div>
+                    <div class="toggle-switch" id="autoLightingToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Automatski update vozila</div>
+                        <div class="setting-description">Automatski ažuriraj status vozila tokom tura</div>
+                    </div>
+                    <div class="toggle-switch active" id="autoVehicleUpdateToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="{% url 'transport:manage_vehicles' %}" class="quick-action">
+                        <i class="fas fa-truck"></i>
+                        Upravljaj vozilima
+                    </a>
+                    <a href="{% url 'transport:carrier_dashboard' %}" class="quick-action">
+                        <i class="fas fa-route"></i>
+                        Aktivne ture
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profil i bezbednost -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <i class="fas fa-user-shield section-icon"></i>
+                    <h3 class="section-title">Profil i bezbednost</h3>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Dvofaktorska autentifikacija</div>
+                        <div class="setting-description">Dodatna sigurnost za vaš nalog</div>
+                    </div>
+                    <div class="toggle-switch" id="twoFactorToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Automatska odjava</div>
+                        <div class="setting-description">Vreme neaktivnosti pre automatske odjave</div>
+                    </div>
+                    <select class="setting-select" id="autoLogoutSelect">
+                        <option value="30">30 minuta</option>
+                        <option value="60" selected>1 sat</option>
+                        <option value="120">2 sata</option>
+                        <option value="0">Nikad</option>
+                    </select>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="{% url 'transport:carrier_dashboard' %}" class="quick-action">
+                        <i class="fas fa-user-edit"></i>
+                        Izmeni profil
+                    </a>
+                    <a href="{% url 'transport:carrier_dashboard' %}" class="quick-action">
+                        <i class="fas fa-key"></i>
+                        Promeni lozinku
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="saveSettings()">
+                <i class="fas fa-save"></i>
+                Sačuvaj podešavanja
+            </button>
+            <button class="btn btn-secondary" onclick="resetSettings()">
+                <i class="fas fa-undo"></i>
+                Resetuj na početno
+            </button>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/modern-effects.js' %}"></script>
+    <script>
+        // Load saved settings
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+        });
+
+        // Toggle switches functionality
+        document.querySelectorAll('.toggle-switch').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                this.classList.toggle('active');
+                
+                // Special handling for dark mode
+                if (this.id === 'darkModeToggle') {
+                    document.body.classList.toggle('dark-mode');
+                    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+                }
+            });
+        });
+
+        // Sound test functionality
+        function testSound() {
+            const soundType = document.getElementById('soundTypeSelect').value;
+            const volume = document.getElementById('soundVolumeSelect').value;
+            
+            // Create audio context for testing
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Set volume
+            const volumeLevel = volume === 'low' ? 0.1 : volume === 'medium' ? 0.3 : 0.5;
+            gainNode.gain.setValueAtTime(volumeLevel, audioContext.currentTime);
+            
+            // Set frequency based on sound type
+            let frequency = 800; // default
+            switch(soundType) {
+                case 'chime': frequency = 1000; break;
+                case 'beep': frequency = 600; break;
+                case 'notification': frequency = 900; break;
+            }
+            
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = soundType === 'beep' ? 'square' : 'sine';
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        // Save settings
+        function saveSettings() {
+            const settings = {
+                darkMode: document.getElementById('darkModeToggle').classList.contains('active'),
+                language: document.getElementById('languageSelect').value,
+                autoRefresh: document.getElementById('autoRefreshToggle').classList.contains('active'),
+                soundNotifications: document.getElementById('soundNotificationsToggle').classList.contains('active'),
+                soundVolume: document.getElementById('soundVolumeSelect').value,
+                soundType: document.getElementById('soundTypeSelect').value,
+                pushNotifications: document.getElementById('pushNotificationsToggle').classList.contains('active'),
+                gpsNavigation: document.getElementById('gpsNavigationToggle').classList.contains('active'),
+                autoLighting: document.getElementById('autoLightingToggle').classList.contains('active'),
+                autoVehicleUpdate: document.getElementById('autoVehicleUpdateToggle').classList.contains('active'),
+                twoFactor: document.getElementById('twoFactorToggle').classList.contains('active'),
+                autoLogout: document.getElementById('autoLogoutSelect').value
+            };
+            
+            localStorage.setItem('appSettings', JSON.stringify(settings));
+            
+            // Show success message
+            alert('Podešavanja su uspešno sačuvana!');
+        }
+
+        // Load settings
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('appSettings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                
+                // Apply settings
+                if (settings.darkMode) {
+                    document.body.classList.add('dark-mode');
+                    document.getElementById('darkModeToggle').classList.add('active');
+                }
+                
+                document.getElementById('languageSelect').value = settings.language || 'sr';
+                
+                if (settings.autoRefresh) document.getElementById('autoRefreshToggle').classList.add('active');
+                if (settings.soundNotifications) document.getElementById('soundNotificationsToggle').classList.add('active');
+                if (settings.pushNotifications) document.getElementById('pushNotificationsToggle').classList.add('active');
+                if (settings.gpsNavigation) document.getElementById('gpsNavigationToggle').classList.add('active');
+                if (settings.autoLighting) document.getElementById('autoLightingToggle').classList.add('active');
+                if (settings.autoVehicleUpdate) document.getElementById('autoVehicleUpdateToggle').classList.add('active');
+                if (settings.twoFactor) document.getElementById('twoFactorToggle').classList.add('active');
+                
+                document.getElementById('soundVolumeSelect').value = settings.soundVolume || 'medium';
+                document.getElementById('soundTypeSelect').value = settings.soundType || 'default';
+                document.getElementById('autoLogoutSelect').value = settings.autoLogout || '60';
+            }
+        }
+
+        // Reset settings
+        function resetSettings() {
+            if (confirm('Da li ste sigurni da želite da resetujete sva podešavanja na početne vrednosti?')) {
+                localStorage.removeItem('appSettings');
+                localStorage.removeItem('darkMode');
+                location.reload();
+            }
+        }
+    </script>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Save notification settings
-    const switches = document.querySelectorAll('.form-check-input');
-    switches.forEach(function(switchElement) {
-        switchElement.addEventListener('change', function() {
-            const setting = this.id;
-            const enabled = this.checked;
-            
-            // Save to localStorage for now (in production, send to server)
-            localStorage.setItem(setting, enabled);
-            
-            // Show feedback
-            const toast = document.createElement('div');
-            toast.className = 'alert alert-success position-fixed';
-            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
-            toast.innerHTML = '<i class="fas fa-check me-2"></i>Podešavanje sačuvano!';
-            document.body.appendChild(toast);
-            
-            setTimeout(function() { toast.remove(); }, 2000);
-        });
-        
-        // Load saved settings
-        const saved = localStorage.getItem(switchElement.id);
-        if (saved !== null) {
-            switchElement.checked = saved === 'true';
-        }
-    });
-});
+    // Add extra JavaScript code here
 </script>
 {% endblock %}

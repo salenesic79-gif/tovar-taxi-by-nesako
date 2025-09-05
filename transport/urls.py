@@ -1,9 +1,35 @@
 from django.urls import path
 from . import views
 
+app_name = 'transport'
+
 urlpatterns = [
+    # Home page
+    path('', views.home_view, name='transport_home'),
+    
+    # Test URL
+    path('test/', views.test_view, name='test'),
+    
     # Authentication
+    path('login/', views.custom_login_view, name='custom_login'),
     path('signup/', views.signup_view, name='signup'),
+    path('signup/sender/', views.signup_sender_view, name='signup_sender'),
+    path('signup/carrier/', views.signup_carrier_view, name='signup_carrier'),
+    
+    # Post-registration workflows
+    path('create-shipment-request/', views.create_shipment_request, name='create_shipment_request'),
+    path('create-route-availability/', views.create_route_availability, name='create_route_availability'),
+    
+    # B2B and Instant Delivery
+    path('instant-delivery/', views.create_instant_delivery, name='create_instant_delivery'),
+    path('food-delivery/', views.create_food_delivery, name='create_food_delivery'),
+    path('premium-subscription/', views.premium_subscription_view, name='premium_subscription'),
+    
+    # Driver extended functionality
+    path('driver-dashboard-extended/', views.driver_dashboard_extended, name='driver_dashboard_extended'),
+    path('accept-delivery/<int:delivery_id>/', views.accept_delivery, name='accept_delivery'),
+    path('update-delivery-status/<int:delivery_id>/', views.update_delivery_status, name='update_delivery_status'),
+    path('update-location/', views.update_location, name='update_location'),
     
     # Dashboards
     path('shipper-dashboard/', views.shipper_dashboard, name='shipper_dashboard'),
@@ -25,6 +51,8 @@ urlpatterns = [
     # Tours
     path('my-tours/', views.my_tours, name='my_tours'),
     path('tour/<int:pk>/', views.tour_detail, name='tour_detail'),
+    path('create-tour/', views.create_tour, name='create_tour'),
+    path('update-tour-location/', views.update_tour_location, name='update_tour_location'),
     
     # Notifications
     path('notifications/', views.notifications, name='notifications'),

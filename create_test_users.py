@@ -67,13 +67,10 @@ def create_test_users():
         # Add test vehicle for prevoznik
         Vehicle.objects.create(
             owner=prevoz,
-            vehicle_type='truck',
+            vehicle_type='kamion',
             license_plate='BG-123-AB',
-            capacity=5000.00,
-            max_volume=25.00,
-            length=6.00,
-            width=2.50,
-            height=2.80,
+            capacity=5.00,
+            volume=25.00,
             is_available=True
         )
         print("✅ Prevoznik kreiran: username=prevoz, password=pass123")

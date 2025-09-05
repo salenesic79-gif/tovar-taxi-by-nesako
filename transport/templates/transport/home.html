@@ -1,17 +1,149 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="sr">
 <head>
-    <title>Home</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tovar Taxi - Početna</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+        }
+        .navbar-brand {
+            margin-left: 7.5px;
+        }
+        .navbar-brand img {
+            height: 56px;
+            width: auto;
+        }
+        .hero-title {
+            margin-bottom: 30px;
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        .hero-subtitle {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .btn-register {
+            background-color: #2ECC71;
+            border: 2px solid #C0C0C0;
+            color: #000000;
+            font-weight: 900;
+            padding: 14px 36px;
+            font-size: 1.32rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .btn-register:hover {
+            background-color: #27AE60;
+            color: #000000;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .feature-card {
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
 </head>
 <body>
-    <h2>Welcome {{ user.username }}</h2>
-    {% if user.is_authenticated %}
-        <p>Email: {{ user.email }}</p>
-        <p>Phone: {{ user.profile.phone_number }}</p>
-        <p>Address: {{ user.profile.address }}</p>
-    {% else %}
-        <a href="{% url 'signup' %}">Sign Up</a>
-        <a href="{% url 'login' %}">Login</a>
-    {% endif %}
+    <!-- Header sa TTaxi.png slikom -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(0, 0, 0);">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 56px; width: auto;">
+            </a>
+            <div class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <span class="navbar-text me-3">Dobrodošli, {{ user.username }}!</span>
+                    <a class="nav-link" href="{% url 'logout' %}" style="color: white; border: 2px solid #FFD700; padding: 8px 16px; border-radius: 5px; text-decoration: none;">Odjavi se</a>
+                {% else %}
+                    <a class="nav-link" href="{% url 'login' %}" style="color: white; border: 2px solid #FFD700; padding: 8px 16px; border-radius: 5px; text-decoration: none;">Prijavi se</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold hero-title">
+                <span class="letter">D</span><span class="letter">o</span><span class="letter">b</span><span class="letter">r</span><span class="letter">o</span><span class="letter">d</span><span class="letter">o</span><span class="letter">š</span><span class="letter">l</span><span class="letter">i</span>
+                <span class="letter"> </span>
+                <span class="letter">u</span>
+                <span class="letter"> </span>
+                <span class="letter">T</span><span class="letter">o</span><span class="letter">v</span><span class="letter">a</span><span class="letter">r</span>
+                <span class="letter"> </span>
+                <span class="letter">T</span><span class="letter">a</span><span class="letter">x</span><span class="letter">i</span>
+            </h1>
+            <div class="lead hero-subtitle">
+                <div>Aplikacija koja spaja naručioce i prevoznike.</div>
+                <div>Budućnost transporta je stigla: povećajte zaradu, smanjite troškove.</div>
+            </div>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'transport:signup' %}" class="btn btn-register btn-lg">REGISTRUJ SE SADA</a>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <i class="fas fa-truck fa-3x text-primary"></i>
+                            </div>
+                            <h5 class="card-title">Brz Transport</h5>
+                            <p class="card-text">Organizujemo brz i siguran transport vaše robe na teritoriji Srbije.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <i class="fas fa-shield-alt fa-3x text-success"></i>
+                            </div>
+                            <h5 class="card-title">Sigurnost</h5>
+                            <p class="card-text">Brzina i efikasnost: Naša mreža i tim su optimizovani za brzu isporuku bez kompromisa po pitanju sigurnosti.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <i class="fas fa-clock fa-3x text-warning"></i>
+                            </div>
+                            <h5 class="card-title">Dostupnost</h5>
+                            <p class="card-text">Vozači u pokretu, uvek dostupni – vaša pošiljka spremna, brza i pouzdana isporuka već je na putu.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p>&copy; 2024 Tovar Taxi by NESAKO. Sva prava zadržana.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

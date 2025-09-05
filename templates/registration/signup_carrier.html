@@ -1,0 +1,399 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registracija Prevoznika - Tovar Taxi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .navbar-brand {
+            margin-left: 7.5px;
+        }
+        .navbar-brand img {
+            height: 56px;
+            width: auto;
+        }
+        .main-title {
+            text-align: center;
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin: 40px 0;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            font-family: 'Montserrat', sans-serif;
+        }
+        .form-container {
+            max-width: 100%;
+            margin: 0;
+            background-color: #90EE90;
+            border: 3px solid #C0C0C0;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            height: 100%;
+        }
+        .terms-container {
+            background-color: #90EE90;
+            border: 3px solid #C0C0C0;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .terms-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #000000;
+            text-shadow: none;
+        }
+        .terms-content {
+            background-color: #FFFFFF;
+            border: 1px solid #000000;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 0.95rem;
+            color: #000000;
+            line-height: 1.4;
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .terms-content p {
+            margin-bottom: 12px;
+        }
+        .terms-content strong {
+            color: #000000;
+            font-weight: 700;
+        }
+        .terms-checkbox {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .terms-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+        }
+        .terms-checkbox label {
+            color: #000000;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 0;
+            cursor: pointer;
+        }
+        .row {
+            align-items: stretch;
+        }
+        .col-md-7, .col-md-5 {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #000000;
+            text-shadow: none;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #000000;
+            font-size: 1.1rem;
+            text-shadow: none;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #000000;
+            border-radius: 8px;
+            background-color: #FFFFFF;
+            color: #000000;
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+        .submit-btn {
+            width: 100%;
+            background-color: #2ECC71;
+            color: #000000;
+            font-weight: 900;
+            border: 2px solid #C0C0C0;
+            padding: 15px;
+            font-size: 1.3rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .submit-btn:hover {
+            background-color: #27AE60;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-link a {
+            color: #000000;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .back-link a:hover {
+            color: #333333;
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 60px;
+        }
+        .container-fluid {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .left-container {
+            width: 60%;
+            margin: 20px;
+        }
+        .right-container {
+            width: 40%;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header sa TTaxi.png slikom -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(0, 0, 0);">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 56px; width: auto;">
+            </a>
+            <div class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <span class="navbar-text me-3">Dobrodošli, {{ user.username }}!</span>
+                    <a class="nav-link" href="{% url 'logout' %}" style="color: white; border: 2px solid #FFD700; padding: 8px 16px; border-radius: 5px; text-decoration: none;">Odjavi se</a>
+                {% else %}
+                    <a class="nav-link" href="{% url 'login' %}" style="color: white; border: 2px solid #FFD700; padding: 8px 16px; border-radius: 5px; text-decoration: none;">Prijavi se</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Title -->
+    <h1 class="main-title">Registracija Prevoznika</h1>
+
+    <!-- Main Content Container -->
+    <div class="container" style="margin-top: 40px; margin-bottom: 60px;">
+        <div class="row">
+            <!-- Leva tabela - Registracija forma -->
+            <div class="col-md-7">
+                <div class="form-container">
+                    <h2 class="form-title">Pridružite se kao Prevoznik</h2>
+                    
+                    <form method="post" action="{% url 'transport:signup_carrier' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="role" value="prevoznik">
+                        
+                        <div class="form-group">
+                            <label for="username">Korisničko ime:</label>
+                            <input type="text" id="username" name="username" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email adresa:</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password1">Lozinka:</label>
+                            <input type="password" id="password1" name="password1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password2">Potvrdite lozinku:</label>
+                            <input type="password" id="password2" name="password2" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="first_name">Ime:</label>
+                            <input type="text" id="first_name" name="first_name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="last_name">Prezime:</label>
+                            <input type="text" id="last_name" name="last_name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone_number">Broj telefona:</label>
+                            <input type="tel" id="phone_number" name="phone_number" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Adresa:</label>
+                            <textarea id="address" name="address" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="company_name">Naziv transportne kompanije:</label>
+                            <input type="text" id="company_name" name="company_name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="pib">PIB (Poreski identifikacioni broj):</label>
+                            <input type="text" id="pib" name="pib" placeholder="123456789" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="maticni_broj">Matični broj:</label>
+                            <input type="text" id="maticni_broj" name="maticni_broj" placeholder="12345678" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bank_account">Broj računa (IBAN):</label>
+                            <input type="text" id="bank_account" name="bank_account" placeholder="RS35260005601001611379">
+                        </div>
+                        
+                        <div class="form-group">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                                <input type="checkbox" id="remember_me" name="remember_me" style="width: 20px; height: 20px;">
+                                <label for="remember_me" style="margin: 0; color: #000000; font-weight: 600; cursor: pointer;">Zapamti me i automatski me vodi u aplikaciju</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="terms_checkbox" style="color: #000000; font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; display: block;">
+                                <input type="checkbox" id="terms_checkbox" name="terms_accepted" required style="margin-right: 8px; width: 16px; height: 16px;">
+                                Prihvatam uslove korišćenja
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Registruj se kao prevoznik</button>
+                        
+                        <!-- WORKFLOW: Nakon uspešne registracije → Login potvrda → Prijavljivanje rute sa slobodnim mestom -->
+                        <!-- SLEDEĆA STRANICA: /transport/create-route-availability/ -->
+                        
+                        <div class="back-link">
+                            <a href="{% url 'transport:signup' %}">← Nazad na izbor tipa korisnika</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Desna tabela - Uslovi korišćenja -->
+            <div class="col-md-5">
+                <div class="terms-container">
+                    <h3 class="terms-title">Uslovi korišćenja</h3>
+                    
+                    <div class="terms-content">
+                        <p><strong>1. OPŠTI USLOVI</strong></p>
+                        <p>Korišćenjem Tovar Taxi platforme kao prevoznik prihvatate sledeće uslove korišćenja. Platforma omogućava povezivanje sa naručiocima transporta.</p>
+                        
+                        <p><strong>2. REGISTRACIJA I VERIFIKACIJA</strong></p>
+                        <p>• Obavezno je navođenje tačnih podataka o kompaniji i vozilima<br>
+                        • PIB, matični broj i dozvole moraju biti važeći<br>
+                        • Redovna verifikacija vozačkih dozvola i osiguranja<br>
+                        • Lažni podaci mogu dovesti do trajnog suspendovanja</p>
+                        
+                        <p><strong>3. DOZVOLE I SERTIFIKATI</strong></p>
+                        <p>• Važeća dozvola za prevoz tereta<br>
+                        • Odgovarajuće kategorije vozačke dozvole<br>
+                        • ADR sertifikat za opasni teret (obavezno)<br>
+                        • Redovno obnavljanje svih dozvola<br>
+                        • Tahograf i digitalna kartica vozača</p>
+                        
+                        <p><strong>4. OSIGURANJE I ODGOVORNOST</strong></p>
+                        <p>• Obavezno kasko i AO osiguranje vozila<br>
+                        • Osiguranje odgovornosti prevoznika minimum 100.000 EUR<br>
+                        • Osiguranje tereta prema CMR konvenciji<br>
+                        • Maksimalna odgovornost: 8.33 SDR/kg<br>
+                        • Izveštavanje o šteti u roku od 24h</p>
+                        
+                        <p><strong>5. TEHNIČKI USLOVI VOZILA</strong></p>
+                        <p>• Redovan tehnički pregled vozila<br>
+                        • Vozila mlađa od 15 godina za međunarodni saobraćaj<br>
+                        • GPS praćenje obavezno za sva vozila<br>
+                        • Održavanje vozila u ispravnom stanju<br>
+                        • Čistoća i higijena vozila</p>
+                        
+                        <p><strong>6. PLAĆANJE I NAKNADE</strong></p>
+                        <p>• Platforma naplaćuje proviziju od 8% na svaku realizovanu turu<br>
+                        • Plaćanje se vrši u roku od 7 dana nakon završetka<br>
+                        • Bonus za redovne prevoznike: -1% provizije<br>
+                        • Penali za kašnjenja: 5% vrednosti ture<br>
+                        • Kamate na neplaćene obaveze: 0.15% dnevno</p>
+                        
+                        <p><strong>7. OPERATIVNI USLOVI</strong></p>
+                        <p>• Poštovanje dogovorenih rokova isporuke<br>
+                        • Obavezno prijavljivanje lokacije svakih 2h<br>
+                        • Dostupnost za komunikaciju 24/7<br>
+                        • Profesionalno ponašanje prema klijentima<br>
+                        • Poštovanje radnog vremena i odmora vozača</p>
+                        
+                        <p><strong>8. OTKAZIVANJE I IZMENE</strong></p>
+                        <p>• Otkazivanje do 4h pre: bez naknade<br>
+                        • Otkazivanje 0-4h pre: naknada 50% vrednosti<br>
+                        • Nepojavljivanje: suspendovanje 7 dana<br>
+                        • Tri nepojavljivanja: trajno uklanjanje</p>
+                        
+                        <p><strong>9. PRIVATNOST PODATAKA (GDPR)</strong></p>
+                        <p>• Podaci se koriste za operativne potrebe<br>
+                        • GPS podaci se čuvaju 90 dana<br>
+                        • Pravo na pristup i brisanje podataka<br>
+                        • Podaci se dele sa naručiocima radi praćenja</p>
+                        
+                        <p><strong>10. REŠAVANJE SPOROVA</strong></p>
+                        <p>• Arbitraža kroz Udruženje prevoznika Srbije<br>
+                        • Nadležan sud u Beogradu<br>
+                        • Primena CMR konvencije za međunarodni saobraćaj</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 Tovar Taxi. Sva prava zadržana.</p>
+    </footer>
+</body>
+</html>

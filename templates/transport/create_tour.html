@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dopuni Turu - Tovar Taxi</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #000000;
+        }
+
+        .header {
+            background-color: rgb(0, 0, 0) !important;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #FFD700;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .back-btn {
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border: 2px solid #FFD700;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #FFD700;
+            color: #000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 120px auto 50px;
+            padding: 0 20px;
+        }
+
+        .form-container {
+            background: #90EE90;
+            border: 3px solid #000000;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #000000;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .form-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #000000;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: #000000;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #000000;
+            border-radius: 8px;
+            background: #FFFFFF;
+            color: #000000;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2ECC71;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+        }
+
+        .location-group {
+            position: relative;
+        }
+
+        .location-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #2ECC71;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .location-btn:hover {
+            background: #27AE60;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: #2ECC71;
+            border: 2px solid #000000;
+            color: #000000;
+            font-weight: 900;
+            font-size: 1.2rem;
+            padding: 15px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background: #27AE60;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .vehicle-info {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #000000;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .vehicle-plate {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #000000;
+            letter-spacing: 3px;
+            margin-bottom: 0.5rem;
+        }
+
+        .vehicle-type {
+            font-weight: 600;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                margin-top: 100px;
+                padding: 0 15px;
+            }
+            
+            .form-container {
+                padding: 25px;
+            }
+            
+            .form-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <a href="{% url 'home' %}" class="logo">
+                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi Logo">
+                TOVAR TAXI
+            </a>
+            <a href="{% url 'transport:carrier_dashboard' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Nazad
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <h1 class="form-title">Dopuni Turu</h1>
+            <p class="form-subtitle">Unesite detalje vaše ture i krenite sa transportom</p>
+            
+            {% if vehicle %}
+            <div class="vehicle-info">
+                <div class="vehicle-plate">{{ vehicle.license_plate }}</div>
+                <div class="vehicle-type">{{ vehicle.get_vehicle_type_display }} - {{ vehicle.capacity }}t</div>
+            </div>
+            {% endif %}
+            
+            <form method="post" id="tourForm">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="polaziste" class="form-label">
+                        <i class="fas fa-map-marker-alt"></i> Polazište:
+                    </label>
+                    <div class="location-group">
+                        {{ form.polaziste }}
+                        <button type="button" id="trenutnaLokacija" class="location-btn">
+                            <i class="fas fa-location-arrow"></i> Moja lokacija
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.odrediste.id_for_label }}" class="form-label">
+                        <i class="fas fa-flag-checkered"></i> Odredište:
+                    </label>
+                    {{ form.odrediste }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.planirana_putanja.id_for_label }}" class="form-label">
+                        <i class="fas fa-route"></i> Planirana putanja:
+                    </label>
+                    {{ form.planirana_putanja }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.dostupno_za_dotovar.id_for_label }}" class="form-label">
+                        <i class="fas fa-boxes"></i> Dostupno za dotovar:
+                    </label>
+                    {{ form.dostupno_za_dotovar }}
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.kapacitet.id_for_label }}" class="form-label">
+                            <i class="fas fa-weight-hanging"></i> Kapacitet (tone):
+                        </label>
+                        {{ form.kapacitet }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.slobodna_kilaza.id_for_label }}" class="form-label">
+                            <i class="fas fa-balance-scale"></i> Slobodna kilaža (kg):
+                        </label>
+                        {{ form.slobodna_kilaza }}
+                    </div>
+                </div>
+                
+                {{ form.vehicle }}
+                
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-truck"></i> Krećem sada
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Geolokacija funkcionalnost
+        document.getElementById('trenutnaLokacija').addEventListener('click', function() {
+            const button = this;
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Lociranje...';
+            button.disabled = true;
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        
+                        // Pokušaj reverse geocoding
+                        fetch(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=YOUR_API_KEY`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.results && data.results.length > 0) {
+                                    document.getElementById('polaziste').value = data.results[0].formatted;
+                                } else {
+                                    document.getElementById('polaziste').value = `${latitude}, ${longitude}`;
+                                }
+                            })
+                            .catch(() => {
+                                document.getElementById('polaziste').value = `${latitude}, ${longitude}`;
+                            })
+                            .finally(() => {
+                                button.innerHTML = originalText;
+                                button.disabled = false;
+                            });
+                    },
+                    function(error) {
+                        alert('Greška pri dobijanju lokacije: ' + error.message);
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+            } else {
+                alert("Geolokacija nije podržana u vašem pretraživaču.");
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        });
+
+        // Form submission
+        document.getElementById('tourForm').addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('.submit-btn');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kreiranje ture...';
+            submitBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>

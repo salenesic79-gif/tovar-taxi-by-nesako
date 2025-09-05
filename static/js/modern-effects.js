@@ -244,6 +244,95 @@ document.addEventListener('DOMContentLoaded', function() {
             new bootstrap.Modal(document.getElementById('shortcutsModal')).show();
         }
     }
+
+    // Debug Popup System
+    function showDebugPopup(title, message, type = 'error') {
+        // Remove existing popup if any
+        const existingPopup = document.querySelector('.debug-popup-overlay');
+        if (existingPopup) {
+            existingPopup.remove();
+        }
+
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'debug-popup-overlay';
+
+        // Create popup
+        const popup = document.createElement('div');
+        popup.className = `debug-popup error-${type}`;
+        
+        popup.innerHTML = `
+            <div class="debug-popup-title">${title}</div>
+            <div class="debug-popup-message">${message}</div>
+            <button class="debug-popup-close" onclick="closeDebugPopup()">U redu</button>
+        `;
+
+        overlay.appendChild(popup);
+        document.body.appendChild(overlay);
+
+        // Close on overlay click
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                closeDebugPopup();
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDebugPopup();
+            }
+        });
+    }
+
+    function closeDebugPopup() {
+        const overlay = document.querySelector('.debug-popup-overlay');
+        if (overlay) {
+            overlay.remove();
+        }
+    }
+
+    // Auto-detect common errors and show popup
+    // Check for Django form errors
+    const errorElements = document.querySelectorAll('.text-danger, .errorlist, .alert-danger');
+    if (errorElements.length > 0) {
+        let errorMessage = '';
+        errorElements.forEach(element => {
+            const text = element.textContent.trim();
+            if (text) {
+                errorMessage += text + '\n';
+            }
+        });
+        
+        if (errorMessage) {
+            // Determine error type based on content
+            let errorType = 'validation';
+            let title = 'Greška u validaciji';
+            
+            if (errorMessage.toLowerCase().includes('username') || errorMessage.toLowerCase().includes('korisničko ime')) {
+                errorType = 'username';
+                title = 'Greška sa korisničkim imenom';
+            } else if (errorMessage.toLowerCase().includes('connection') || errorMessage.toLowerCase().includes('konekcija')) {
+                errorType = 'connection';
+                title = 'Greška konekcije';
+            } else if (errorMessage.toLowerCase().includes('server') || errorMessage.toLowerCase().includes('500')) {
+                errorType = 'server';
+                title = 'Greška servera';
+            }
+            
+            showDebugPopup(title, errorMessage.trim(), errorType);
+        }
+    }
+    
+    // Check for network errors
+    window.addEventListener('offline', function() {
+        showDebugPopup('Nema internet konekcije', 'Proverite vašu internet konekciju i pokušajte ponovo.', 'connection');
+    });
+    
+    // Check for JavaScript errors
+    window.addEventListener('error', function(e) {
+        showDebugPopup('JavaScript greška', 'Dogodila se neočekivana greška. Molimo osvežite stranicu.', 'server');
+    });
 });
 
 // CSS dodatak za notifikacije
@@ -277,6 +366,50 @@ const notificationStyles = `
         left: 10px;
         min-width: auto;
     }
+}
+
+.debug-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.debug-popup {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+}
+
+.debug-popup-title {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.debug-popup-message {
+    margin-bottom: 20px;
+}
+
+.debug-popup-close {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.debug-popup-close:hover {
+    background-color: #0056b3;
 }
 </style>
 `;
