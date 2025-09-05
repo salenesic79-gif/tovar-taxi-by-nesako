@@ -13,6 +13,19 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2ECC71">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tovar Taxi">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{% url 'transport:pwa_manifest' %}">
+    
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" href="{% static 'images/TTaxi.png' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/TTaxi.png' %}">
+    
     <style>
         :root {
             --primary-color: #667eea;
@@ -365,38 +378,136 @@
     
     <!-- Custom JS -->
     <script>
-        // Enhanced animations and effects
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add dashboard-card class to all cards for animations
-            const cards = document.querySelectorAll('.card');
-            cards.forEach((card, index) => {
-                card.classList.add('dashboard-card');
-                card.style.animationDelay = `${index * 0.1}s`;
-            });
+        // Manual Install Button (always visible on mobile)
+        function createInstallButton() {
+            const installBtn = document.createElement('button');
+            installBtn.id = 'pwa-install-btn';
+            installBtn.innerHTML = '&#x1F4F1; Dodaj na početni ekran';
+            installBtn.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #2ECC71, #27AE60);
+                color: white;
+                border: none;
+                padding: 12px 16px;
+                border-radius: 25px;
+                font-weight: bold;
+                z-index: 9999;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                font-size: 14px;
+                cursor: pointer;
+                animation: pulse 2s infinite;
+            `;
             
-            // Enhanced button interactions
-            const buttons = document.querySelectorAll('.btn');
-            buttons.forEach(button => {
-                button.classList.add('gpu-accelerated');
-            });
+            // Add pulse animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                    100% { transform: scale(1); }
+                }
+            `;
+            document.head.appendChild(style);
             
-            // Real-time form validation
-            const forms = document.querySelectorAll('form');
-            forms.forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    const submitBtn = this.querySelector('button[type="submit"]');
-                    if (submitBtn && !submitBtn.disabled) {
-                        submitBtn.innerHTML = '<span class="loading-spinner"></span> Obrađuje se...';
-                        submitBtn.disabled = true;
+            return installBtn;
+        }
+
+        // Check if running as PWA
+        function isPWA() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true;
+        }
+
+        // Show install instructions
+        function showInstallInstructions() {
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            
+            let instructions = '';
+            if (isAndroid) {
+                instructions = `
+                    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; max-width: 300px;">
+                        <h3 style="margin: 0 0 15px 0; color: #2ECC71;">&#x1F4F1; Instaliraj aplikaciju</h3>
+                        <p style="margin: 0 0 15px 0; color: #333;">Za instalaciju:</p>
+                        <ol style="color: #333; padding-left: 20px;">
+                            <li>Kliknite na &#x25CF;&#x25CF;&#x25CF; (tri tačke) u browser-u</li>
+                            <li>Izaberite "Dodaj na početni ekran"</li>
+                            <li>Potvrdite instalaciju</li>
+                        </ol>
+                        <button onclick="this.parentElement.remove()" style="background: #2ECC71; color: white; border: none; padding: 10px 20px; border-radius: 5px; float: right;">OK</button>
+                    </div>
+                `;
+            } else if (isIOS) {
+                instructions = `
+                    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; max-width: 300px;">
+                        <h3 style="margin: 0 0 15px 0; color: #2ECC71;">&#x1F4F1; Instaliraj aplikaciju</h3>
+                        <p style="margin: 0 0 15px 0; color: #333;">Za instalaciju:</p>
+                        <ol style="color: #333; padding-left: 20px;">
+                            <li>Kliknite na dugme Share &#x1F4E4;</li>
+                            <li>Izaberite "Add to Home Screen"</li>
+                            <li>Potvrdite instalaciju</li>
+                        </ol>
+                        <button onclick="this.parentElement.remove()" style="background: #2ECC71; color: white; border: none; padding: 10px 20px; border-radius: 5px; float: right;">OK</button>
+                    </div>
+                `;
+            }
+            
+            if (instructions) {
+                document.body.insertAdjacentHTML('beforeend', instructions);
+            }
+        }
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+        
+        // PWA Install Logic
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            if (!isPWA()) {
+                const installBtn = createInstallButton();
+                installBtn.addEventListener('click', () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                            if (choiceResult.outcome === 'accepted') {
+                                console.log('User accepted the A2HS prompt');
+                            }
+                            deferredPrompt = null;
+                            installBtn.remove();
+                        });
+                    } else {
+                        showInstallInstructions();
                     }
                 });
-            });
-            
-            // Progressive enhancement
-            if ('serviceWorker' in navigator) {
-                // Future PWA support
-                console.log('PWA ready');
+                document.body.appendChild(installBtn);
             }
+        });
+
+        // Fallback - show button after 3 seconds if no beforeinstallprompt
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (!isPWA() && !document.getElementById('pwa-install-btn')) {
+                    const installBtn = createInstallButton();
+                    installBtn.addEventListener('click', showInstallInstructions);
+                    document.body.appendChild(installBtn);
+                }
+            }, 3000);
         });
     </script>
     

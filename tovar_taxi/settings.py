@@ -4,6 +4,7 @@ Django settings for tovar_taxi project.
 
 from pathlib import Path
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -85,10 +86,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Europe/Belgrade'
+TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+# Login/Logout URLs
+LOGIN_REDIRECT_URL = '/'
 
 # Locale paths
 LOCALE_PATHS = [
@@ -109,14 +113,17 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Login/Logout URLs
-LOGIN_URL = '/login/'
-# LOGIN_REDIRECT_URL = '/transport/create-shipment-request/'  # Ukloniti da custom_login_view može da radi role-based redirect
-LOGOUT_REDIRECT_URL = '/'
-
 # Channels configuration
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
+
+# Stripe Configuration
+STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY', default='pk_test_51234567890abcdef')
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='sk_test_51234567890abcdef')
+STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='whsec_1234567890abcdef')
+
+# Currency settings
+DEFAULT_CURRENCY = 'RSD'  # Serbian Dinar

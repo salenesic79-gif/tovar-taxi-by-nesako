@@ -397,3 +397,84 @@ class PremiumSubscription(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.subscription_type}"
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    sound_file = models.CharField(max_length=50, default='ping.mp3')
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.message[:50]}"
+
+
+class Cargo(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Na čekanju'),
+        ('reserved', 'Rezervisano'),
+        ('assigned', 'Dodeljeno prevozniku'),
+        ('in_transit', 'U transportu'),
+        ('delivered', 'Isporučeno'),
+        ('paid', 'Plaćeno'),
+    ]
+    
+    # Povezivanje sa postojećim sistemom
+    posiljilac = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posiljke')
+    prevoznik = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='teretni_poslovi')
+    tour = models.ForeignKey(Tour, on_delete=models.SET_NULL, null=True, blank=True, related_name='tereti')
+    
+    # Informacije o teretu
+    tezina = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0.1)])
+    broj_paleta = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    opis_tereta = models.TextField(blank=True)
+    
+    # Lokacije
+    polazna_latitude = models.DecimalField(max_digits=9, decimal_places=6)
+    polazna_longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    polazna_adresa = models.CharField(max_length=255)
+    
+    odredisna_latitude = models.DecimalField(max_digits=9, decimal_places=6)
+    odredisna_longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    odredisna_adresa = models.CharField(max_length=255)
+    
+    # Cene i plaćanje
+    udaljenost_km = models.DecimalField(max_digits=8, decimal_places=2)
+    cena_za_posiljaoce = models.DecimalField(max_digits=10, decimal_places=2)
+    cena_za_prevoznika = models.DecimalField(max_digits=10, decimal_places=2)  # minus 15%
+    app_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # 15% fee
+    payment_intent_id = models.CharField(max_length=100, blank=True)
+    
+    # Eko-ambalaža
+    eko_ambalaza = models.TextField(blank=True)
+    
+    # Status i vreme
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    kreiran = models.DateTimeField(auto_now_add=True)
+    isporucen = models.DateTimeField(null=True, blank=True)
+    
+    def save(self, *args, **kwargs):
+        # Automatski izračunaj cene
+        if self.cena_za_posiljaoce and not self.cena_za_prevoznika:
+            self.app_fee = self.cena_za_posiljaoce * 0.15  # 15% fee
+            self.cena_za_prevoznika = self.cena_za_posiljaoce - self.app_fee
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"Teret {self.id} - {self.broj_paleta} paleta - {self.status}"
+
+
+class CenaPoKilometrazi(models.Model):
+    """Tabela cena za palete po udaljenosti"""
+    broj_paleta = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    cena_do_200km = models.DecimalField(max_digits=10, decimal_places=2)
+    cena_preko_200km = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    class Meta:
+        unique_together = ['broj_paleta']
+        verbose_name = 'Cena po kilometraži'
+        verbose_name_plural = 'Cene po kilometraži'
+    
+    def __str__(self):
+        return f"{self.broj_paleta} paleta: {self.cena_do_200km}/{self.cena_preko_200km} RSD"

@@ -2,8 +2,233 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
-from django.http import JsonResponse
+from django.utils import timezone
+import stripe
+import json
+from .models import Cargo, Notification, Profile, CenaPoKilometrazi, Vehicle
+from .utils import izracunaj_cenu, izracunaj_udaljenost, predlozi_eko_ambalazu, izracunaj_cenu_za_prevoznika
+from django.conf import settings
+
+# Stripe konfiguracija
+stripe.api_key = getattr(settings, 'STRIPE_SECRET_KEY', '')
+
+@login_required
+def cargo_mapa(request):
+    """Stranica sa mapom za kreiranje nove rezervacije tereta"""
+    if request.method == 'POST':
+        try:
+            # Uzmi podatke iz forme
+            tezina = float(request.POST.get('tezina'))
+            broj_paleta = int(request.POST.get('broj_paleta'))
+            polazna_lat = float(request.POST.get('polazna_lat'))
+            polazna_lon = float(request.POST.get('polazna_lon'))
+            polazna_adresa = request.POST.get('polazna_adresa')
+            odredisna_lat = float(request.POST.get('odredisna_lat'))
+            odredisna_lon = float(request.POST.get('odredisna_lon'))
+            odredisna_adresa = request.POST.get('odredisna_adresa')
+            opis_tereta = request.POST.get('opis_tereta', '')
+            
+            # Izračunaj udaljenost
+            udaljenost = izracunaj_udaljenost(polazna_lat, polazna_lon, odredisna_lat, odredisna_lon)
+            
+            # Izračunaj cenu za pošiljaoce
+            cena_za_posiljaoce = izracunaj_cenu(broj_paleta, udaljenost)
+            
+            # Izračunaj cenu za prevoznika (minus 15%)
+            cena_za_prevoznika, app_fee = izracunaj_cenu_za_prevoznika(cena_za_posiljaoce)
+            
+            # Predlog eko-ambalaže
+            eko_ambalaza = predlozi_eko_ambalazu(tezina)
+            
+            # Kreiraj Stripe PaymentIntent (rezervacija)
+            if stripe.api_key:
+                intent = stripe.PaymentIntent.create(
+                    amount=int(cena_za_posiljaoce * 100),  # u centima
+                    currency='rsd',
+                    capture_method='manual',  # rezervacija bez naplate
+                    metadata={
+                        'posiljilac_id': request.user.id,
+                        'broj_paleta': broj_paleta,
+                        'udaljenost': udaljenost
+                    }
+                )
+                payment_intent_id = intent.id
+                client_secret = intent.client_secret
+            else:
+                payment_intent_id = f"test_{timezone.now().timestamp()}"
+                client_secret = "test_client_secret"
+            
+            # Sačuvaj cargo objekat
+            cargo = Cargo.objects.create(
+                posiljilac=request.user,
+                tezina=tezina,
+                broj_paleta=broj_paleta,
+                opis_tereta=opis_tereta,
+                polazna_latitude=polazna_lat,
+                polazna_longitude=polazna_lon,
+                polazna_adresa=polazna_adresa,
+                odredisna_latitude=odredisna_lat,
+                odredisna_longitude=odredisna_lon,
+                odredisna_adresa=odredisna_adresa,
+                udaljenost_km=udaljenost,
+                cena_za_posiljaoce=cena_za_posiljaoce,
+                cena_za_prevoznika=cena_za_prevoznika,
+                app_fee=app_fee,
+                payment_intent_id=payment_intent_id,
+                eko_ambalaza=eko_ambalaza,
+                status='reserved'
+            )
+            
+            # Kreiraj notifikaciju za pošiljaoce
+            Notification.objects.create(
+                user=request.user,
+                message=f"Nova rezervacija kreirana - {broj_paleta} paleta, {udaljenost:.1f}km, {cena_za_posiljaoce} RSD",
+                sound_file='ping.mp3'
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'cargo_id': cargo.id,
+                'client_secret': client_secret,
+                'cena_za_posiljaoce': cena_za_posiljaoce,
+                'cena_za_prevoznika': cena_za_prevoznika,
+                'app_fee': app_fee,
+                'udaljenost': udaljenost,
+                'eko_ambalaza': eko_ambalaza
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    # GET request - prikaži formu
+    cene = CenaPoKilometrazi.objects.all().order_by('broj_paleta')
+    return render(request, 'transport/cargo_mapa.html', {
+        'stripe_public_key': getattr(settings, 'STRIPE_PUBLIC_KEY', ''),
+        'cene': cene
+    })
+
+@login_required
+def potvrdi_istovar(request, cargo_id):
+    """Potvrda istovara i isplata prevozniku"""
+    cargo = get_object_or_404(Cargo, id=cargo_id)
+    
+    # Proveri da li je korisnik prevoznik za ovaj teret
+    if request.user.profile.role != 'prevoznik' or cargo.prevoznik != request.user:
+        messages.error(request, 'Nemate dozvolu za ovu akciju.')
+        return redirect('transport:carrier_dashboard')
+    
+    if request.method == 'POST' and cargo.status == 'in_transit':
+        try:
+            # Izvrši Stripe capture (isplata) ako postoji
+            if stripe.api_key and cargo.payment_intent_id and not cargo.payment_intent_id.startswith('test_'):
+                stripe.PaymentIntent.capture(cargo.payment_intent_id)
+            
+            # Ažuriraj status
+            cargo.status = 'paid'
+            cargo.isporucen = timezone.now()
+            cargo.save()
+            
+            # Notifikacija za pošiljaoce
+            Notification.objects.create(
+                user=cargo.posiljilac,
+                message=f"Teret isporučen i plaćanje potvrđeno - {cargo.cena_za_posiljaoce} RSD",
+                sound_file='success.wav'
+            )
+            
+            # Notifikacija za prevoznika sa cenom minus 15%
+            Notification.objects.create(
+                user=request.user,
+                message=f"Isplata potvrđena - {cargo.cena_za_prevoznika} RSD (ukupno: {cargo.cena_za_posiljaoce} RSD, app fee: {cargo.app_fee} RSD)",
+                sound_file='success.wav'
+            )
+            
+            messages.success(request, f'Istovar potvrđen! Vaša zarada: {cargo.cena_za_prevoznika} RSD')
+            
+        except Exception as e:
+            messages.error(request, f'Greška pri potvrdi: {str(e)}')
+    
+    return render(request, 'transport/potvrdi_istovar.html', {'cargo': cargo})
+
+@login_required
+def lista_tereta(request):
+    """Lista tereta za pošiljaoce i prevoznike"""
+    if request.user.profile.role == 'naručilac':
+        tereti = Cargo.objects.filter(posiljilac=request.user).order_by('-kreiran')
+        template = 'transport/lista_tereta_posiljilac.html'
+    elif request.user.profile.role == 'prevoznik':
+        # Prikaži dostupne tereti i dodeljene tereti
+        dostupni_tereti = Cargo.objects.filter(status='reserved', prevoznik__isnull=True).order_by('-kreiran')
+        moji_tereti = Cargo.objects.filter(prevoznik=request.user).order_by('-kreiran')
+        return render(request, 'transport/lista_tereta_prevoznik.html', {
+            'dostupni_tereti': dostupni_tereti,
+            'moji_tereti': moji_tereti
+        })
+    else:
+        tereti = Cargo.objects.none()
+        template = 'transport/lista_tereta_posiljilac.html'
+    
+    return render(request, template, {'tereti': tereti})
+
+@login_required
+def prihvati_teret(request, cargo_id):
+    """Prevoznik prihvata teret"""
+    if request.user.profile.role != 'prevoznik':
+        return JsonResponse({'success': False, 'error': 'Nemate dozvolu'})
+    
+    cargo = get_object_or_404(Cargo, id=cargo_id, status='reserved', prevoznik__isnull=True)
+    
+    # Dodeli teret prevozniku
+    cargo.prevoznik = request.user
+    cargo.status = 'assigned'
+    cargo.save()
+    
+    # Notifikacija za pošiljaoce
+    Notification.objects.create(
+        user=cargo.posiljilac,
+        message=f"Vaš teret je prihvaćen od strane prevoznika {request.user.get_full_name() or request.user.username}",
+        sound_file='ping.mp3'
+    )
+    
+    # Notifikacija za prevoznika sa cenom minus 15%
+    Notification.objects.create(
+        user=request.user,
+        message=f"Prihvatili ste teret - Vaša zarada: {cargo.cena_za_prevoznika} RSD (od ukupno {cargo.cena_za_posiljaoce} RSD)",
+        sound_file='success.wav'
+    )
+    
+    return JsonResponse({'success': True, 'message': 'Teret uspešno prihvaćen!'})
+
+def notifikacije_api(request):
+    """API za dobijanje notifikacija"""
+    if request.user.is_authenticated:
+        notifikacije = Notification.objects.filter(
+            user=request.user, 
+            is_read=False
+        ).order_by('-created_at')[:5]
+        
+        data = [{
+            'id': n.id,
+            'message': n.message,
+            'sound_file': n.sound_file,
+            'created_at': n.created_at.isoformat()
+        } for n in notifikacije]
+        
+        # Označi kao pročitane
+        notifikacije.update(is_read=True)
+        
+        return JsonResponse({'notifikacije': data})
+    
+    return JsonResponse({'notifikacije': []})
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q, Count, Sum
@@ -13,7 +238,7 @@ import json
 
 from .models import (
     Profile, Vehicle, Shipment, ShipmentOffer, Tour, ChatMessage, Notification, Location,
-    InstantDelivery, FoodDelivery, PaymentReservation, DriverLocation, PremiumSubscription
+    InstantDelivery, FoodDelivery, PaymentReservation, DriverLocation, PremiumSubscription, Cargo, CenaPoKilometrazi
 )
 from .forms import SignupForm, ShipmentForm, VehicleForm, ShipmentOfferForm, TourForm
 
@@ -506,14 +731,9 @@ def add_vehicle(request):
         vehicle_brand = request.POST.get('vehicle_brand')
         vehicle_color = request.POST.get('vehicle_color')
         transport_license = request.POST.get('transport_license')
-        insurance_policy = request.POST.get('insurance_policy', '')
-        insurance_amount = request.POST.get('insurance_amount', '')
         vehicle_type = request.POST.get('vehicle_type')
         loading_height = request.POST.get('loading_height')
         payload_capacity = request.POST.get('payload_capacity')
-        fleet_size = request.POST.get('fleet_size')
-        specializations = request.POST.getlist('specializations')
-        coverage_areas = request.POST.getlist('coverage_areas')
         
         # Validation
         errors = []
@@ -531,8 +751,6 @@ def add_vehicle(request):
             errors.append('Visina utovarnog dela je obavezna')
         if not payload_capacity:
             errors.append('Tovarna nosivost je obavezna')
-        if not fleet_size:
-            errors.append('Broj vozila u floti je obavezan')
             
         # Check if license plate already exists
         if Vehicle.objects.filter(license_plate=license_plate).exists():
@@ -546,21 +764,20 @@ def add_vehicle(request):
             return render(request, 'transport/add_vehicle.html')
         
         try:
-            # Create vehicle
+            # Convert capacity from kg to tons
+            capacity_tons = float(payload_capacity) / 1000
+            
+            # Create vehicle with correct field names
             vehicle = Vehicle.objects.create(
                 owner=request.user,
                 license_plate=license_plate,
                 vehicle_brand=vehicle_brand,
                 vehicle_color=vehicle_color,
                 transport_license=transport_license,
-                insurance_policy=insurance_policy,
-                insurance_amount=insurance_amount or None,
                 vehicle_type=vehicle_type,
                 loading_height=int(loading_height),
-                capacity=int(payload_capacity),
-                fleet_size=fleet_size,
-                specializations=','.join(specializations) if specializations else '',
-                coverage_areas=','.join(coverage_areas) if coverage_areas else '',
+                capacity=capacity_tons,
+                volume=10.0,  # Default volume - can be calculated later
                 is_available=True
             )
             
@@ -1368,3 +1585,401 @@ def check_destination_proximity(tour, current_lat, current_lng):
     #     return distance <= 5.0  # 5km radius
     
     return False
+
+# Stripe integration and cargo system views
+import stripe
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
+
+# Initialize Stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+@login_required
+def cargo_map_view(request):
+    """Display cargo map interface with Stripe integration"""
+    context = {
+        'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY,
+    }
+    return render(request, 'transport/cargo_map.html', context)
+
+@login_required
+@require_POST
+def calculate_price_view(request):
+    """Calculate price for cargo based on distance and pallet count"""
+    try:
+        data = json.loads(request.body)
+        pickup_lat = data.get('pickup_lat')
+        pickup_lng = data.get('pickup_lng')
+        delivery_lat = data.get('delivery_lat')
+        delivery_lng = data.get('delivery_lng')
+        pallet_count = data.get('pallet_count', 1)
+        weight = data.get('weight', 0)
+        
+        # Calculate distance using geopy
+        distance_km = calculate_distance(pickup_lat, pickup_lng, delivery_lat, delivery_lng)
+        
+        # Calculate price using utility function
+        price_data = calculate_price(pallet_count, distance_km)
+        
+        # Get eco suggestion
+        eco_suggestion = get_eco_suggestion(weight)
+        
+        return JsonResponse({
+            'success': True,
+            'distance_km': distance_km,
+            'pallet_count': pallet_count,
+            'weight': weight,
+            'base_price': price_data['base_price'],
+            'total_price': price_data['total_price'],
+            'eco_suggestion': eco_suggestion
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+@require_POST
+def create_cargo_view(request):
+    """Create cargo shipment with Stripe PaymentIntent"""
+    try:
+        data = json.loads(request.body)
+        
+        # Calculate price
+        pickup_lat = data.get('pickup_lat')
+        pickup_lng = data.get('pickup_lng')
+        delivery_lat = data.get('delivery_lat')
+        delivery_lng = data.get('delivery_lng')
+        pallet_count = data.get('pallet_count', 1)
+        weight = data.get('weight', 0)
+        
+        distance_km = calculate_distance(pickup_lat, pickup_lng, delivery_lat, delivery_lng)
+        price_data = calculate_price(pallet_count, distance_km)
+        
+        # Create Stripe PaymentIntent
+        intent = stripe.PaymentIntent.create(
+            amount=int(price_data['total_price'] * 100),  # Convert to cents
+            currency='rsd',
+            metadata={
+                'user_id': request.user.id,
+                'pallet_count': pallet_count,
+                'distance_km': distance_km
+            },
+            capture_method='manual'  # Manual capture after delivery confirmation
+        )
+        
+        # Create Cargo object
+        cargo = Cargo.objects.create(
+            shipper=request.user,
+            pickup_address=data.get('pickup_address'),
+            pickup_lat=pickup_lat,
+            pickup_lng=pickup_lng,
+            delivery_address=data.get('delivery_address'),
+            delivery_lat=delivery_lat,
+            delivery_lng=delivery_lng,
+            pallet_count=pallet_count,
+            weight=weight,
+            description=data.get('description', ''),
+            price=price_data['total_price'],
+            distance_km=distance_km,
+            payment_intent_id=intent.id,
+            status='pending_payment'
+        )
+        
+        # Create notification for carriers
+        Notification.objects.create(
+            user=request.user,
+            title="Nova Pošiljka Kreirana",
+            message=f"Kreirana pošiljka od {pallet_count} paleta za {price_data['total_price']} RSD",
+            notification_type='cargo',
+            sound_file='success'
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'client_secret': intent.client_secret,
+            'cargo_id': cargo.id
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+def cargo_list_view(request):
+    """List cargo shipments for current user"""
+    if request.user.profile.role == 'naručilac':
+        cargos = Cargo.objects.filter(shipper=request.user).order_by('-created_at')
+    else:
+        cargos = Cargo.objects.filter(status__in=['pending_carrier', 'accepted']).order_by('-created_at')
+    
+    return render(request, 'transport/cargo_list.html', {'cargos': cargos})
+
+@login_required
+def cargo_detail_view(request, cargo_id):
+    """Display cargo details"""
+    cargo = get_object_or_404(Cargo, id=cargo_id)
+    
+    # Check permissions
+    if cargo.shipper != request.user and cargo.carrier != request.user:
+        return HttpResponseForbidden()
+    
+    return render(request, 'transport/cargo_detail.html', {'cargo': cargo})
+
+@login_required
+@require_POST
+def accept_cargo_view(request, cargo_id):
+    """Carrier accepts cargo shipment"""
+    cargo = get_object_or_404(Cargo, id=cargo_id)
+    
+    if cargo.status != 'pending_carrier':
+        return JsonResponse({'success': False, 'error': 'Pošiljka nije dostupna'})
+    
+    # Calculate carrier price (85% of total price)
+    carrier_price = calculate_carrier_price(cargo.price)
+    
+    cargo.carrier = request.user
+    cargo.status = 'accepted'
+    cargo.carrier_price = carrier_price
+    cargo.save()
+    
+    # Create notifications
+    Notification.objects.create(
+        user=cargo.shipper,
+        title="Pošiljka Prihvaćena",
+        message=f"Prevoznik {request.user.get_full_name()} je prihvatio vašu pošiljku",
+        notification_type='cargo',
+        sound_file='success'
+    )
+    
+    Notification.objects.create(
+        user=request.user,
+        title="Pošiljka Prihvaćena",
+        message=f"Prihvatili ste pošiljku. Zarada: {carrier_price} RSD",
+        notification_type='payment',
+        sound_file='success'
+    )
+    
+    return JsonResponse({'success': True})
+
+@login_required
+@require_POST
+def confirm_delivery_view(request, cargo_id):
+    """Confirm delivery and capture Stripe payment"""
+    cargo = get_object_or_404(Cargo, id=cargo_id)
+    
+    if cargo.shipper != request.user:
+        return JsonResponse({'success': False, 'error': 'Nemate dozvolu'})
+    
+    if cargo.status != 'in_transit':
+        return JsonResponse({'success': False, 'error': 'Pošiljka nije u tranzitu'})
+    
+    try:
+        # Capture Stripe payment
+        stripe.PaymentIntent.capture(cargo.payment_intent_id)
+        
+        cargo.status = 'delivered'
+        cargo.delivered_at = timezone.now()
+        cargo.save()
+        
+        # Create notifications
+        Notification.objects.create(
+            user=cargo.carrier,
+            title="Dostava Potvrđena",
+            message=f"Dostava je potvrđena. Zarada: {cargo.carrier_price} RSD",
+            notification_type='payment',
+            sound_file='success'
+        )
+        
+        return JsonResponse({'success': True})
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+def notifications_api(request):
+    """API endpoint for fetching notifications"""
+    notifications = Notification.objects.filter(
+        user=request.user,
+        is_read=False
+    ).order_by('-created_at')[:10]
+    
+    data = {
+        'notifications': [{
+            'id': n.id,
+            'title': n.title,
+            'message': n.message,
+            'notification_type': n.notification_type,
+            'sound_file': n.sound_file,
+            'is_read': n.is_read,
+            'created_at': n.created_at.isoformat()
+        } for n in notifications]
+    }
+    
+    return JsonResponse(data)
+
+@login_required
+@require_POST
+def mark_notification_read(request, notification_id):
+    """Mark notification as read"""
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+    notification.is_read = True
+    notification.save()
+    return JsonResponse({'success': True})
+
+@login_required
+@require_POST
+def notification_action(request, notification_id):
+    """Handle notification action"""
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+    data = json.loads(request.body)
+    action = data.get('action')
+    
+    # Handle different actions based on notification type
+    redirect_url = None
+    
+    if action == 'view_cargo':
+        redirect_url = f'/transport/cargo-list/'
+    elif action == 'accept_cargo':
+        redirect_url = f'/transport/cargo-list/'
+    elif action == 'view_dashboard':
+        if request.user.profile.role == 'naručilac':
+            redirect_url = '/transport/shipper-dashboard/'
+        else:
+            redirect_url = '/transport/carrier-dashboard/'
+    
+    notification.is_read = True
+    notification.save()
+    
+    return JsonResponse({'success': True, 'redirect': redirect_url})
+
+@csrf_exempt
+@require_POST
+def stripe_webhook(request):
+    """Handle Stripe webhooks"""
+    payload = request.body
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+    
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+        )
+    except ValueError:
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError:
+        return HttpResponse(status=400)
+    
+    # Handle the event
+    if event['type'] == 'payment_intent.succeeded':
+        payment_intent = event['data']['object']
+        
+        # Update cargo status
+        try:
+            cargo = Cargo.objects.get(payment_intent_id=payment_intent['id'])
+            if cargo.status == 'pending_payment':
+                cargo.status = 'pending_carrier'
+                cargo.save()
+        except Cargo.DoesNotExist:
+            pass
+    
+    return HttpResponse(status=200)
+
+@login_required
+@require_POST
+def stripe_cancel_subscription(request):
+    """Cancel Stripe subscription (placeholder for future premium features)"""
+    return JsonResponse({'success': True, 'message': 'Subscription cancelled'})
+
+@login_required
+@require_POST
+def start_transport_view(request, cargo_id):
+    """Start transport for cargo shipment"""
+    cargo = get_object_or_404(Cargo, id=cargo_id)
+    
+    if cargo.carrier != request.user:
+        return JsonResponse({'success': False, 'error': 'Nemate dozvolu'})
+    
+    if cargo.status != 'accepted':
+        return JsonResponse({'success': False, 'error': 'Pošiljka nije u odgovarajućem statusu'})
+    
+    cargo.status = 'in_transit'
+    cargo.started_at = timezone.now()
+    cargo.save()
+    
+    # Create notifications
+    Notification.objects.create(
+        user=cargo.shipper,
+        title="Transport Počet",
+        message=f"Prevoznik je počeo transport vaše pošiljke #{cargo.id}",
+        notification_type='cargo',
+        sound_file='ping'
+    )
+    
+    return JsonResponse({'success': True})
+
+# PWA Views
+def pwa_manifest(request):
+    """PWA Manifest JSON"""
+    manifest = {
+        "name": "Tovar Taxi - Transport Platform",
+        "short_name": "Tovar Taxi",
+        "description": "Platforma za efikasno upravljanje transportom",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#ffffff",
+        "theme_color": "#2ECC71",
+        "orientation": "portrait-primary",
+        "icons": [
+            {
+                "src": "/static/images/TTaxi.png",
+                "sizes": "192x192",
+                "type": "image/png",
+                "purpose": "maskable any"
+            },
+            {
+                "src": "/static/images/TTaxi.png",
+                "sizes": "512x512", 
+                "type": "image/png",
+                "purpose": "maskable any"
+            }
+        ],
+        "categories": ["business", "logistics", "transport"],
+        "lang": "sr"
+    }
+    return JsonResponse(manifest)
+
+
+def service_worker(request):
+    """Service Worker for PWA"""
+    sw_content = """
+const CACHE_NAME = 'tovar-taxi-v1';
+const urlsToCache = [
+    '/',
+    '/static/css/responsive.css',
+    '/static/js/notifications.js',
+    '/static/images/TTaxi.png'
+];
+
+self.addEventListener('install', function(event) {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(function(cache) {
+                return cache.addAll(urlsToCache);
+            })
+    );
+});
+
+self.addEventListener('fetch', function(event) {
+    event.respondWith(
+        caches.match(event.request)
+            .then(function(response) {
+                if (response) {
+                    return response;
+                }
+                return fetch(event.request);
+            }
+        )
+    );
+});
+"""
+    return HttpResponse(sw_content, content_type='application/javascript')

@@ -1,0 +1,482 @@
+/* Responsive Design for Tovar Taxi Application */
+
+/* Mobile-first approach with breakpoints */
+:root {
+    --mobile-breakpoint: 768px;
+    --tablet-breakpoint: 992px;
+    --desktop-breakpoint: 1200px;
+    
+    /* Notification positioning variables */
+    --notification-mobile-width: calc(100% - 20px);
+    --notification-desktop-width: 25%;
+    --notification-desktop-min-width: 300px;
+}
+
+/* Base responsive utilities */
+.container-responsive {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Mobile styles (default - mobile first) */
+@media (max-width: 767px) {
+    /* Navigation adjustments */
+    .navbar-nav {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .navbar-nav .nav-item {
+        width: 100%;
+        text-align: center;
+        margin: 5px 0;
+    }
+    
+    /* Dashboard cards */
+    .dashboard-card {
+        margin-bottom: 15px;
+        padding: 15px;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    /* Vehicle license plates - stack vertically on mobile */
+    .license-plate-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .license-plate {
+        width: 100%;
+        max-width: 280px;
+        height: auto;
+        min-height: 70px;
+    }
+    
+    /* Cargo cards - full width on mobile */
+    .cargo-card {
+        margin-bottom: 20px;
+    }
+    
+    .cargo-map-mini {
+        height: 200px; /* Larger on mobile for better visibility */
+    }
+    
+    /* Form adjustments */
+    .form-container {
+        padding: 20px 15px;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    /* Map containers */
+    .map-container {
+        height: 300px; /* Smaller on mobile to save space */
+        margin-bottom: 20px;
+    }
+    
+    /* Price display */
+    .price-display {
+        font-size: 1.1em;
+        text-align: center;
+        padding: 15px;
+    }
+    
+    /* Notification positioning - mobile takes >50% of screen */
+    #notification-container {
+        position: fixed !important;
+        top: 20px !important;
+        left: 10px !important;
+        right: 10px !important;
+        width: var(--notification-mobile-width) !important;
+        max-width: none !important;
+        z-index: 9999;
+    }
+    
+    .notification {
+        width: 100% !important;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+    
+    .notification-header {
+        font-size: 16px !important;
+    }
+    
+    .notification-message {
+        font-size: 13px !important;
+    }
+    
+    /* Table responsiveness */
+    .table-responsive-mobile {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .table-responsive-mobile table {
+        min-width: 600px;
+    }
+    
+    /* Hide desktop-only elements */
+    .desktop-only {
+        display: none !important;
+    }
+    
+    /* Show mobile-only elements */
+    .mobile-only {
+        display: block !important;
+    }
+    
+    /* Adjust font sizes for mobile */
+    h1 { font-size: 1.8rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.3rem; }
+    h4 { font-size: 1.1rem; }
+    
+    /* Mobile-specific spacing */
+    .mb-mobile-3 { margin-bottom: 1rem; }
+    .mt-mobile-3 { margin-top: 1rem; }
+    .p-mobile-2 { padding: 0.5rem; }
+}
+
+/* Tablet styles */
+@media (min-width: 768px) and (max-width: 991px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .license-plate-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        justify-items: center;
+    }
+    
+    .cargo-card {
+        margin-bottom: 25px;
+    }
+    
+    .map-container {
+        height: 350px;
+    }
+    
+    /* Notification positioning - tablet uses desktop rules */
+    #notification-container {
+        position: fixed !important;
+        top: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        width: var(--notification-desktop-width) !important;
+        min-width: var(--notification-desktop-min-width) !important;
+        max-width: 400px !important;
+    }
+    
+    .mobile-only {
+        display: none !important;
+    }
+    
+    .desktop-only {
+        display: block !important;
+    }
+}
+
+/* Desktop styles */
+@media (min-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+    }
+    
+    .license-plate-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+        justify-items: center;
+    }
+    
+    .cargo-card {
+        margin-bottom: 30px;
+    }
+    
+    .map-container {
+        height: 400px;
+    }
+    
+    /* Notification positioning - desktop top-right quarter */
+    #notification-container {
+        position: fixed !important;
+        top: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        width: var(--notification-desktop-width) !important;
+        min-width: var(--notification-desktop-min-width) !important;
+        max-width: 400px !important;
+        z-index: 9999;
+    }
+    
+    .notification {
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+    
+    .mobile-only {
+        display: none !important;
+    }
+    
+    .desktop-only {
+        display: block !important;
+    }
+}
+
+/* Large desktop styles */
+@media (min-width: 1200px) {
+    .container-responsive {
+        max-width: 1400px;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+    }
+    
+    .license-plate-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+    }
+}
+
+/* Responsive utilities */
+.w-mobile-100 {
+    width: 100% !important;
+}
+
+@media (min-width: 768px) {
+    .w-mobile-100 {
+        width: auto !important;
+    }
+}
+
+/* Responsive text alignment */
+.text-center-mobile {
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    .text-center-mobile {
+        text-align: left;
+    }
+}
+
+/* Responsive padding and margins */
+.p-responsive {
+    padding: 15px;
+}
+
+@media (min-width: 768px) {
+    .p-responsive {
+        padding: 25px;
+    }
+}
+
+@media (min-width: 992px) {
+    .p-responsive {
+        padding: 30px;
+    }
+}
+
+/* Responsive grid system for cargo and vehicle cards */
+.responsive-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .responsive-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+}
+
+@media (min-width: 992px) {
+    .responsive-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .responsive-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Responsive button groups */
+.btn-group-responsive {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+@media (min-width: 768px) {
+    .btn-group-responsive {
+        flex-direction: row;
+        gap: 15px;
+    }
+}
+
+/* Responsive form layouts */
+.form-row-responsive {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+@media (min-width: 768px) {
+    .form-row-responsive {
+        flex-direction: row;
+        gap: 20px;
+    }
+    
+    .form-row-responsive > * {
+        flex: 1;
+    }
+}
+
+/* Responsive map and content layout */
+.map-content-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+@media (min-width: 992px) {
+    .map-content-layout {
+        flex-direction: row;
+        gap: 30px;
+    }
+    
+    .map-content-layout .map-section {
+        flex: 2;
+    }
+    
+    .map-content-layout .content-section {
+        flex: 1;
+    }
+}
+
+/* Responsive notification animations */
+@keyframes slideInMobile {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInDesktop {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 767px) {
+    .notification {
+        animation: slideInMobile 0.3s ease-out;
+    }
+}
+
+@media (min-width: 768px) {
+    .notification {
+        animation: slideInDesktop 0.3s ease-out;
+    }
+}
+
+/* Print styles */
+@media print {
+    #notification-container,
+    .btn,
+    .navbar,
+    .modal {
+        display: none !important;
+    }
+    
+    .cargo-card,
+    .vehicle-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .notification {
+        border: 2px solid currentColor;
+    }
+    
+    .cargo-card,
+    .vehicle-card {
+        border: 1px solid currentColor;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .notification,
+    .cargo-card,
+    .license-plate {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Dark mode support (future enhancement) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --card-bg: #2d2d2d;
+    }
+    
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+    }
+    
+    .cargo-card,
+    .vehicle-card {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+    }
+}
