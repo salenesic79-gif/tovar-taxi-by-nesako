@@ -2,60 +2,18 @@
 <!DOCTYPE html>
 <html lang="sr">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tovar Taxi - Početna</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/TTaxi.ico' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
     <style>
-        .logo-dropdown {
-            background: transparent !important;
-            border: none !important;
-            padding: 5px !important;
-            cursor: pointer !important;
-        }
-        
-        .shortcut-btn {
-            position: fixed !important;
-            bottom: 20px !important;
-            right: 20px !important;
-            background: transparent !important;
-            border: 2px solid #FFD700 !important;
-            border-radius: 10px !important;
-            padding: 10px !important;
-            z-index: 9999 !important;
-            text-decoration: none !important;
-            display: block !important;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
-        }
-        
-        .shortcut-btn img {
-            height: 40px !important;
-            width: auto !important;
-        }
-        
-        /* Touch-friendly styles for mobile */
-        @media (max-width: 768px) {
-            .logo-dropdown {
-                min-height: 44px !important;
-                min-width: 44px !important;
-            }
-            .shortcut-btn {
-                min-height: 60px !important;
-                min-width: 60px !important;
-            }
-            .navbar .d-flex {
-                flex-wrap: wrap !important;
-                gap: 10px !important;
-            }
-            .navbar .d-flex a {
-                font-size: 14px !important;
-                padding: 6px 10px !important;
-            }
-        }
-        
         .hero-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 100px 0;
-        }
-        .navbar-brand {
-            margin-left: 7.5px;
         }
         .navbar-brand img {
             height: 56px;
@@ -96,25 +54,48 @@
         .feature-card:hover {
             transform: translateY(-5px);
         }
+        
+        /* PWA Install Button - vizuelno uklopljen */
+        .pwa-install-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #2ECC71, #27AE60);
+            border: 2px solid #FFD700;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .pwa-install-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+        .pwa-install-btn i {
+            color: #000000;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .pwa-install-btn.hidden {
+            display: none;
+        }
     </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tovar Taxi - Početna</title>
-    <link rel="icon" type="image/x-icon" href="{% static 'images/TTaxi.ico' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="manifest" href="{% static 'manifest.json' %}">
 </head>
 <body>
-    <!-- Header sa TTaxi.png slikom -->
+    <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(0, 0, 0);">
         <div class="container">
-            <!-- Simple Logo Link -->
-            <a class="navbar-brand logo-dropdown" href="{% url 'home' %}" style="text-decoration: none;">
-                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 56px; width: auto;">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi">
             </a>
             
-            <!-- Simple Navigation Links -->
             <div class="d-flex" style="gap: 15px;">
                 {% if user.is_authenticated %}
                     <a href="{% url 'dashboard' %}" style="color: white; text-decoration: none; padding: 8px 12px; border: 1px solid white; border-radius: 5px;">📊 Dashboard</a>
@@ -130,15 +111,7 @@
     <!-- Hero Section -->
     <section class="hero-section">
         <div class="container text-center">
-            <h1 class="display-4 fw-bold hero-title">
-                <span class="letter">D</span><span class="letter">o</span><span class="letter">b</span><span class="letter">r</span><span class="letter">o</span><span class="letter">d</span><span class="letter">o</span><span class="letter">š</span><span class="letter">l</span><span class="letter">i</span>
-                <span class="letter"> </span>
-                <span class="letter">u</span>
-                <span class="letter"> </span>
-                <span class="letter">T</span><span class="letter">o</span><span class="letter">v</span><span class="letter">a</span><span class="letter">r</span>
-                <span class="letter"> </span>
-                <span class="letter">T</span><span class="letter">a</span><span class="letter">x</span><span class="letter">i</span>
-            </h1>
+            <h1 class="display-4 fw-bold hero-title">Dobrodošli u Tovar Taxi</h1>
             <div class="lead hero-subtitle">
                 <div>Aplikacija koja spaja naručioce i prevoznike.</div>
                 <div>Budućnost transporta je stigla: povećajte zaradu, smanjite troškove.</div>
@@ -149,6 +122,7 @@
         </div>
     </section>
 
+    <!-- Features Section -->
     <section class="py-5">
         <div class="container">
             <div class="row text-center">
@@ -189,30 +163,6 @@
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <div class="container my-5">
-        <div class="row text-center">
-            <div class="col-md-4 mb-3">
-                <div class="feature-card">
-                    <h3 class="text-primary">{{ total_shipments }}</h3>
-                    <p class="mb-0">Aktivnih pošiljaka</p>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="feature-card">
-                    <h3 class="text-success">{{ total_carriers }}</h3>
-                    <p class="mb-0">Registrovanih prevoznika</p>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="feature-card">
-                    <h3 class="text-warning">{{ total_vehicles }}</h3>
-                    <p class="mb-0">Dostupnih vozila</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Footer -->
     <footer class="bg-dark text-white py-4">
         <div class="container text-center">
@@ -220,27 +170,38 @@
         </div>
     </footer>
 
-    <!-- Shortcut Button (looks like logo) -->
-    <a href="#" onclick="createShortcut()" class="shortcut-btn" title="Kreiraj prečicu">
-        <img src="{% static 'images/TTaxi.png' %}" alt="Kreiraj prečicu">
-    </a>
+    <!-- PWA Install Button -->
+    <button id="pwaInstallBtn" class="pwa-install-btn hidden" title="Dodaj na početni ekran">
+        <i class="fas fa-download"></i>
+    </button>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        function createShortcut() {
-            // PWA install prompt ili instrukcije za kreiranje prečice
-            if ('serviceWorker' in navigator) {
-                // PWA install
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    e.prompt();
-                });
-            } else {
-                // Instrukcije za kreiranje prečice
-                alert('Za kreiranje prečice:\n\n1. Kliknite na ⋮ (tri tačke) u browser-u\n2. Izaberite "Dodaj na početni ekran"\n3. Potvrdite instalaciju');
+        // PWA Install functionality
+        let deferredPrompt;
+        const installBtn = document.getElementById('pwaInstallBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.remove('hidden');
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.classList.add('hidden');
+                }
+                deferredPrompt = null;
             }
-        }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBtn.classList.add('hidden');
+        });
     </script>
 </body>
 </html>

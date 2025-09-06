@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', '192.168.0.21', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['tovar-taxi-by-nesako.onrender.com', 'localhost', '127.0.0.1', '192.168.0.21']
 
 # Application definition
 INSTALLED_APPS = [
