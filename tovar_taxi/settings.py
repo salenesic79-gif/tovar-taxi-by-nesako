@@ -15,10 +15,7 @@ SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# Template caching disabled in DEBUG mode
-TEMPLATES_AUTO_RELOAD = True
-
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', '192.168.0.21', 'localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
@@ -47,14 +44,19 @@ ROOT_URLCONF = 'tovar_taxi.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [r'C:\Users\PC\Desktop\tovar-taxi-by-nesako\templates'],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': False,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+            ],
+            'debug': True,
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
             ],
         },
     },
@@ -130,3 +132,13 @@ STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='whsec_123456789
 
 # Currency settings
 DEFAULT_CURRENCY = 'RSD'  # Serbian Dinar
+
+# Force template reloading
+TEMPLATES_AUTO_RELOAD = True
+
+# Disable all caching
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}

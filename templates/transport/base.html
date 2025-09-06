@@ -1,6 +1,4 @@
 {% load static %}
-<!-- TEST COMMENT - TEMPLATE LOADING CHECK 2025-01-06 -->
-<!-- NOVO TEST 2025-01-06 08:22 - DROPDOWN MENU FIX -->
 <!DOCTYPE html>
 <html lang="sr">
 <head>
@@ -15,462 +13,128 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Custom CSS -->
+    <link href="{% static 'css/animations.css' %}" rel="stylesheet">
+    <link href="{% static 'css/responsive.css' %}" rel="stylesheet">
+    <link href="{% static 'css/popup-styles.css' %}" rel="stylesheet">
+    
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#2ECC71">
+    <meta name="theme-color" content="#667eea">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Tovar Taxi">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="{% static 'manifest.json' %}">
-    
-    <!-- PWA Icons -->
     <link rel="apple-touch-icon" href="{% static 'images/TTaxi.png' %}">
-    <link rel="icon" type="image/png" href="{% static 'images/TTaxi.png' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
     
     <style>
         :root {
             --primary-color: #667eea;
             --secondary-color: #764ba2;
-            --accent-color: #FFD700;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --dark-color: #1f2937;
-            --light-color: #f8fafc;
-            --border-color: #e5e7eb;
-            --text-primary: #111827;
-            --text-secondary: #6b7280;
+            --accent-color: #f093fb;
+            --success-color: #2ECC71;
+            --warning-color: #F39C12;
+            --danger-color: #E74C3C;
+            --dark-color: #2C3E50;
+            --light-color: #ECF0F1;
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+
         body {
             font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: var(--text-primary);
-            background-color: #fafbfc;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
-        
-        /* Navigation Styles */
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-            padding: 1rem 0;
-        }
-        
+
         .navbar-brand img {
-            height: 40px;
-            cursor: pointer;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            height: 56px;
+            width: auto;
         }
-        
-        .dropdown-menu {
-            background: rgba(102, 126, 234, 0.95);
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-        
-        .dropdown-item {
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
             color: white;
-            padding: 10px 20px;
+            padding: 100px 0;
+            text-align: center;
         }
-        
-        .dropdown-item:hover {
-            background: rgba(255,255,255,0.2);
-            color: white;
-        }
-        
-        .nav-link {
-            color: white !important;
-        }
-        
-        .nav-link:hover {
-            color: var(--accent-color) !important;
-        }
-        
-        /* Icon alignment fixes */
-        .nav-link i, .btn i, .list-group-item i {
-            vertical-align: middle;
-            margin-right: 0.5rem;
-        }
-        
-        /* Text overflow fixes */
-        .card-title, .card-text, .nav-link {
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }
-        
-        .sidebar .nav-link {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .navbar-nav .nav-link {
-            color: white !important;
-            font-weight: 500;
-            padding: 0.75rem 1.5rem !important;
-            border-radius: 25px;
-            transition: all 0.3s ease;
-            margin: 0 0.25rem;
-        }
-        
-        .navbar-nav .nav-link:hover {
-            background-color: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-        }
-        
-        .btn-login {
-            border: 2px solid var(--accent-color) !important;
-            background: transparent !important;
-            color: var(--accent-color) !important;
-            font-weight: 600;
-            padding: 0.5rem 1.5rem !important;
-            border-radius: 25px !important;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-login:hover {
-            background: var(--accent-color) !important;
-            color: var(--dark-color) !important;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-        }
-        
-        /* Cards */
-        .card {
-            border: none;
+
+        .feature-card {
+            background: white;
             border-radius: 15px;
-            box-shadow: 0 4px 25px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            overflow: hidden;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 35px rgba(0,0,0,0.15);
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
-        
-        .card-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            border: none;
-            padding: 1.5rem;
-            font-weight: 600;
-        }
-        
-        /* Buttons */
-        .btn {
-            border-radius: 10px;
-            font-weight: 500;
-            padding: 0.75rem 2rem;
-            transition: all 0.3s ease;
-            border: none;
-        }
-        
+
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             border: none;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn-success {
-            background: var(--success-color);
-            border: none;
-        }
-        
-        .btn-success:hover {
-            background: #059669;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
-        }
-        
-        .btn-warning {
-            background: var(--warning-color);
-            border: none;
-            color: white;
-        }
-        
-        .btn-warning:hover {
-            background: #d97706;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
-        }
-        
-        .btn-outline-light {
-            border: 2px solid rgba(255,255,255,0.8);
-            color: white;
-            background: transparent;
-        }
-        
-        .btn-outline-light:hover {
-            background: white;
-            color: var(--primary-color);
-            border-color: white;
-            transform: translateY(-2px);
-        }
-        
-        /* Forms */
-        .form-control {
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            padding: 0.75rem 1rem;
-            font-size: 0.95rem;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 500;
             transition: all 0.3s ease;
         }
-        
-        .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
-        
-        .form-label {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
         }
-        
-        /* Tables */
-        .table {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-        }
-        
-        .table thead th {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+
+        .footer {
+            background: var(--dark-color);
             color: white;
-            border: none;
-            font-weight: 600;
-            padding: 1rem;
-        }
-        
-        .table tbody td {
-            padding: 1rem;
-            vertical-align: middle;
-            border-color: var(--border-color);
-        }
-        
-        .table tbody tr:hover {
-            background-color: rgba(102, 126, 234, 0.05);
-        }
-        
-        /* Badges */
-        .badge {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 500;
-            font-size: 0.8rem;
-        }
-        
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease-out;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .navbar-nav {
-                text-align: center;
-                margin-top: 1rem;
-            }
-            
-            .btn {
-                width: 100%;
-                margin-bottom: 0.5rem;
-            }
-            
-            .card {
-                margin-bottom: 1rem;
-            }
-        }
-        
-        /* Mobile Responsive Fixes */
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 10px;
-            }
-            
-            .navbar {
-                padding: 0.5rem 0;
-            }
-            
-            .dropdown-menu {
-                min-width: 280px;
-                max-width: 90vw;
-                font-size: 14px;
-            }
-            
-            .dropdown-item {
-                padding: 12px 16px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            
-            .form-select {
-                max-width: 120px;
-            }
-            
-            .btn {
-                padding: 8px 16px;
-                font-size: 14px;
-            }
-            
-            .card {
-                margin: 10px 5px;
-                border-radius: 12px;
-            }
-            
-            .form-control, .form-select {
-                padding: 10px 12px;
-                font-size: 16px; /* Prevents zoom on iOS */
-            }
-            
-            /* Prevent horizontal scroll */
-            body {
-                overflow-x: hidden;
-            }
-            
-            .row {
-                margin: 0 -5px;
-            }
-            
-            .col, .col-md-6, .col-lg-4 {
-                padding: 0 5px;
-                margin-bottom: 15px;
-            }
-        }
-        
-        /* PWA Styles */
-        .pwa-install-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 15px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
-            z-index: 1000;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        /* Custom utilities */
-        .text-gradient {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .bg-gradient-primary {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        }
-        
-        .shadow-custom {
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        }
-        
-        /* Loading spinner */
-        .spinner-border-custom {
-            width: 3rem;
-            height: 3rem;
-            border-width: 0.3em;
-            border-color: var(--primary-color);
-            border-right-color: transparent;
+            padding: 40px 0;
+            margin-top: 50px;
         }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-        <div class="container d-flex justify-content-between align-items-center">
-            <!-- Logo as Navigation Button -->
-            <div class="dropdown">
-                <a class="navbar-brand d-flex align-items-center" href="javascript:void(0)" onclick="showMenu()" style="text-decoration: none; cursor: pointer;" id="logoDropdown">
-                    <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 40px;">
-                    <span style="color: red; font-size: 12px; margin-left: 5px;">KLIK</span>
-                </a>
-                <div id="customMenu" style="display: none; position: absolute; top: 60px; left: 0; background: white; border: 1px solid #ccc; padding: 10px; z-index: 1000; min-width: 200px;">
-                    <div style="padding: 5px; border-bottom: 1px solid #eee;"><a href="{% url 'home' %}" style="text-decoration: none; color: #333;">🏠 Početna</a></div>
-                    {% if user.is_authenticated %}
-                        <div style="padding: 5px; border-bottom: 1px solid #eee;"><a href="{% url 'dashboard' %}" style="text-decoration: none; color: #333;">📊 Kontrolna tabla</a></div>
-                        <div style="padding: 5px; border-bottom: 1px solid #eee;"><a href="#" onclick="alert('Notifikacije: Uključene')" style="text-decoration: none; color: #333;">🔔 Notifikacije</a></div>
-                        <div style="padding: 5px; border-bottom: 1px solid #eee;"><a href="#" onclick="alert('Zvuk: Uključen')" style="text-decoration: none; color: #333;">🔊 Zvuk</a></div>
-                        <div style="padding: 5px;"><a href="#" onclick="alert('Tovar Taxi v1.0')" style="text-decoration: none; color: #333;">ℹ️ O aplikaciji</a></div>
-                    {% endif %}
-                </div>
-            </div>
 
-            <script>
-                function showMenu() {
-                    const menu = document.getElementById('customMenu');
-                    if (menu.style.display === 'none') {
-                        menu.style.display = 'block';
-                        // Hide menu when clicking outside
-                        setTimeout(() => {
-                            document.addEventListener('click', function hideMenu(e) {
-                                if (!e.target.closest('#logoDropdown') && !e.target.closest('#customMenu')) {
-                                    menu.style.display = 'none';
-                                    document.removeEventListener('click', hideMenu);
-                                }
-                            });
-                        }, 100);
-                    } else {
-                        menu.style.display = 'none';
-                    }
-                }
-            </script>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi">
+            </a>
             
-            <!-- Right side - Login/Username -->
-            {% if user.is_authenticated %}
-                <div class="dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: white; text-decoration: none;">
-                        <i class="fas fa-user-circle me-2"></i>{{ user.get_full_name|default:user.username }}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Odjavi se</a></li>
-                    </ul>
-                </div>
-            {% else %}
-                <a class="btn btn-outline-light" href="{% url 'login' %}">
-                    <i class="fas fa-sign-in-alt me-1"></i>Prijavi se
-                </a>
-            {% endif %}
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Početna</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Odjavi se</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Prijavi se</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'transport:signup' %}">Registruj se</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </nav>
 
@@ -496,230 +160,8 @@
         </div>
     </footer>
 
-    <!-- PWA Install Button -->
-    <button id="pwa-install-btn" class="pwa-install-btn" style="display: none;">
-        <i class="fas fa-download me-2"></i>Dodaj na početnu
-    </button>
-
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Force dropdown initialization
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropdownTrigger = document.getElementById('logoDropdown');
-            if (dropdownTrigger) {
-                new bootstrap.Dropdown(dropdownTrigger);
-            }
-        });
-        
-        // PWA Install functionality
-        let deferredPrompt;
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('pwa-install-btn').style.display = 'block';
-        });
-        
-        document.getElementById('pwa-install-btn').addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    document.getElementById('pwa-install-btn').style.display = 'none';
-                }
-                deferredPrompt = null;
-            }
-        });
-        
-        // Hide install button if already installed
-        window.addEventListener('appinstalled', () => {
-            document.getElementById('pwa-install-btn').style.display = 'none';
-        });
-        
-        // Manual Install Button (always visible on mobile)
-        function createInstallButton() {
-            const installBtn = document.createElement('button');
-            installBtn.id = 'pwa-install-btn';
-            installBtn.innerHTML = '&#x1F4F1; Dodaj na početni ekran';
-            installBtn.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #2ECC71, #27AE60);
-                color: white;
-                border: none;
-                padding: 12px 16px;
-                border-radius: 25px;
-                font-weight: bold;
-                z-index: 9999;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                font-size: 14px;
-                cursor: pointer;
-                animation: pulse 2s infinite;
-            `;
-            
-            // Add pulse animation
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes pulse {
-                    0% { transform: scale(1); }
-                    50% { transform: scale(1.05); }
-                    100% { transform: scale(1); }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            return installBtn;
-        }
-
-        // Check if running as PWA
-        function isPWA() {
-            return window.matchMedia('(display-mode: standalone)').matches || 
-                   window.navigator.standalone === true;
-        }
-
-        // Show install instructions
-        function showInstallInstructions() {
-            const isAndroid = /Android/i.test(navigator.userAgent);
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            
-            let instructions = '';
-            if (isAndroid) {
-                instructions = `
-                    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; max-width: 300px;">
-                        <h3 style="margin: 0 0 15px 0; color: #2ECC71;">&#x1F4F1; Instaliraj aplikaciju</h3>
-                        <p style="margin: 0 0 15px 0; color: #333;">Za instalaciju:</p>
-                        <ol style="color: #333; padding-left: 20px;">
-                            <li>Kliknite na &#x25CF;&#x25CF;&#x25CF; (tri tačke) u browser-u</li>
-                            <li>Izaberite "Dodaj na početni ekran"</li>
-                            <li>Potvrdite instalaciju</li>
-                        </ol>
-                        <button onclick="this.parentElement.remove()" style="background: #2ECC71; color: white; border: none; padding: 10px 20px; border-radius: 5px; float: right;">OK</button>
-                    </div>
-                `;
-            } else if (isIOS) {
-                instructions = `
-                    <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; max-width: 300px;">
-                        <h3 style="margin: 0 0 15px 0; color: #2ECC71;">&#x1F4F1; Instaliraj aplikaciju</h3>
-                        <p style="margin: 0 0 15px 0; color: #333;">Za instalaciju:</p>
-                        <ol style="color: #333; padding-left: 20px;">
-                            <li>Kliknite na dugme Share &#x1F4E4;</li>
-                            <li>Izaberite "Add to Home Screen"</li>
-                            <li>Potvrdite instalaciju</li>
-                        </ol>
-                        <button onclick="this.parentElement.remove()" style="background: #2ECC71; color: white; border: none; padding: 10px 20px; border-radius: 5px; float: right;">OK</button>
-                    </div>
-                `;
-            }
-            
-            if (instructions) {
-                document.body.insertAdjacentHTML('beforeend', instructions);
-            }
-        }
-
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch(function(registrationError) {
-                        console.log('SW registration failed: ', registrationError);
-                    });
-            });
-        }
-        
-        // PWA Install Logic
-        let deferredPrompt;
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            if (!isPWA()) {
-                const installBtn = createInstallButton();
-                installBtn.addEventListener('click', () => {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        deferredPrompt.userChoice.then((choiceResult) => {
-                            if (choiceResult.outcome === 'accepted') {
-                                console.log('User accepted the A2HS prompt');
-                            }
-                            deferredPrompt = null;
-                            installBtn.remove();
-                        });
-                    } else {
-                        showInstallInstructions();
-                    }
-                });
-                document.body.appendChild(installBtn);
-            }
-        });
-
-        // Fallback - show button after 3 seconds if no beforeinstallprompt
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                if (!isPWA() && !document.getElementById('pwa-install-btn')) {
-                    const installBtn = createInstallButton();
-                    installBtn.addEventListener('click', showInstallInstructions);
-                    document.body.appendChild(installBtn);
-                }
-            }, 3000);
-        });
-        
-        // Settings functionality
-        function toggleNotifications() {
-            const status = document.getElementById('notif-status');
-            const isEnabled = status.textContent === 'Uključene';
-            status.textContent = isEnabled ? 'Isključene' : 'Uključene';
-            status.className = isEnabled ? 'badge bg-danger ms-auto' : 'badge bg-success ms-auto';
-            localStorage.setItem('notifications', !isEnabled);
-        }
-        
-        function toggleSound() {
-            const status = document.getElementById('sound-status');
-            const isEnabled = status.textContent === 'Uključen';
-            status.textContent = isEnabled ? 'Isključen' : 'Uključen';
-            status.className = isEnabled ? 'badge bg-danger ms-auto' : 'badge bg-success ms-auto';
-            localStorage.setItem('sound', !isEnabled);
-        }
-        
-        function changeNotificationTone(tone) {
-            localStorage.setItem('notificationTone', tone);
-            // Play preview of selected tone
-            if (tone !== 'default') {
-                const audio = new Audio(`{% static 'audio/' %}${tone}.wav`);
-                audio.play().catch(e => console.log('Audio preview failed'));
-            }
-        }
-        
-        function toggleDarkMode() {
-            const status = document.getElementById('dark-status');
-            const isEnabled = status.textContent === 'Uključen';
-            status.textContent = isEnabled ? 'Isključen' : 'Uključen';
-            status.className = isEnabled ? 'badge bg-secondary ms-auto' : 'badge bg-primary ms-auto';
-            document.body.classList.toggle('dark-mode', !isEnabled);
-            localStorage.setItem('darkMode', !isEnabled);
-        }
-        
-        function showAppInfo() {
-            alert('Tovar Taxi v1.0\nAplikacija za prevoz tereta\n© 2024 Sva prava zadržana');
-        }
-        
-        // Load saved settings
-        document.addEventListener('DOMContentLoaded', function() {
-            const notifications = localStorage.getItem('notifications') !== 'false';
-            const sound = localStorage.getItem('sound') !== 'false';
-            const darkMode = localStorage.getItem('darkMode') === 'true';
-            
-            if (!notifications) toggleNotifications();
-            if (!sound) toggleSound();
-            if (darkMode) toggleDarkMode();
-        });
-    </script>
     
     {% block extra_js %}{% endblock %}
 </body>

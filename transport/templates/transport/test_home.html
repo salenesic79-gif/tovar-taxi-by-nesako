@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TEST TEMPLATE</title>
+    <style>
+        body { 
+            background: red !important; 
+            color: white !important; 
+            font-size: 30px !important; 
+            text-align: center !important; 
+            padding: 50px !important; 
+        }
+        .test-logo { 
+            background: yellow !important; 
+            border: 5px solid blue !important; 
+            padding: 20px !important; 
+            cursor: pointer !important; 
+            display: inline-block !important; 
+        }
+        .test-menu { 
+            background: green !important; 
+            color: white !important; 
+            padding: 20px !important; 
+            margin: 20px !important; 
+            display: none !important; 
+        }
+        .pwa-btn { 
+            position: fixed !important; 
+            bottom: 20px !important; 
+            right: 20px !important; 
+            background: orange !important; 
+            color: black !important; 
+            padding: 20px !important; 
+            border: none !important; 
+            font-size: 16px !important; 
+        }
+    </style>
+</head>
+<body>
+    <h1>🔴 TEST TEMPLATE RADI! 🔴</h1>
+    <p>Vreme: 09:27 - Mobilni test</p>
+    
+    <div class="test-logo" onclick="showMenu()">
+        🟡 KLIKNITE LOGO 🟡
+    </div>
+    
+    <div id="testMenu" class="test-menu">
+        🟢 MENI SE OTVORIO! 🟢
+        <br>Logo dropdown radi!
+    </div>
+    
+    <button class="pwa-btn" onclick="testPWA()">
+        📱 PWA TEST
+    </button>
+    
+    <script>
+        function showMenu() {
+            const menu = document.getElementById('testMenu');
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'block';
+                alert('MENI OTVOREN!');
+            } else {
+                menu.style.display = 'none';
+                alert('MENI ZATVOREN!');
+            }
+        }
+        
+        function testPWA() {
+            alert('PWA DUGME RADI!');
+        }
+    </script>
+</body>
+</html>
