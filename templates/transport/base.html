@@ -21,7 +21,7 @@
     <meta name="apple-mobile-web-app-title" content="Tovar Taxi">
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="{% url 'transport:pwa_manifest' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
     
     <!-- PWA Icons -->
     <link rel="apple-touch-icon" href="{% static 'images/TTaxi.png' %}">
@@ -420,7 +420,7 @@
         <div class="container d-flex justify-content-between align-items-center">
             <!-- Logo as Navigation Button -->
             <div class="dropdown">
-                <a class="navbar-brand dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; cursor: pointer;" id="logoDropdown">
+                <a class="navbar-brand dropdown-toggle d-flex align-items-center" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; cursor: pointer;" id="logoDropdown" onclick="event.preventDefault();">
                     <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 40px;">
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="logoDropdown">
@@ -505,17 +505,48 @@
         </div>
     </footer>
 
+    <!-- PWA Install Button -->
+    <button id="pwa-install-btn" class="pwa-install-btn" style="display: none;">
+        <i class="fas fa-download me-2"></i>Dodaj na početnu
+    </button>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Advanced CSS Animations -->
-    <link rel="stylesheet" href="{% static 'css/animations.css' %}">
-    
-    <!-- Modern JavaScript Effects -->
-    <script src="{% static 'js/modern-effects.js' %}"></script>
-    
-    <!-- Custom JS -->
     <script>
+        // Force dropdown initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownTrigger = document.getElementById('logoDropdown');
+            if (dropdownTrigger) {
+                new bootstrap.Dropdown(dropdownTrigger);
+            }
+        });
+        
+        // PWA Install functionality
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-btn').style.display = 'block';
+        });
+        
+        document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    document.getElementById('pwa-install-btn').style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+        
+        // Hide install button if already installed
+        window.addEventListener('appinstalled', () => {
+            document.getElementById('pwa-install-btn').style.display = 'none';
+        });
+        
         // Manual Install Button (always visible on mobile)
         function createInstallButton() {
             const installBtn = document.createElement('button');
