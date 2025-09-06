@@ -54,11 +54,42 @@
             background-color: #fafbfc;
         }
         
-        /* Navigation */
+        /* Navigation Styles */
         .navbar {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
             box-shadow: 0 2px 20px rgba(0,0,0,0.1);
             padding: 1rem 0;
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+            cursor: pointer;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        
+        .dropdown-menu {
+            background: rgba(102, 126, 234, 0.95);
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .dropdown-item {
+            color: white;
+            padding: 10px 20px;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        .nav-link {
+            color: white !important;
+        }
+        
+        .nav-link:hover {
+            color: var(--accent-color) !important;
         }
         
         /* Icon alignment fixes */
@@ -77,12 +108,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-        
-        .navbar-brand img {
-            height: 50px;
-            width: auto;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
         
         .navbar-nav .nav-link {
@@ -311,37 +336,37 @@
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi">
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="navbar-nav ms-auto">
+        <div class="container d-flex justify-content-between align-items-center">
+            <!-- Logo as Navigation Button -->
+            <div class="dropdown">
+                <a class="navbar-brand dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none;">
+                    <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 40px;">
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'home' %}"><i class="fas fa-home me-2"></i>Početna</a></li>
                     {% if user.is_authenticated %}
-                        <span class="navbar-text me-3">
-                            <i class="fas fa-user-circle me-2"></i>Dobrodošli, {{ user.get_full_name|default:user.username }}!
-                        </span>
-                        <a class="nav-link" href="{% url 'dashboard' %}">
-                            <i class="fas fa-tachometer-alt me-1"></i>Kontrolna tabla
-                        </a>
-                        <a class="nav-link" href="{% url 'home' %}">
-                            <i class="fas fa-user-switch me-1"></i>Promeni korisnika
-                        </a>
-                        <a class="nav-link" href="{% url 'logout' %}">
-                            <i class="fas fa-sign-out-alt me-1"></i>Odjavi se
-                        </a>
-                    {% else %}
-                        <a class="nav-link btn-login" href="{% url 'login' %}">
-                            <i class="fas fa-sign-in-alt me-1"></i>Prijavi se
-                        </a>
+                        <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Kontrolna tabla</a></li>
+                        <li><a class="dropdown-item" href="{% url 'transport:cargo_list' %}"><i class="fas fa-boxes me-2"></i>Moj teret</a></li>
+                        <li><a class="dropdown-item" href="{% url 'transport:create_tour' %}"><i class="fas fa-plus me-2"></i>Nova tura</a></li>
                     {% endif %}
-                </div>
+                </ul>
             </div>
+            
+            <!-- Right side - Login/Username -->
+            {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: white; text-decoration: none;">
+                        <i class="fas fa-user-circle me-2"></i>{{ user.get_full_name|default:user.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Odjavi se</a></li>
+                    </ul>
+                </div>
+            {% else %}
+                <a class="btn btn-outline-light" href="{% url 'login' %}">
+                    <i class="fas fa-sign-in-alt me-1"></i>Prijavi se
+                </a>
+            {% endif %}
         </div>
     </nav>
 
