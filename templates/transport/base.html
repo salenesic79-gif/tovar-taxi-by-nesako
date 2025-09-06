@@ -1,5 +1,6 @@
 {% load static %}
 <!-- TEST COMMENT - TEMPLATE LOADING CHECK 2025-01-06 -->
+<!-- NOVO TEST 2025-01-06 08:22 - DROPDOWN MENU FIX -->
 <!DOCTYPE html>
 <html lang="sr">
 <head>
@@ -420,50 +421,40 @@
         <div class="container d-flex justify-content-between align-items-center">
             <!-- Logo as Navigation Button -->
             <div class="dropdown">
-                <a class="navbar-brand dropdown-toggle d-flex align-items-center" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; cursor: pointer;" id="logoDropdown" onclick="event.preventDefault();">
+                <a class="navbar-brand d-flex align-items-center" href="javascript:void(0)" onclick="showMenu()" style="text-decoration: none; cursor: pointer;" id="logoDropdown">
                     <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 40px;">
+                    <span style="color: red; font-size: 12px; margin-left: 5px;">KLIK</span>
                 </a>
-                <ul class="dropdown-menu" aria-labelledby="logoDropdown">
-                    <li><a class="dropdown-item" href="{% url 'home' %}"><i class="fas fa-home me-2"></i>Početna</a></li>
+                <div id="customMenu" style="display: none; position: absolute; top: 60px; left: 0; background: white; border: 1px solid #ccc; padding: 10px; z-index: 1000; min-width: 200px;">
+                    <div style="padding: 5px; border-bottom: 1px solid #eee;"><a href="{% url 'home' %}" style="text-decoration: none; color: #333;">🏠 Početna</a></div>
                     {% if user.is_authenticated %}
-                        <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Kontrolna tabla</a></li>
-                        <li><a class="dropdown-item" href="{% url 'transport:cargo_list' %}"><i class="fas fa-boxes me-2"></i>Moj teret</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><h6 class="dropdown-header"><i class="fas fa-cog me-2"></i>Podešavanja</h6></li>
-                        <li>
-                            <a class="dropdown-item" href="#" onclick="toggleNotifications()">
-                                <i class="fas fa-bell me-2"></i>Notifikacije 
-                                <span class="badge bg-success ms-auto" id="notif-status">Uključene</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#" onclick="toggleSound()">
-                                <i class="fas fa-volume-up me-2"></i>Zvuk 
-                                <span class="badge bg-success ms-auto" id="sound-status">Uključen</span>
-                            </a>
-                        </li>
-                        <li>
-                            <div class="dropdown-item">
-                                <i class="fas fa-music me-2"></i>Ton notifikacije
-                                <select class="form-select form-select-sm ms-2" style="width: auto; display: inline-block;" onchange="changeNotificationTone(this.value)">
-                                    <option value="default">Osnovni</option>
-                                    <option value="ping">Ping</option>
-                                    <option value="success">Uspeh</option>
-                                    <option value="alert">Upozorenje</option>
-                                </select>
-                            </div>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#" onclick="toggleDarkMode()">
-                                <i class="fas fa-moon me-2"></i>Tamni režim 
-                                <span class="badge bg-secondary ms-auto" id="dark-status">Isključen</span>
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" onclick="showAppInfo()"><i class="fas fa-info-circle me-2"></i>O aplikaciji</a></li>
+                        <div style="padding: 5px; border-bottom: 1px solid #eee;"><a href="{% url 'dashboard' %}" style="text-decoration: none; color: #333;">📊 Kontrolna tabla</a></div>
+                        <div style="padding: 5px; border-bottom: 1px solid #eee;"><a href="#" onclick="alert('Notifikacije: Uključene')" style="text-decoration: none; color: #333;">🔔 Notifikacije</a></div>
+                        <div style="padding: 5px; border-bottom: 1px solid #eee;"><a href="#" onclick="alert('Zvuk: Uključen')" style="text-decoration: none; color: #333;">🔊 Zvuk</a></div>
+                        <div style="padding: 5px;"><a href="#" onclick="alert('Tovar Taxi v1.0')" style="text-decoration: none; color: #333;">ℹ️ O aplikaciji</a></div>
                     {% endif %}
-                </ul>
+                </div>
             </div>
+
+            <script>
+                function showMenu() {
+                    const menu = document.getElementById('customMenu');
+                    if (menu.style.display === 'none') {
+                        menu.style.display = 'block';
+                        // Hide menu when clicking outside
+                        setTimeout(() => {
+                            document.addEventListener('click', function hideMenu(e) {
+                                if (!e.target.closest('#logoDropdown') && !e.target.closest('#customMenu')) {
+                                    menu.style.display = 'none';
+                                    document.removeEventListener('click', hideMenu);
+                                }
+                            });
+                        }, 100);
+                    } else {
+                        menu.style.display = 'none';
+                    }
+                }
+            </script>
             
             <!-- Right side - Login/Username -->
             {% if user.is_authenticated %}
