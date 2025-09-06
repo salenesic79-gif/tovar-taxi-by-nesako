@@ -15,6 +15,9 @@ SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Template caching disabled in DEBUG mode
+TEMPLATES_AUTO_RELOAD = True
+
 ALLOWED_HOSTS = ['*']
 
 # Application definition

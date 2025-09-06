@@ -82,6 +82,7 @@ urlpatterns = [
     path('websocket-test/', views.websocket_test, name='websocket_test'),
     
     # PWA URLs
+    path('pwa-manifest/', views.pwa_manifest, name='pwa_manifest'),
     path('manifest.json', views.pwa_manifest, name='pwa_manifest'),
     path('sw.js', views.service_worker, name='service_worker'),
 ]

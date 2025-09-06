@@ -1,4 +1,5 @@
 {% load static %}
+<!-- TEST COMMENT - TEMPLATE LOADING CHECK 2025-01-06 -->
 <!DOCTYPE html>
 <html lang="sr">
 <head>
@@ -305,6 +306,86 @@
             }
         }
         
+        /* Mobile Responsive Fixes */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            .navbar {
+                padding: 0.5rem 0;
+            }
+            
+            .dropdown-menu {
+                min-width: 280px;
+                max-width: 90vw;
+                font-size: 14px;
+            }
+            
+            .dropdown-item {
+                padding: 12px 16px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .form-select {
+                max-width: 120px;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            
+            .card {
+                margin: 10px 5px;
+                border-radius: 12px;
+            }
+            
+            .form-control, .form-select {
+                padding: 10px 12px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            /* Prevent horizontal scroll */
+            body {
+                overflow-x: hidden;
+            }
+            
+            .row {
+                margin: 0 -5px;
+            }
+            
+            .col, .col-md-6, .col-lg-4 {
+                padding: 0 5px;
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* PWA Styles */
+        .pwa-install-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
         /* Custom utilities */
         .text-gradient {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
@@ -339,15 +420,47 @@
         <div class="container d-flex justify-content-between align-items-center">
             <!-- Logo as Navigation Button -->
             <div class="dropdown">
-                <a class="navbar-brand dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none;">
+                <a class="navbar-brand dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; cursor: pointer;" id="logoDropdown">
                     <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi" style="height: 40px;">
                 </a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu" aria-labelledby="logoDropdown">
                     <li><a class="dropdown-item" href="{% url 'home' %}"><i class="fas fa-home me-2"></i>Početna</a></li>
                     {% if user.is_authenticated %}
                         <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Kontrolna tabla</a></li>
                         <li><a class="dropdown-item" href="{% url 'transport:cargo_list' %}"><i class="fas fa-boxes me-2"></i>Moj teret</a></li>
-                        <li><a class="dropdown-item" href="{% url 'transport:create_tour' %}"><i class="fas fa-plus me-2"></i>Nova tura</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header"><i class="fas fa-cog me-2"></i>Podešavanja</h6></li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="toggleNotifications()">
+                                <i class="fas fa-bell me-2"></i>Notifikacije 
+                                <span class="badge bg-success ms-auto" id="notif-status">Uključene</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="toggleSound()">
+                                <i class="fas fa-volume-up me-2"></i>Zvuk 
+                                <span class="badge bg-success ms-auto" id="sound-status">Uključen</span>
+                            </a>
+                        </li>
+                        <li>
+                            <div class="dropdown-item">
+                                <i class="fas fa-music me-2"></i>Ton notifikacije
+                                <select class="form-select form-select-sm ms-2" style="width: auto; display: inline-block;" onchange="changeNotificationTone(this.value)">
+                                    <option value="default">Osnovni</option>
+                                    <option value="ping">Ping</option>
+                                    <option value="success">Uspeh</option>
+                                    <option value="alert">Upozorenje</option>
+                                </select>
+                            </div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="toggleDarkMode()">
+                                <i class="fas fa-moon me-2"></i>Tamni režim 
+                                <span class="badge bg-secondary ms-auto" id="dark-status">Isključen</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="showAppInfo()"><i class="fas fa-info-circle me-2"></i>O aplikaciji</a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -533,6 +646,56 @@
                     document.body.appendChild(installBtn);
                 }
             }, 3000);
+        });
+        
+        // Settings functionality
+        function toggleNotifications() {
+            const status = document.getElementById('notif-status');
+            const isEnabled = status.textContent === 'Uključene';
+            status.textContent = isEnabled ? 'Isključene' : 'Uključene';
+            status.className = isEnabled ? 'badge bg-danger ms-auto' : 'badge bg-success ms-auto';
+            localStorage.setItem('notifications', !isEnabled);
+        }
+        
+        function toggleSound() {
+            const status = document.getElementById('sound-status');
+            const isEnabled = status.textContent === 'Uključen';
+            status.textContent = isEnabled ? 'Isključen' : 'Uključen';
+            status.className = isEnabled ? 'badge bg-danger ms-auto' : 'badge bg-success ms-auto';
+            localStorage.setItem('sound', !isEnabled);
+        }
+        
+        function changeNotificationTone(tone) {
+            localStorage.setItem('notificationTone', tone);
+            // Play preview of selected tone
+            if (tone !== 'default') {
+                const audio = new Audio(`{% static 'audio/' %}${tone}.wav`);
+                audio.play().catch(e => console.log('Audio preview failed'));
+            }
+        }
+        
+        function toggleDarkMode() {
+            const status = document.getElementById('dark-status');
+            const isEnabled = status.textContent === 'Uključen';
+            status.textContent = isEnabled ? 'Isključen' : 'Uključen';
+            status.className = isEnabled ? 'badge bg-secondary ms-auto' : 'badge bg-primary ms-auto';
+            document.body.classList.toggle('dark-mode', !isEnabled);
+            localStorage.setItem('darkMode', !isEnabled);
+        }
+        
+        function showAppInfo() {
+            alert('Tovar Taxi v1.0\nAplikacija za prevoz tereta\n© 2024 Sva prava zadržana');
+        }
+        
+        // Load saved settings
+        document.addEventListener('DOMContentLoaded', function() {
+            const notifications = localStorage.getItem('notifications') !== 'false';
+            const sound = localStorage.getItem('sound') !== 'false';
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            
+            if (!notifications) toggleNotifications();
+            if (!sound) toggleSound();
+            if (darkMode) toggleDarkMode();
         });
     </script>
     

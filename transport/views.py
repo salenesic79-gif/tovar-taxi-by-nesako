@@ -252,17 +252,7 @@ def test_view(request):
 
 def home_view(request):
     """Glavna stranica aplikacije"""
-    if request.user.is_authenticated:
-        try:
-            profile = request.user.profile
-            if profile.role == 'naručilac':
-                return redirect('transport:create_shipment_request')
-            elif profile.role in ['prevoznik', 'vozač']:
-                return redirect('transport:create_route_availability')
-        except Profile.DoesNotExist:
-            pass
-    
-    # Statistike za neregistrovane korisnike
+    # Statistike za sve korisnike
     context = {
         'total_shipments': Shipment.objects.filter(status='published').count(),
         'total_carriers': Profile.objects.filter(role='prevoznik').count(),
@@ -1983,3 +1973,33 @@ self.addEventListener('fetch', function(event) {
 });
 """
     return HttpResponse(sw_content, content_type='application/javascript')
+
+def pwa_manifest(request):
+    """PWA Manifest for adding app to home screen"""
+    manifest = {
+        "name": "Tovar Taxi",
+        "short_name": "TovarTaxi",
+        "description": "Aplikacija za prevoz tereta",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#667eea",
+        "theme_color": "#667eea",
+        "orientation": "portrait",
+        "icons": [
+            {
+                "src": "/static/images/TTaxi.png",
+                "sizes": "192x192",
+                "type": "image/png",
+                "purpose": "maskable any"
+            },
+            {
+                "src": "/static/images/TTaxi.png", 
+                "sizes": "512x512",
+                "type": "image/png",
+                "purpose": "maskable any"
+            }
+        ],
+        "categories": ["business", "productivity", "transportation"],
+        "lang": "sr"
+    }
+    return JsonResponse(manifest)
