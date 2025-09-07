@@ -78,11 +78,6 @@ DATABASES = {
     }
 }
 
-# Production database configuration (PostgreSQL za Render)
-if not DEBUG:
-    import dj_database_url
-    DATABASES['default'] = dj_database_url.parse(os.environ.get('DATABASE_URL'))
-
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
