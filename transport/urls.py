@@ -12,9 +12,6 @@ urlpatterns = [
     
     # Authentication
     path('login/', views.custom_login_view, name='custom_login'),
-    path('signup/', views.signup_view, name='signup'),
-    path('signup/sender/', views.signup_sender_view, name='signup_sender'),
-    path('signup/carrier/', views.signup_carrier_view, name='signup_carrier'),
     path('signup/sender/new/', views.signup_sender_new_view, name='signup_sender_new'),
     path('signup/carrier/new/', views.signup_carrier_new_view, name='signup_carrier_new'),
     
