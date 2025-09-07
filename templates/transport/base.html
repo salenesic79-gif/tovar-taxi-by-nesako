@@ -27,10 +27,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Tovar Taxi">
     <meta name="msapplication-TileColor" content="#667eea">
-    <meta name="msapplication-TileImage" content="{% static 'images/TTaxi.png' %}">
-    <link rel="apple-touch-icon" href="{% static 'images/TTaxi.png' %}">
+    <meta name="msapplication-TileImage" content="{% static 'images/TTaxi9_icon.ico.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/TTaxi9_icon.ico.png' %}">
     <link rel="manifest" href="{% static 'manifest.json' %}">
-    <link rel="shortcut icon" href="{% static 'images/TTaxi.png' %}">
+    <link rel="shortcut icon" href="{% static 'images/TTaxi9_icon.ico.png' %}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/TTaxi9_icon.ico.png' %}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/TTaxi9_icon.ico.png' %}">
     
     <style>
         :root {
@@ -102,6 +104,22 @@
             padding: 40px 0;
             margin-top: 50px;
         }
+        
+        /* Mobilni responsive header */
+        @media (max-width: 768px) {
+            .navbar-brand img {
+                height: 40px;
+                width: auto;
+            }
+            .navbar-nav {
+                flex-direction: column;
+                align-items: center;
+            }
+            .nav-link {
+                font-size: 16px;
+                padding: 10px 0;
+            }
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -112,7 +130,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'images/TTaxi.png' %}" alt="Tovar Taxi">
+                <img src="{% static 'images/TTaxi9_icon.ico.png' %}" alt="Tovar Taxi">
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">

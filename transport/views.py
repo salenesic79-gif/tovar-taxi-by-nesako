@@ -263,27 +263,51 @@ def home_view(request):
 
 def signup_view(request):
     """Registracija korisnika"""
+    print(f"[DEBUG] signup_view called - Method: {request.method}")
+    
     if request.method == 'POST':
+        print(f"[DEBUG] POST data received: {request.POST}")
         form = SignupForm(request.POST)
+        print(f"[DEBUG] Form created, is_valid: {form.is_valid()}")
+        
         if form.is_valid():
+            print("[DEBUG] Form is valid, creating user...")
             user = form.save()
-            Profile.objects.create(
+            print(f"[DEBUG] User created: {user.username}")
+            
+            profile = Profile.objects.create(
                 user=user,
                 role=form.cleaned_data['role'],
                 phone_number=form.cleaned_data['phone_number'],
                 address=form.cleaned_data['address'],
-                company_name=form.cleaned_data['company_name']
+                company_name=form.cleaned_data.get('company_name', '')
             )
+            print(f"[DEBUG] Profile created: {profile.id}")
+            
             login(request, user)
-            messages.success(request, 'Uspešno ste se registrovali!')
+            print(f"[DEBUG] User logged in: {user.is_authenticated}")
+            
+            messages.success(request, f'Dobrodošli {user.first_name}! Uspešno ste se registrovali.')
+            
+            # Role-based redirect
             if form.cleaned_data['role'] == 'naručilac':
+                print("[DEBUG] Redirecting to create_shipment_request")
                 return redirect('transport:create_shipment_request')
             elif form.cleaned_data['role'] in ['prevoznik', 'vozač']:
+                print("[DEBUG] Redirecting to create_route_availability")
                 return redirect('transport:create_route_availability')
+            else:
+                print("[DEBUG] Redirecting to home")
+                return redirect('home')
+        else:
+            print(f"[DEBUG] Form errors: {form.errors}")
+            messages.error(request, 'Greška u registraciji. Proverite unete podatke.')
     else:
+        print("[DEBUG] GET request, creating empty form")
         form = SignupForm()
     
-    return render(request, 'registration/signup.html', {'form': form})
+    print("[DEBUG] Rendering signup template")
+    return render(request, 'transport/signup.html', {'form': form})
 
 
 @csrf_exempt

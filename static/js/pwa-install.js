@@ -86,16 +86,16 @@ class PWAManager {
             installBtn.className = 'pwa-install-button';
             installBtn.innerHTML = `
                 <i class="fas fa-download"></i>
-                <span>Instaliraj aplikaciju</span>
+                <span>Instaliraj na telefon</span>
             `;
             installBtn.addEventListener('click', () => this.installApp());
             
-            // Add to header or create floating button
-            const header = document.querySelector('.header, .navbar');
-            if (header) {
+            // Dodaj u header ili kreiraj floating button za mobilni
+            const header = document.querySelector('.navbar');
+            if (header && window.innerWidth > 768) {
                 header.appendChild(installBtn);
             } else {
-                installBtn.classList.add('floating-install-btn');
+                installBtn.classList.add('floating-install-btn-mobile');
                 document.body.appendChild(installBtn);
             }
         }
@@ -332,7 +332,7 @@ class PWAManager {
                 box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
             }
             
-            .floating-install-btn {
+            .floating-install-btn-mobile {
                 position: fixed;
                 bottom: 20px;
                 right: 20px;

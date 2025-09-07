@@ -22,16 +22,200 @@
 
 /* Mobile styles (default - mobile first) */
 @media (max-width: 767px) {
+    /* Header i navigacija - mobilni responsive */
+    .navbar {
+        padding: 8px 15px !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+    }
+    
+    .navbar-brand {
+        padding: 0 !important;
+    }
+    
+    .navbar-brand img {
+        height: 35px !important;
+        width: auto !important;
+        max-width: 120px !important;
+    }
+    
+    .navbar-toggler {
+        border: none !important;
+        padding: 4px 8px !important;
+        font-size: 18px !important;
+    }
+    
+    .navbar-collapse {
+        margin-top: 10px;
+        border-top: 1px solid #eee;
+        padding-top: 10px;
+    }
+    
     /* Navigation adjustments */
     .navbar-nav {
         flex-direction: column;
         width: 100%;
+        align-items: stretch !important;
     }
     
     .navbar-nav .nav-item {
         width: 100%;
         text-align: center;
-        margin: 5px 0;
+        margin: 3px 0;
+    }
+    
+    .navbar-nav .nav-link {
+        padding: 12px 15px !important;
+        font-size: 16px !important;
+        border-radius: 8px;
+        margin: 2px 0;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea !important;
+        font-weight: 500;
+    }
+    
+    .navbar-nav .nav-link:hover {
+        background: rgba(102, 126, 234, 0.2) !important;
+        color: #5a6fd8 !important;
+    }
+    
+    /* Dugmad u header-u - mobilni responsive */
+    .btn {
+        font-size: 14px !important;
+        padding: 10px 16px !important;
+        margin: 4px 2px !important;
+        border-radius: 8px !important;
+        min-height: 44px; /* Touch target minimum */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-sm {
+        font-size: 13px !important;
+        padding: 8px 12px !important;
+        min-height: 40px;
+    }
+    
+    .btn-lg {
+        font-size: 16px !important;
+        padding: 12px 20px !important;
+        min-height: 48px;
+    }
+    
+    /* Form polja - sprečavanje preklapanja */
+    .form-control {
+        font-size: 16px !important; /* Sprečava zoom na iOS */
+        padding: 12px 15px !important;
+        margin-bottom: 15px !important;
+        border-radius: 8px !important;
+        border: 2px solid #e9ecef !important;
+        min-height: 48px !important;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+    }
+    
+    .form-select {
+        font-size: 16px !important;
+        padding: 12px 15px !important;
+        min-height: 48px !important;
+        background-position: right 12px center !important;
+    }
+    
+    .form-label {
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        margin-bottom: 8px !important;
+        color: #495057 !important;
+    }
+    
+    /* Input group - mobilni responsive */
+    .input-group {
+        margin-bottom: 15px !important;
+    }
+    
+    .input-group .form-control {
+        margin-bottom: 0 !important;
+    }
+    
+    .input-group-text {
+        padding: 12px 15px !important;
+        font-size: 14px !important;
+        min-height: 48px !important;
+        border: 2px solid #e9ecef !important;
+    }
+    
+    /* Container i spacing - mobilni */
+    .container {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+        max-width: 100% !important;
+    }
+    
+    .row {
+        margin-left: -10px !important;
+        margin-right: -10px !important;
+    }
+    
+    .col, [class*="col-"] {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+    
+    /* Card komponente - mobilni responsive */
+    .card {
+        margin-bottom: 20px !important;
+        border-radius: 12px !important;
+        border: none !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        padding: 15px 20px !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border-radius: 12px 12px 0 0 !important;
+        border-bottom: none !important;
+    }
+    
+    .card-body {
+        padding: 20px !important;
+    }
+    
+    .card-title {
+        font-size: 18px !important;
+        margin-bottom: 15px !important;
+    }
+    
+    /* Modal - mobilni responsive */
+    .modal-dialog {
+        margin: 10px !important;
+        max-width: calc(100% - 20px) !important;
+    }
+    
+    .modal-content {
+        border-radius: 12px !important;
+    }
+    
+    .modal-header {
+        padding: 15px 20px !important;
+    }
+    
+    .modal-body {
+        padding: 20px !important;
+    }
+    
+    .modal-footer {
+        padding: 15px 20px !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    
+    .modal-footer .btn {
+        width: 100% !important;
+        margin: 0 !important;
     }
     
     /* Dashboard cards */
