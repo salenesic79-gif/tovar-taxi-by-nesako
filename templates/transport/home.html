@@ -69,7 +69,6 @@
                     <span style="color: white; padding: 8px 12px;">Dobrodošli, {{ user.username }}!</span>
                     <a href="{% url 'logout' %}" style="color: white; text-decoration: none; padding: 8px 12px; border: 1px solid #FFD700; border-radius: 5px;">Odjavi se</a>
                 {% else %}
-                    <a href="{% url 'transport:signup' %}" style="color: white; text-decoration: none; padding: 8px 12px; border: 1px solid #2ECC71; border-radius: 5px;">Registruj se</a>
                     <a href="{% url 'login' %}" style="color: white; text-decoration: none; padding: 8px 12px; border: 1px solid #FFD700; border-radius: 5px;">Prijavi se</a>
                 {% endif %}
             </div>
@@ -89,7 +88,7 @@
                     <a href="{% url 'transport:signup_sender_new' %}" class="btn btn-register btn-lg">
                         <i class="fas fa-box me-2"></i>NARUČILAC
                     </a>
-                    <a href="{% url 'transport:signup_carrier_new' %}" class="btn btn-carrier btn-lg">
+                    <a href="{% url 'transport:signup_carrier_new' %}" class="btn btn-register btn-lg">
                         <i class="fas fa-truck me-2"></i>PREVOZNIK
                     </a>
                 </div>
