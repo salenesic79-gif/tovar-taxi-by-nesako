@@ -189,52 +189,11 @@
             <h1 class="section-title">
                 <i class="fas fa-truck me-3"></i>Registracija - Prevoznik
             </h1>
-            
-            <!-- Info Cards -->
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="info-card">
-                        <h5><i class="fas fa-money-bill-wave me-2"></i>Dodatna Zarada</h5>
-                        <p>Povećajte svoju zaradu koristeći slobodne kapacitete vašeg vozila za transport robe.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="info-card">
-                        <h5><i class="fas fa-route me-2"></i>Optimizacija Ruta</h5>
-                        <p>Naša aplikacija vam pomaže da optimizujete rute i smanjite prazne kilometraže.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="info-card">
-                        <h5><i class="fas fa-handshake me-2"></i>Pouzdani Klijenti</h5>
-                        <p>Pristupite bazi verifikovanih naručilaca i obezbedite redovne poslove.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="info-card">
-                        <h5><i class="fas fa-mobile-alt me-2"></i>Jednostavna Aplikacija</h5>
-                        <p>Upravljajte svojim poslovima kroz intuitivnu mobilnu aplikaciju dostupnu 24/7.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="info-card">
-                        <h5><i class="fas fa-credit-card me-2"></i>Brza Naplata</h5>
-                        <p>Automatska naplata kroz aplikaciju sa brzim transferom sredstava na vaš račun.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="info-card">
-                        <h5><i class="fas fa-chart-line me-2"></i>Analitika Poslovanja</h5>
-                        <p>Pratite statistike svojih voznji, zaradu i optimizujte svoje poslovanje.</p>
-                    </div>
-                </div>
-            </div>
 
             <!-- Registration Form -->
             <div class="mt-4">
-                <form method="post" action="{% url 'transport:signup_carrier' %}">
+                <form method="post" action="{% url 'transport:signup_carrier_new' %}">
                     {% csrf_token %}
-                    <input type="hidden" name="role" value="prevoznik">
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -276,8 +235,8 @@
                                 <option value="">Izaberite tip vozila</option>
                                 <option value="kombi">Kombi</option>
                                 <option value="kamion">Kamion</option>
-                                <option value="kamionet">Kamionet</option>
                                 <option value="prikolica">Prikolica</option>
+                                <option value="tandem">Tandem</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -286,9 +245,17 @@
                         </div>
                     </div>
                     
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label for="address" class="form-label">Adresa</label>
                         <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                    </div>
+                    
+                    <!-- Checkbox za zapamti me -->
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
+                        <label class="form-check-label" for="rememberMe">
+                            Zapamti me
+                        </label>
                     </div>
                     
                     <!-- Checkbox za uslove korišćenja -->
@@ -356,43 +323,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let infoCards = [
-            { title: 'Dodatna Zarada', icon: 'money-bill-wave', text: 'Povećajte svoju zaradu koristeći slobodne kapacitete vašeg vozila za transport robe.' },
-            { title: 'Optimizacija Ruta', icon: 'route', text: 'Naša aplikacija vam pomaže da optimizujete rute i smanjite prazne kilometraže.' },
-            { title: 'Pouzdani Klijenti', icon: 'handshake', text: 'Pristupite bazi verifikovanih naručilaca i obezbedite redovne poslove.' },
-            { title: 'Jednostavna Aplikacija', icon: 'mobile-alt', text: 'Upravljajte svojim poslovima kroz intuitivnu mobilnu aplikaciju dostupnu 24/7.' },
-            { title: 'Brza Naplata', icon: 'credit-card', text: 'Automatska naplata kroz aplikaciju sa brzim transferom sredstava na vaš račun.' },
-            { title: 'Analitika Poslovanja', icon: 'chart-line', text: 'Pratite statistike svojih voznji, zaradu i optimizujte svoje poslovanje.' }
-        ];
-
-        let currentCard = 0;
-        let infoTitle = document.getElementById('infoTitle');
-        let infoText = document.getElementById('infoText');
-
-        function changeInfoCard() {
-            infoTitle.innerHTML = `<i class="fas fa-${infoCards[currentCard].icon} me-2"></i>${infoCards[currentCard].title}`;
-            infoText.textContent = infoCards[currentCard].text;
-            currentCard = (currentCard + 1) % infoCards.length;
-        }
-
-        function openInfoModal() {
-            let modal = new bootstrap.Modal(document.getElementById('infoModal'));
-            modal.show();
-            let allInfoCards = document.getElementById('allInfoCards');
-            allInfoCards.innerHTML = '';
-            infoCards.forEach(card => {
-                let cardHTML = `
-                    <div class="col-md-4">
-                        <div class="info-card">
-                            <h5><i class="fas fa-${card.icon} me-2"></i>${card.title}</h5>
-                            <p>${card.text}</p>
-                        </div>
-                    </div>
-                `;
-                allInfoCards.innerHTML += cardHTML;
-            });
-        }
-
         function openTermsModal() {
             let modal = new bootstrap.Modal(document.getElementById('termsModal'));
             modal.show();
@@ -408,9 +338,6 @@
             let termsModal = new bootstrap.Modal(document.getElementById('termsModal'));
             termsModal.hide();
         }
-
-        changeInfoCard();
-        setInterval(changeInfoCard, 7000);
     </script>
 </body>
 </html>
