@@ -23,8 +23,14 @@
     
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tovar Taxi">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-TileImage" content="{% static 'images/TTaxi.png' %}">
     <link rel="apple-touch-icon" href="{% static 'images/TTaxi.png' %}">
     <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="shortcut icon" href="{% static 'images/TTaxi.png' %}">
     
     <style>
         :root {
@@ -162,6 +168,70 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- PWA Install and Enhanced Functionality -->
+    <script src="{% static 'js/pwa-install.js' %}"></script>
+    
+    <!-- Offline/Online Status Handling -->
+    <script>
+        // Online/Offline status handling
+        function updateConnectionStatus() {
+            const statusIndicator = document.getElementById('connection-status');
+            if (!statusIndicator) {
+                const indicator = document.createElement('div');
+                indicator.id = 'connection-status';
+                indicator.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    background: #dc3545;
+                    color: white;
+                    text-align: center;
+                    padding: 8px;
+                    z-index: 9999;
+                    display: none;
+                    font-weight: 600;
+                `;
+                indicator.innerHTML = '<i class="fas fa-wifi-slash"></i> Nema internetske veze - Rad u offline režimu';
+                document.body.appendChild(indicator);
+            }
+            
+            const indicator = document.getElementById('connection-status');
+            if (navigator.onLine) {
+                indicator.style.display = 'none';
+            } else {
+                indicator.style.display = 'block';
+            }
+        }
+        
+        // Listen for online/offline events
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        
+        // Check initial status
+        document.addEventListener('DOMContentLoaded', updateConnectionStatus);
+        
+        // Update notifications periodically
+        function updateNotifications() {
+            if (navigator.onLine) {
+                fetch('/transport/api/notifications/')
+                    .then(response => response.json())
+                    .then(data => {
+                        const badge = document.querySelector('.notification-badge');
+                        if (badge && data.unread_count > 0) {
+                            badge.textContent = data.unread_count;
+                            badge.style.display = 'inline-block';
+                        }
+                    })
+                    .catch(error => console.log('Notification update failed:', error));
+            }
+        }
+        
+        // Update notifications every 30 seconds
+        setInterval(updateNotifications, 30000);
+        document.addEventListener('DOMContentLoaded', updateNotifications);
+    </script>
     
     {% block extra_js %}{% endblock %}
 </body>

@@ -15,6 +15,8 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=20, blank=True)
     address = models.TextField(blank=True)
     company_name = models.CharField(max_length=200, blank=True)
+    pib = models.CharField(max_length=20, blank=True, verbose_name='PIB')
+    maticni_broj = models.CharField(max_length=20, blank=True, verbose_name='Matični broj')
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
