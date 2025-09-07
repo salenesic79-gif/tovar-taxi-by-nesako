@@ -641,19 +641,22 @@ def custom_login_view(request):
             print(f"DEBUG: Authentication successful for {username}")
             login(request, user)
             
-            # Role-based redirect
+            # Role-based redirect - NAKON login-a
             try:
-                profile = user.profile
-                print(f"DEBUG: User {username} has profile with role: {profile.role}")
+                profile = user.profile  # Sada možemo pristupiti profilu
+                print(f"DEBUG: User role: {profile.role}")
                 
                 if profile.role == 'naručilac':
                     print("DEBUG: Redirecting to shipper_dashboard")
                     return redirect('transport:shipper_dashboard')
-                elif profile.role in ['prevoznik', 'vozač']:
-                    print("DEBUG: Redirecting to carrier_dashboard (prevoznik/vozač)")
+                elif profile.role == 'prevoznik':
+                    print("DEBUG: Redirecting to carrier_dashboard")
                     return redirect('transport:carrier_dashboard')
+                elif profile.role == 'vozač':
+                    print("DEBUG: Redirecting to driver_dashboard")
+                    return redirect('transport:driver_dashboard')
                 else:
-                    print(f"DEBUG: Unknown role '{profile.role}', redirecting to home")
+                    print("DEBUG: Unknown role, redirecting to home")
                     return redirect('home')
             except Profile.DoesNotExist:
                 print(f"DEBUG: Profile does not exist for user {username}, redirecting to home")
