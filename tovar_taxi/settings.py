@@ -131,8 +131,8 @@ LOCALE_PATHS = [
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Disable manifest staticfiles storage to avoid missing file errors on Render
-STATICFILES_STORAGE = None
+# WhiteNoise storage configuration for Render deployment
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),

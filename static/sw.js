@@ -10,8 +10,8 @@ const STATIC_FILES = [
     '/static/css/popup-styles.css',
     '/static/js/modern-effects.js',
     '/static/js/notifications.js',
-    '/static/images/TTaxi.png',
-    '/static/images/TTaxi_icon.png',
+    '/static/images/TTaxi9_icon.ico.png',
+    '/static/images/TTaxi9_icon.ico.png',
     '/static/manifest.json',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
@@ -203,8 +203,8 @@ self.addEventListener('push', (event) => {
     
     const options = {
         body: 'Nova notifikacija u Tovar Taxi aplikaciji',
-        icon: '/static/images/TTaxi_icon.png',
-        badge: '/static/images/TTaxi_icon.png',
+        icon: '/static/images/TTaxi9_icon.ico.png',
+        badge: '/static/images/TTaxi9_icon.ico.png',
         vibrate: [200, 100, 200],
         data: {
             url: '/transport/notifications/'
@@ -213,7 +213,7 @@ self.addEventListener('push', (event) => {
             {
                 action: 'open',
                 title: 'Otvori',
-                icon: '/static/images/TTaxi_icon.png'
+                icon: '/static/images/TTaxi9_icon.ico.png'
             },
             {
                 action: 'close',
