@@ -85,7 +85,14 @@
                 <div>Budućnost transporta je stigla: povećajte zaradu, smanjite troškove.</div>
             </div>
             {% if not user.is_authenticated %}
-                <a href="{% url 'transport:signup' %}" class="btn btn-register btn-lg">REGISTRUJ SE SADA</a>
+                <div class="d-flex justify-content-center gap-4 mt-4">
+                    <a href="{% url 'transport:signup_sender_new' %}" class="btn btn-register btn-lg">
+                        <i class="fas fa-box me-2"></i>NARUČILAC
+                    </a>
+                    <a href="{% url 'transport:signup_carrier_new' %}" class="btn btn-carrier btn-lg">
+                        <i class="fas fa-truck me-2"></i>PREVOZNIK
+                    </a>
+                </div>
             {% endif %}
         </div>
     </section>

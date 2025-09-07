@@ -1902,3 +1902,210 @@ def edit_vehicle(request, vehicle_id):
         'vehicle': vehicle,
     }
     return render(request, 'transport/edit_vehicle.html', context)
+
+def signup_sender_new_view(request):
+    """Nova registracija naručilaca sa opisnim poljima"""
+    if request.method == 'POST':
+        # Extract form fields
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        phone_number = request.POST.get('phone_number')
+        address = request.POST.get('address')
+        company_name = request.POST.get('company_name', '')
+        
+        # Validation
+        if not all([username, email, password1, password2, phone_number, address]):
+            messages.error(request, 'Sva obavezna polja moraju biti popunjena.')
+            return render(request, 'transport/signup_sender_new.html', {
+                'username': username,
+                'email': email,
+                'phone_number': phone_number,
+                'address': address,
+                'company_name': company_name,
+            })
+        
+        if password1 != password2:
+            messages.error(request, 'Lozinke se ne poklapaju.')
+            return render(request, 'transport/signup_sender_new.html', {
+                'username': username,
+                'email': email,
+                'phone_number': phone_number,
+                'address': address,
+                'company_name': company_name,
+            })
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Korisničko ime već postoji.')
+            return render(request, 'transport/signup_sender_new.html', {
+                'username': username,
+                'email': email,
+                'phone_number': phone_number,
+                'address': address,
+                'company_name': company_name,
+            })
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email adresa već postoji.')
+            return render(request, 'transport/signup_sender_new.html', {
+                'username': username,
+                'email': email,
+                'phone_number': phone_number,
+                'address': address,
+                'company_name': company_name,
+            })
+        
+        try:
+            # Create user
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password1
+            )
+            
+            # Create profile
+            profile = Profile.objects.create(
+                user=user,
+                role='naručilac',
+                phone_number=phone_number,
+                address=address,
+                company_name=company_name
+            )
+            
+            messages.success(request, 'Uspešno ste se registrovali kao naručilac!')
+            
+            # Auto login
+            user = authenticate(username=username, password=password1)
+            if user:
+                login(request, user)
+                return redirect('transport:shipper_dashboard')
+            else:
+                return redirect('login')
+                
+        except Exception as e:
+            messages.error(request, f'Greška pri registraciji: {str(e)}')
+            return render(request, 'transport/signup_sender_new.html', {
+                'username': username,
+                'email': email,
+                'phone_number': phone_number,
+                'address': address,
+                'company_name': company_name,
+            })
+    
+    return render(request, 'transport/signup_sender_new.html')
+
+
+def signup_carrier_new_view(request):
+    """Nova registracija prevoznika sa opisnim poljima"""
+    if request.method == 'POST':
+        # Extract form fields
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        phone_number = request.POST.get('phone_number')
+        address = request.POST.get('address')
+        company_name = request.POST.get('company_name')
+        tip_vozila = request.POST.get('tip_vozila')
+        registarski_broj = request.POST.get('registarski_broj')
+        
+        # Validation
+        if not all([username, email, password1, password2, phone_number, address, company_name, tip_vozila, registarski_broj]):
+            messages.error(request, 'Sva polja su obavezna.')
+            return render(request, 'transport/signup_carrier_new.html', {
+                'username': username,
+                'email': email,
+                'phone_number': phone_number,
+                'address': address,
+                'company_name': company_name,
+                'tip_vozila': tip_vozila,
+                'registarski_broj': registarski_broj,
+            })
+        
+        if password1 != password2:
+            messages.error(request, 'Lozinke se ne poklapaju.')
+            return render(request, 'transport/signup_carrier_new.html', {
+                'username': username,
+                'email': email,
+                'phone_number': phone_number,
+                'address': address,
+                'company_name': company_name,
+                'tip_vozila': tip_vozila,
+                'registarski_broj': registarski_broj,
+            })
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Korisničko ime već postoji.')
+            return render(request, 'transport/signup_carrier_new.html', {
+                'username': username,
+                'email': email,
+                'phone_number': phone_number,
+                'address': address,
+                'company_name': company_name,
+                'tip_vozila': tip_vozila,
+                'registarski_broj': registarski_broj,
+            })
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email adresa već postoji.')
+            return render(request, 'transport/signup_carrier_new.html', {
+                'username': username,
+                'email': email,
+                'phone_number': phone_number,
+                'address': address,
+                'company_name': company_name,
+                'tip_vozila': tip_vozila,
+                'registarski_broj': registarski_broj,
+            })
+        
+        try:
+            # Create user
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password1
+            )
+            
+            # Create profile
+            profile = Profile.objects.create(
+                user=user,
+                role='prevoznik',
+                phone_number=phone_number,
+                address=address,
+                company_name=company_name
+            )
+            
+            # Create vehicle
+            Vehicle.objects.create(
+                owner=user,
+                tip_vozila=tip_vozila,
+                registarski_broj=registarski_broj,
+                nosivost=0,  # Default value
+                dimenzije='',  # Default value
+                status='dostupan'
+            )
+            
+            messages.success(request, 'Uspešno ste se registrovali kao prevoznik!')
+            
+            # Auto login
+            user = authenticate(username=username, password=password1)
+            if user:
+                login(request, user)
+                return redirect('transport:carrier_dashboard')
+            else:
+                return redirect('login')
+                
+        except Exception as e:
+            messages.error(request, f'Greška pri registraciji: {str(e)}')
+            return render(request, 'transport/signup_carrier_new.html', {
+                'username': username,
+                'email': email,
+                'phone_number': phone_number,
+                'address': address,
+                'company_name': company_name,
+                'tip_vozila': tip_vozila,
+                'registarski_broj': registarski_broj,
+            })
+    
+    return render(request, 'transport/signup_carrier_new.html')

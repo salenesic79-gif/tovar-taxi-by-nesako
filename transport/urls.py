@@ -15,6 +15,8 @@ urlpatterns = [
     path('signup/', views.signup_view, name='signup'),
     path('signup/sender/', views.signup_sender_view, name='signup_sender'),
     path('signup/carrier/', views.signup_carrier_view, name='signup_carrier'),
+    path('signup/sender/new/', views.signup_sender_new_view, name='signup_sender_new'),
+    path('signup/carrier/new/', views.signup_carrier_new_view, name='signup_carrier_new'),
     
     # Post-registration workflows
     path('create-shipment-request/', views.create_shipment_request, name='create_shipment_request'),
