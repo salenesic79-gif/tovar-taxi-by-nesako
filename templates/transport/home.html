@@ -64,11 +64,12 @@
                 <img src="{% static 'images/TTaxi2_icon.ico.png' %}" alt="Tovar Taxi">
             </a>
             
-            <div class="d-flex" style="gap: 15px;">
+            <div class="d-flex flex-column" style="gap: 15px;">
                 {% if user.is_authenticated %}
                     <span style="color: white; padding: 8px 12px;">Dobrodošli, {{ user.username }}!</span>
                     <a href="{% url 'logout' %}" style="color: white; text-decoration: none; padding: 8px 12px; border: 1px solid #FFD700; border-radius: 5px;">Odjavi se</a>
                 {% else %}
+                    <span style="color: white; padding: 8px 12px; font-size: 1.1rem;">Registruj se</span>
                     <a href="{% url 'login' %}" style="color: white; text-decoration: none; padding: 8px 12px; border: 1px solid #FFD700; border-radius: 5px;">Prijavi se</a>
                 {% endif %}
             </div>
