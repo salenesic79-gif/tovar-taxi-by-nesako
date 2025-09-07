@@ -41,11 +41,8 @@
                         </a>
                     </li>
                     {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'settings' %}">
-                            <i class="fas fa-cog me-2"></i>Podešavanja
-                        </a>
-                    </li>
+                    {% endif %}
+                    <!-- Uklonjen settings link jer ne postoji URL pattern -->
                 </ul>
             </div>
         </div>
@@ -256,7 +253,7 @@
                                         {% for shipment in recent_shipments %}
                                         <tr>
                                             <td><a href="{% url 'shipment_detail' shipment.pk %}">{{ shipment.reference_number }}</a></td>
-                                            <td>📍 {{ shipment.pickup_city }} → 🎯 {{ shipment.delivery_city }}</td>
+                                            <td> {{ shipment.pickup_city }} → {{ shipment.delivery_city }}</td>
                                             <td>
                                                 <span class="badge badge-{% if shipment.status == 'published' %}primary{% elif shipment.status == 'assigned' %}warning{% elif shipment.status == 'delivered' %}success{% else %}secondary{% endif %}">
                                                     {{ shipment.get_status_display }}
@@ -294,7 +291,7 @@
                                         {% for offer in recent_offers %}
                                         <tr>
                                             <td><a href="{% url 'shipment_detail' offer.shipment.pk %}">{{ offer.shipment.reference_number }}</a></td>
-                                            <td>📍 {{ offer.shipment.pickup_city }} → 🎯 {{ offer.shipment.delivery_city }}</td>
+                                            <td> {{ offer.shipment.pickup_city }} → {{ offer.shipment.delivery_city }}</td>
                                             <td>{{ offer.offered_price }} RSD</td>
                                             <td>
                                                 <span class="badge badge-{% if offer.is_accepted %}success{% else %}warning{% endif %}">
