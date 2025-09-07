@@ -47,6 +47,8 @@ urlpatterns = [
     # Vehicles
     path('manage-vehicles/', views.manage_vehicles, name='manage_vehicles'),
     path('add-vehicle/', views.add_vehicle, name='add_vehicle'),
+    path('vehicle/<int:vehicle_id>/', views.vehicle_details, name='vehicle_details'),
+    path('edit-vehicle/<int:vehicle_id>/', views.edit_vehicle, name='edit_vehicle'),
     
     # Tours
     path('my-tours/', views.my_tours, name='my_tours'),
