@@ -252,13 +252,26 @@ def test_view(request):
 
 def home_view(request):
     """Glavna stranica aplikacije"""
-    # Statistike za sve korisnike
-    context = {
-        'total_shipments': Shipment.objects.filter(status='published').count(),
-        'total_carriers': Profile.objects.filter(role='prevoznik').count(),
-        'total_vehicles': Vehicle.objects.filter(is_available=True).count(),
-    }
-    return render(request, 'transport/home.html', context)
+    try:
+        # Statistike za sve korisnike
+        context = {
+            'total_shipments': Shipment.objects.filter(status='published').count(),
+            'total_carriers': Profile.objects.filter(role='prevoznik').count(),
+            'total_vehicles': Vehicle.objects.filter(is_available=True).count(),
+        }
+        print(f"[DEBUG] Home view context: {context}")
+        return render(request, 'transport/home.html', context)
+    except Exception as e:
+        print(f"[ERROR] Home view error: {str(e)}")
+        import traceback
+        print(f"[ERROR] Traceback: {traceback.format_exc()}")
+        # Fallback context
+        context = {
+            'total_shipments': 0,
+            'total_carriers': 0,
+            'total_vehicles': 0,
+        }
+        return render(request, 'transport/home.html', context)
 
 
 def signup_view(request):
@@ -1604,7 +1617,7 @@ def check_destination_proximity(tour, current_lat, current_lng):
 import stripe
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods
 import json
 
 # Initialize Stripe
@@ -1619,7 +1632,7 @@ def cargo_map_view(request):
     return render(request, 'transport/cargo_map.html', context)
 
 @login_required
-@require_POST
+@require_http_methods(['POST'])
 def calculate_price_view(request):
     """Calculate price for cargo based on distance and pallet count"""
     try:
@@ -1654,7 +1667,7 @@ def calculate_price_view(request):
         return JsonResponse({'success': False, 'error': str(e)})
 
 @login_required
-@require_POST
+@require_http_methods(['POST'])
 def create_cargo_view(request):
     """Create cargo shipment with Stripe PaymentIntent"""
     try:
@@ -1741,7 +1754,7 @@ def cargo_detail_view(request, cargo_id):
     return render(request, 'transport/cargo_detail.html', {'cargo': cargo})
 
 @login_required
-@require_POST
+@require_http_methods(['POST'])
 def accept_cargo_view(request, cargo_id):
     """Carrier accepts cargo shipment"""
     cargo = get_object_or_404(Cargo, id=cargo_id)
@@ -1777,7 +1790,7 @@ def accept_cargo_view(request, cargo_id):
     return JsonResponse({'success': True})
 
 @login_required
-@require_POST
+@require_http_methods(['POST'])
 def confirm_delivery_view(request, cargo_id):
     """Confirm delivery and capture Stripe payment"""
     cargo = get_object_or_404(Cargo, id=cargo_id)
@@ -1833,7 +1846,7 @@ def notifications_api(request):
     return JsonResponse(data)
 
 @login_required
-@require_POST
+@require_http_methods(['POST'])
 def mark_notification_read(request, notification_id):
     """Mark notification as read"""
     notification = get_object_or_404(Notification, id=notification_id, user=request.user)
@@ -1842,7 +1855,7 @@ def mark_notification_read(request, notification_id):
     return JsonResponse({'success': True})
 
 @login_required
-@require_POST
+@require_http_methods(['POST'])
 def notification_action(request, notification_id):
     """Handle notification action"""
     notification = get_object_or_404(Notification, id=notification_id, user=request.user)
@@ -1868,7 +1881,7 @@ def notification_action(request, notification_id):
     return JsonResponse({'success': True, 'redirect': redirect_url})
 
 @csrf_exempt
-@require_POST
+@require_http_methods(['POST'])
 def stripe_webhook(request):
     """Handle Stripe webhooks"""
     payload = request.body
@@ -1899,13 +1912,13 @@ def stripe_webhook(request):
     return HttpResponse(status=200)
 
 @login_required
-@require_POST
+@require_http_methods(['POST'])
 def stripe_cancel_subscription(request):
     """Cancel Stripe subscription (placeholder for future premium features)"""
     return JsonResponse({'success': True, 'message': 'Subscription cancelled'})
 
 @login_required
-@require_POST
+@require_http_methods(['POST'])
 def start_transport_view(request, cargo_id):
     """Start transport for cargo shipment"""
     cargo = get_object_or_404(Cargo, id=cargo_id)

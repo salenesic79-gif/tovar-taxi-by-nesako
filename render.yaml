@@ -3,11 +3,13 @@ services:
     name: tovar-taxi-web
     env: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn tovar_taxi.wsgi:application --bind 0.0.0.0:$PORT"
+    startCommand: "gunicorn tovar_taxi.wsgi:application --bind 0.0.0.0:$PORT --log-level debug"
     envVars:
       - key: DEBUG
-        value: false
+        value: true
       - key: SECRET_KEY
         generateValue: true
       - key: WEB_CONCURRENCY
         value: 4
+      - key: RENDER_EXTERNAL_HOSTNAME
+        value: tovar-taxi-by-nesako-web.onrender.com
