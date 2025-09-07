@@ -31,6 +31,6 @@ else:
 
 # Collect static files
 echo "Collecting static files..."
-python manage.py collectstatic --no-input
+python manage.py collectstatic --noinput --clear
 
 echo "Build process completed successfully!"
