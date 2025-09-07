@@ -111,10 +111,27 @@
 
     <!-- Animirani info prozor -->
     <div class="container mt-4">
-        <div class="animated-info-box" id="animatedInfoBox">
+        <div class="animated-info-box" id="animatedInfoBox" style="cursor: pointer;" onclick="openInfoModal()">
             <div class="info-content">
                 <h5 id="infoTitle"><i class="fas fa-shipping-fast me-2"></i>Brza Dostava</h5>
                 <p id="infoText">Pronađite prevoznike u vašoj blizini i obezbedite brzu dostavu vaše robe direktno do odredišta.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal za sve info kartice -->
+    <div class="modal fade" id="infoModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Prednosti za Naručioce</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row" id="allInfoCards">
+                        <!-- Sve kartice će biti dodane ovde -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -169,24 +186,71 @@
                         </div>
                     </div>
                     
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label for="address" class="form-label">Adresa</label>
                         <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                    </div>
+                    
+                    <!-- Checkbox za uslove korišćenja -->
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="termsCheck" name="terms_accepted" required>
+                        <label class="form-check-label" for="termsCheck">
+                            Prihvatam <a href="#" onclick="openTermsModal()" class="text-success">uslove korišćenja</a> i <a href="#" onclick="openPrivacyModal()" class="text-success">pravila privatnosti</a>
+                        </label>
                     </div>
                     
                     <button type="submit" class="btn btn-success btn-lg w-100">
                         <i class="fas fa-user-plus me-2"></i>Registruj se kao Naručilac
                     </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal za uslove korišćenja -->
+    <div class="modal fade" id="termsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Uslovi korišćenja</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                
-                <!-- Checkbox za uslove korišćenja -->
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="termsCheck" name="terms_accepted" required>
-                    <label class="form-check-label" for="termsCheck">
-                        Prihvatam <a href="#" class="text-success">uslove korišćenja</a> i <a href="#" class="text-success">pravila privatnosti</a>
-                    </label>
+                <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                    <h6>1. Opšti uslovi</h6>
+                    <p>Korišćenjem Tovar Taxi aplikacije, prihvatate sledeće uslove korišćenja...</p>
+                    
+                    <h6>2. Odgovornosti naručioca</h6>
+                    <p>Kao naručilac transporta, obavezujete se da...</p>
+                    
+                    <h6>3. Plaćanje i troškovi</h6>
+                    <p>Svi troškovi transporta su jasno definisani...</p>
+                    
+                    <h6>4. Otkazivanje i refundiranje</h6>
+                    <p>Uslovi za otkazivanje i povraćaj sredstava...</p>
                 </div>
-            </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="acceptTerms()">Prihvatam uslove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal za pravila privatnosti -->
+    <div class="modal fade" id="privacyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pravila privatnosti</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                    <h6>Zaštita ličnih podataka</h6>
+                    <p>Vaši lični podaci su zaštićeni u skladu sa GDPR propisima...</p>
+                    
+                    <h6>Korišćenje podataka</h6>
+                    <p>Podaci se koriste isključivo za pružanje usluga transporta...</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -209,6 +273,40 @@
             infoTitle.innerHTML = `<i class="fas fa-${infoCards[currentCard].icon} me-2"></i>${infoCards[currentCard].title}`;
             infoText.textContent = infoCards[currentCard].text;
             currentCard = (currentCard + 1) % infoCards.length;
+        }
+
+        function openInfoModal() {
+            let modal = new bootstrap.Modal(document.getElementById('infoModal'));
+            modal.show();
+            let allInfoCards = document.getElementById('allInfoCards');
+            allInfoCards.innerHTML = '';
+            infoCards.forEach(card => {
+                let cardHTML = `
+                    <div class="col-md-4">
+                        <div class="info-card">
+                            <h5><i class="fas fa-${card.icon} me-2"></i>${card.title}</h5>
+                            <p>${card.text}</p>
+                        </div>
+                    </div>
+                `;
+                allInfoCards.innerHTML += cardHTML;
+            });
+        }
+
+        function openTermsModal() {
+            let modal = new bootstrap.Modal(document.getElementById('termsModal'));
+            modal.show();
+        }
+
+        function openPrivacyModal() {
+            let modal = new bootstrap.Modal(document.getElementById('privacyModal'));
+            modal.show();
+        }
+
+        function acceptTerms() {
+            document.getElementById('termsCheck').checked = true;
+            let termsModal = new bootstrap.Modal(document.getElementById('termsModal'));
+            termsModal.hide();
         }
 
         changeInfoCard();

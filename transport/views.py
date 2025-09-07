@@ -82,8 +82,8 @@ def signup_view(request):
                 print("[DEBUG] Redirecting to create_shipment_request")
                 return redirect('transport:create_shipment_request')
             elif form.cleaned_data['role'] in ['prevoznik', 'vozač']:
-                print("[DEBUG] Redirecting to create_route_availability")
-                return redirect('transport:create_route_availability')
+                print("[DEBUG] Redirecting to carrier_dashboard (prevoznik/vozač)")
+                return redirect('transport:carrier_dashboard')
             else:
                 print("[DEBUG] Redirecting to home")
                 return redirect('home')
@@ -176,7 +176,7 @@ def signup_sender_view(request):
             
             login(request, user)
             messages.success(request, 'Uspešno ste se registrovali!')
-            return redirect('transport:create_shipment_request')
+            return redirect('transport:sender_dashboard')
             
         except Exception as e:
             messages.error(request, f'Greška pri registraciji: {str(e)}')
@@ -1973,13 +1973,14 @@ def signup_sender_new_view(request):
                 company_name=company_name
             )
             
+            login(request, user)
             messages.success(request, 'Uspešno ste se registrovali kao naručilac!')
             
             # Auto login
             user = authenticate(username=username, password=password1)
             if user:
                 login(request, user)
-                return redirect('transport:shipper_dashboard')
+                return redirect('transport:sender_dashboard')
             else:
                 return redirect('login')
                 
