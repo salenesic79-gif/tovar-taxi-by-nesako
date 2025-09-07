@@ -78,6 +78,22 @@
             border-color: #2ECC71;
             box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
         }
+        .animated-info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #2ECC71;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            animation: fadeIn 1s;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -93,51 +109,25 @@
         </div>
     </nav>
 
-    <!-- Registration Content -->
+    <!-- Animirani info prozor -->
+    <div class="container mt-4">
+        <div class="animated-info-box" id="animatedInfoBox">
+            <div class="info-content">
+                <h5 id="infoTitle"><i class="fas fa-shipping-fast me-2"></i>Brza Dostava</h5>
+                <p id="infoText">Pronađite prevoznike u vašoj blizini i obezbedite brzu dostavu vaše robe direktno do odredišta.</p>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="registration-container">
             <h1 class="section-title">
                 <i class="fas fa-box me-3"></i>Registracija - Naručilac
             </h1>
-            
+
             <!-- Info Cards -->
             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="info-card">
-                        <h5><i class="fas fa-shipping-fast me-2"></i>Brza Dostava</h5>
-                        <p>Pronađite prevoznike u vašoj blizini i obezbedite brzu dostavu vaše robe direktno do odredišta.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="info-card">
-                        <h5><i class="fas fa-dollar-sign me-2"></i>Povoljne Cene</h5>
-                        <p>Poredite ponude različitih prevoznika i izaberite najoptimalniju cenu za vaš transport.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="info-card">
-                        <h5><i class="fas fa-shield-alt me-2"></i>Sigurnost</h5>
-                        <p>Svi prevoznici su verifikovani, a vaša roba je osigurana tokom celog procesa transporta.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="info-card">
-                        <h5><i class="fas fa-clock me-2"></i>24/7 Podrška</h5>
-                        <p>Naš tim za podršku je dostupan 24 sata dnevno da vam pomogne sa bilo kojim pitanjem.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="info-card">
-                        <h5><i class="fas fa-map-marked-alt me-2"></i>Praćenje Robe</h5>
-                        <p>Pratite lokaciju vaše robe u realnom vremenu kroz našu naprednu aplikaciju.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="info-card">
-                        <h5><i class="fas fa-star me-2"></i>Ocenjivanje</h5>
-                        <p>Ocenite prevoznike nakon usluge i pomozite drugim korisnicima da donose bolje odluke.</p>
-                    </div>
-                </div>
+                <!-- Kartice uklonjene jer su sada u animiranom prozoru -->
             </div>
 
             <!-- Registration Form -->
@@ -184,14 +174,45 @@
                         <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
                     </div>
                     
-                    <button type="submit" class="btn btn-register">
-                        <i class="fas fa-user-plus me-2"></i>REGISTRUJ SE KAO NARUČILAC
+                    <button type="submit" class="btn btn-success btn-lg w-100">
+                        <i class="fas fa-user-plus me-2"></i>Registruj se kao Naručilac
                     </button>
-                </form>
-            </div>
+                </div>
+                
+                <!-- Checkbox za uslove korišćenja -->
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="termsCheck" name="terms_accepted" required>
+                    <label class="form-check-label" for="termsCheck">
+                        Prihvatam <a href="#" class="text-success">uslove korišćenja</a> i <a href="#" class="text-success">pravila privatnosti</a>
+                    </label>
+                </div>
+            </form>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let infoCards = [
+            { title: 'Brza Dostava', icon: 'shipping-fast', text: 'Pronađite prevoznike u vašoj blizini i obezbedite brzu dostavu vaše robe direktno do odredišta.' },
+            { title: 'Povoljne Cene', icon: 'dollar-sign', text: 'Poredite ponude različitih prevoznika i izaberite najoptimalniju cenu za vaš transport.' },
+            { title: 'Sigurnost', icon: 'shield-alt', text: 'Svi prevoznici su verifikovani, a vaša roba je osigurana tokom celog procesa transporta.' },
+            { title: '24/7 Podrška', icon: 'clock', text: 'Naš tim za podršku je dostupan 24 sata dnevno da vam pomogne sa bilo kojim pitanjem.' },
+            { title: 'Praćenje Robe', icon: 'map-marked-alt', text: 'Pratite lokaciju vaše robe u realnom vremenu kroz našu naprednu aplikaciju.' },
+            { title: 'Ocenjivanje', icon: 'star', text: 'Ocenite prevoznike nakon usluge i pomozite drugim korisnicima da donose bolje odluke.' }
+        ];
+
+        let currentCard = 0;
+        let infoTitle = document.getElementById('infoTitle');
+        let infoText = document.getElementById('infoText');
+
+        function changeInfoCard() {
+            infoTitle.innerHTML = `<i class="fas fa-${infoCards[currentCard].icon} me-2"></i>${infoCards[currentCard].title}`;
+            infoText.textContent = infoCards[currentCard].text;
+            currentCard = (currentCard + 1) % infoCards.length;
+        }
+
+        changeInfoCard();
+        setInterval(changeInfoCard, 7000);
+    </script>
 </body>
 </html>

@@ -78,6 +78,22 @@
             border-color: #2ECC71;
             box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
         }
+        .animated-info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #2ECC71;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            animation: fadeIn 1s;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -92,6 +108,40 @@
             </div>
         </div>
     </nav>
+
+    <!-- Animated Info Box -->
+    <div class="container">
+        <div class="animated-info-box" id="animated-info-box">
+            <h5 id="info-box-title"></h5>
+            <p id="info-box-text"></p>
+        </div>
+    </div>
+
+    <script>
+        const infoBox = document.getElementById('animated-info-box');
+        const infoBoxTitle = document.getElementById('info-box-title');
+        const infoBoxText = document.getElementById('info-box-text');
+
+        const infoBoxData = [
+            { title: 'Dodatna Zarada', text: 'Povećajte svoju zaradu koristeći slobodne kapacitete vašeg vozila za transport robe.' },
+            { title: 'Optimizacija Ruta', text: 'Naša aplikacija vam pomaže da optimizujete rute i smanjite prazne kilometraže.' },
+            { title: 'Pouzdani Klijenti', text: 'Pristupite bazi verifikovanih naručilaca i obezbedite redovne poslove.' },
+            { title: 'Jednostavna Aplikacija', text: 'Upravljajte svojim poslovima kroz intuitivnu mobilnu aplikaciju dostupnu 24/7.' },
+            { title: 'Brza Naplata', text: 'Automatska naplata kroz aplikaciju sa brzim transferom sredstava na vaš račun.' },
+            { title: 'Analitika Poslovanja', text: 'Pratite statistike svojih voznji, zaradu i optimizujte svoje poslovanje.' },
+        ];
+
+        let currentInfoBoxIndex = 0;
+
+        function updateInfoBox() {
+            infoBoxTitle.textContent = infoBoxData[currentInfoBoxIndex].title;
+            infoBoxText.textContent = infoBoxData[currentInfoBoxIndex].text;
+            currentInfoBoxIndex = (currentInfoBoxIndex + 1) % infoBoxData.length;
+        }
+
+        updateInfoBox();
+        setInterval(updateInfoBox, 7000);
+    </script>
 
     <!-- Registration Content -->
     <div class="container">
