@@ -1904,26 +1904,31 @@ def edit_vehicle(request, vehicle_id):
     return render(request, 'transport/edit_vehicle.html', context)
 
 def signup_sender_new_view(request):
-    """Nova registracija naručilaca sa opisnim poljima"""
     if request.method == 'POST':
-        # Extract form fields
         username = request.POST.get('username')
         email = request.POST.get('email')
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
         phone_number = request.POST.get('phone_number')
         address = request.POST.get('address')
-        company_name = request.POST.get('company_name', '')
+        company_name = request.POST.get('company_name')
+        tip_robe = request.POST.get('tip_robe')
+        kolicina = request.POST.get('kolicina')
+        opis_posiljke = request.POST.get('opis_posiljke')
+        remember_me = request.POST.get('remember_me')
         
         # Validation
         if not all([username, email, password1, password2, phone_number, address]):
-            messages.error(request, 'Sva obavezna polja moraju biti popunjena.')
+            messages.error(request, 'Molimo popunite sva obavezna polja.')
             return render(request, 'transport/signup_sender_new.html', {
                 'username': username,
                 'email': email,
                 'phone_number': phone_number,
                 'address': address,
                 'company_name': company_name,
+                'tip_robe': tip_robe,
+                'kolicina': kolicina,
+                'opis_posiljke': opis_posiljke,
             })
         
         if password1 != password2:
@@ -1934,6 +1939,9 @@ def signup_sender_new_view(request):
                 'phone_number': phone_number,
                 'address': address,
                 'company_name': company_name,
+                'tip_robe': tip_robe,
+                'kolicina': kolicina,
+                'opis_posiljke': opis_posiljke,
             })
         
         if User.objects.filter(username=username).exists():
@@ -1944,6 +1952,9 @@ def signup_sender_new_view(request):
                 'phone_number': phone_number,
                 'address': address,
                 'company_name': company_name,
+                'tip_robe': tip_robe,
+                'kolicina': kolicina,
+                'opis_posiljke': opis_posiljke,
             })
         
         if User.objects.filter(email=email).exists():
@@ -1954,6 +1965,9 @@ def signup_sender_new_view(request):
                 'phone_number': phone_number,
                 'address': address,
                 'company_name': company_name,
+                'tip_robe': tip_robe,
+                'kolicina': kolicina,
+                'opis_posiljke': opis_posiljke,
             })
         
         try:
@@ -1973,17 +1987,18 @@ def signup_sender_new_view(request):
                 company_name=company_name
             )
             
+            # Login user
             login(request, user)
-            messages.success(request, 'Uspešno ste se registrovali kao naručilac!')
             
-            # Auto login
-            user = authenticate(username=username, password=password1)
-            if user:
-                login(request, user)
-                return redirect('transport:sender_dashboard')
+            # Set session expiry based on remember_me
+            if remember_me:
+                request.session.set_expiry(1209600)  # 2 weeks
             else:
-                return redirect('login')
-                
+                request.session.set_expiry(0)  # Browser session
+            
+            messages.success(request, 'Uspešno ste se registrovali!')
+            return redirect('transport:sender_dashboard')
+            
         except Exception as e:
             messages.error(request, f'Greška pri registraciji: {str(e)}')
             return render(request, 'transport/signup_sender_new.html', {
@@ -1992,15 +2007,16 @@ def signup_sender_new_view(request):
                 'phone_number': phone_number,
                 'address': address,
                 'company_name': company_name,
+                'tip_robe': tip_robe,
+                'kolicina': kolicina,
+                'opis_posiljke': opis_posiljke,
             })
     
     return render(request, 'transport/signup_sender_new.html')
 
 
 def signup_carrier_new_view(request):
-    """Nova registracija prevoznika sa opisnim poljima"""
     if request.method == 'POST':
-        # Extract form fields
         username = request.POST.get('username')
         email = request.POST.get('email')
         password1 = request.POST.get('password1')
@@ -2008,18 +2024,21 @@ def signup_carrier_new_view(request):
         phone_number = request.POST.get('phone_number')
         address = request.POST.get('address')
         company_name = request.POST.get('company_name')
+        pib = request.POST.get('pib')
         tip_vozila = request.POST.get('tip_vozila')
         registarski_broj = request.POST.get('registarski_broj')
+        remember_me = request.POST.get('remember_me')
         
         # Validation
-        if not all([username, email, password1, password2, phone_number, address, company_name, tip_vozila, registarski_broj]):
-            messages.error(request, 'Sva polja su obavezna.')
+        if not all([username, email, password1, password2, phone_number, address, company_name, pib, tip_vozila, registarski_broj]):
+            messages.error(request, 'Molimo popunite sva obavezna polja.')
             return render(request, 'transport/signup_carrier_new.html', {
                 'username': username,
                 'email': email,
                 'phone_number': phone_number,
                 'address': address,
                 'company_name': company_name,
+                'pib': pib,
                 'tip_vozila': tip_vozila,
                 'registarski_broj': registarski_broj,
             })
@@ -2032,6 +2051,7 @@ def signup_carrier_new_view(request):
                 'phone_number': phone_number,
                 'address': address,
                 'company_name': company_name,
+                'pib': pib,
                 'tip_vozila': tip_vozila,
                 'registarski_broj': registarski_broj,
             })
@@ -2044,6 +2064,7 @@ def signup_carrier_new_view(request):
                 'phone_number': phone_number,
                 'address': address,
                 'company_name': company_name,
+                'pib': pib,
                 'tip_vozila': tip_vozila,
                 'registarski_broj': registarski_broj,
             })
@@ -2056,6 +2077,7 @@ def signup_carrier_new_view(request):
                 'phone_number': phone_number,
                 'address': address,
                 'company_name': company_name,
+                'pib': pib,
                 'tip_vozila': tip_vozila,
                 'registarski_broj': registarski_broj,
             })
@@ -2077,26 +2099,18 @@ def signup_carrier_new_view(request):
                 company_name=company_name
             )
             
-            # Create vehicle
-            Vehicle.objects.create(
-                owner=user,
-                tip_vozila=tip_vozila,
-                registarski_broj=registarski_broj,
-                nosivost=0,  # Default value
-                dimenzije='',  # Default value
-                status='dostupan'
-            )
+            # Login user
+            login(request, user)
             
-            messages.success(request, 'Uspešno ste se registrovali kao prevoznik!')
-            
-            # Auto login
-            user = authenticate(username=username, password=password1)
-            if user:
-                login(request, user)
-                return redirect('transport:carrier_dashboard')
+            # Set session expiry based on remember_me
+            if remember_me:
+                request.session.set_expiry(1209600)  # 2 weeks
             else:
-                return redirect('login')
-                
+                request.session.set_expiry(0)  # Browser session
+            
+            messages.success(request, 'Uspešno ste se registrovali!')
+            return redirect('transport:carrier_dashboard')
+            
         except Exception as e:
             messages.error(request, f'Greška pri registraciji: {str(e)}')
             return render(request, 'transport/signup_carrier_new.html', {
@@ -2105,6 +2119,7 @@ def signup_carrier_new_view(request):
                 'phone_number': phone_number,
                 'address': address,
                 'company_name': company_name,
+                'pib': pib,
                 'tip_vozila': tip_vozila,
                 'registarski_broj': registarski_broj,
             })
