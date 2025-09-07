@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -632,42 +633,46 @@ def custom_login_view(request):
     print(f"DEBUG: custom_login_view called, method: {request.method}")
     
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        print(f"DEBUG: Attempting login for username: {username}")
-        
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            print(f"DEBUG: Authentication successful for {username}")
-            login(request, user)
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            print(f"DEBUG: Attempting login for username: {username}")
             
-            # Role-based redirect - NAKON login-a
-            try:
-                profile = user.profile  # Sada možemo pristupiti profilu
-                print(f"DEBUG: User role: {profile.role}")
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                print(f"DEBUG: Authentication successful for {username}")
+                login(request, user)
                 
-                if profile.role == 'naručilac':
-                    print("DEBUG: Redirecting to shipper_dashboard")
-                    return redirect('transport:shipper_dashboard')
-                elif profile.role == 'prevoznik':
-                    print("DEBUG: Redirecting to carrier_dashboard")
-                    return redirect('transport:carrier_dashboard')
-                elif profile.role == 'vozač':
-                    print("DEBUG: Redirecting to driver_dashboard")
-                    return redirect('transport:driver_dashboard')
-                else:
-                    print("DEBUG: Unknown role, redirecting to home")
+                # Role-based redirect - NAKON login-a
+                try:
+                    profile = user.profile  # Sada možemo pristupiti profilu
+                    print(f"DEBUG: User role: {profile.role}")
+                    
+                    if profile.role == 'naručilac':
+                        print("DEBUG: Redirecting to shipper_dashboard")
+                        return redirect('transport:shipper_dashboard')
+                    elif profile.role == 'prevoznik':
+                        print("DEBUG: Redirecting to carrier_dashboard")
+                        return redirect('transport:carrier_dashboard')
+                    elif profile.role == 'vozač':
+                        print("DEBUG: Redirecting to driver_dashboard")
+                        return redirect('transport:driver_dashboard')
+                    else:
+                        print("DEBUG: Unknown role, redirecting to home")
+                        return redirect('home')
+                except Profile.DoesNotExist:
+                    print(f"DEBUG: Profile does not exist for user {username}, redirecting to home")
+                    # Ako nema profil, idi na home
                     return redirect('home')
-            except Profile.DoesNotExist:
-                print(f"DEBUG: Profile does not exist for user {username}, redirecting to home")
-                # Ako nema profil, idi na home
-                return redirect('home')
-        else:
-            print(f"DEBUG: Authentication failed for username: {username}")
-            messages.error(request, 'Neispravno korisničko ime ili lozinka.')
+            else:
+                print(f"DEBUG: Authentication failed for username: {username}")
+                messages.error(request, 'Neispravno korisničko ime ili lozinka.')
+    else:
+        form = AuthenticationForm()
     
     print("DEBUG: Rendering login template")
-    return render(request, 'registration/login.html')
+    return render(request, 'registration/login.html', {'form': form})
 
 
 # B2B i Instant Delivery Views
