@@ -125,7 +125,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Prednosti za Naručioce</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="bootstrap.Modal.getInstance(document.getElementById('infoModal')).hide();"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="bootstrap.Modal.getInstance(document.getElementById('infoModal')).hide();"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row" id="allInfoCards">
@@ -149,7 +149,7 @@
 
             <!-- Registration Form -->
             <div class="mt-4">
-                <form method="post" action="{% url 'transport:signup_sender' %}">
+                <form method="post" action="{% url 'transport:signup_sender_new' %}">
                     {% csrf_token %}
                     <input type="hidden" name="role" value="narucilac">
                     
@@ -266,7 +266,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Uslovi korišćenja</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="bootstrap.Modal.getInstance(document.getElementById('termsModal')).hide();"></button>
                 </div>
                 <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
                     <h6>1. Opšti uslovi</h6>
@@ -294,7 +294,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Pravila privatnosti</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="bootstrap.Modal.getInstance(document.getElementById('privacyModal')).hide();"></button>
                 </div>
                 <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
                     <h6>Zaštita ličnih podataka</h6>
