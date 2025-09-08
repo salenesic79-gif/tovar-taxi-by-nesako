@@ -125,7 +125,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Prednosti za Prevoznike</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="bootstrap.Modal.getInstance(document.getElementById('infoModal')).hide(); closeInfoModal();"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="closeModal('infoModal')"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row" id="allInfoCards">
@@ -182,11 +182,10 @@
             modal.classList.add('show');
         }
 
-        function closeInfoModal() {
-            const modal = document.getElementById('infoModal');
-            const modalBody = modal.querySelector('.modal-body');
-            const allInfoCards = modalBody.querySelector('#allInfoCards');
-            allInfoCards.innerHTML = '';
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+            modal.classList.remove('show');
         }
     </script>
 
@@ -327,7 +326,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Uslovi korišćenja - Prevoznik</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="bootstrap.Modal.getInstance(document.getElementById('termsModal')).hide();"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="closeModal('termsModal')"></button>
                 </div>
                 <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
                     <h6>1. Opšti uslovi za prevoznike</h6>
@@ -355,7 +354,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Pravila privatnosti</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="bootstrap.Modal.getInstance(document.getElementById('privacyModal')).hide(); closePrivacyModal();"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="closeModal('privacyModal')"></button>
                 </div>
                 <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
                     <h6>Zaštita ličnih podataka</h6>
@@ -386,8 +385,8 @@
             termsModal.hide();
         }
 
-        function closePrivacyModal() {
-            let modal = document.getElementById('privacyModal');
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
             modal.style.display = 'none';
             modal.classList.remove('show');
         }
