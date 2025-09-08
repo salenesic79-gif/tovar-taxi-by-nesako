@@ -168,7 +168,7 @@
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="{% url 'home' %}">Početna</a>
-                <a class="nav-link" href="{% url 'transport:signup' %}">Registracija</a>
+                <a class="nav-link" href="{% url 'transport:signup_sender_new' %}">Registracija</a>
             </div>
         </div>
     </nav>
@@ -192,13 +192,13 @@
                 {% endif %}
                 
                 <div class="form-group">
-                    <label for="{{ form.username.id_for_label }}">Korisničko ime:</label>
-                    {{ form.username }}
+                    <label for="username">Korisničko ime:</label>
+                    <input type="text" id="username" name="username" class="form-control" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="{{ form.password.id_for_label }}">Lozinka:</label>
-                    {{ form.password }}
+                    <label for="password">Lozinka:</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
                 </div>
                 
                 <button type="submit" class="submit-btn">Prijavi se</button>
@@ -206,7 +206,7 @@
             
             <div class="links">
                 <a href="{% url 'home' %}">← Početna</a>
-                <a href="{% url 'transport:signup' %}">Registracija</a>
+                <a href="{% url 'transport:signup_sender_new' %}">Registracija</a>
             </div>
         </div>
     </div>
