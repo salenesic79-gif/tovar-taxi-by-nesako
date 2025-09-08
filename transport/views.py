@@ -639,7 +639,20 @@ def custom_login_view(request):
             password = form.cleaned_data.get('password')
             print(f"DEBUG: Attempting login for username: {username}")
             
+            # Pokušaj autentifikaciju sa username ili email
             user = authenticate(request, username=username, password=password)
+            
+            # Ako ne uspe sa username, pokušaj sa email
+            if user is None:
+                try:
+                    # Pronađi korisnika po email adresi
+                    user_by_email = User.objects.get(email=username)
+                    user = authenticate(request, username=user_by_email.username, password=password)
+                    print(f"DEBUG: Tried authentication with email {username}, found user: {user_by_email.username}")
+                except User.DoesNotExist:
+                    print(f"DEBUG: No user found with email: {username}")
+                    user = None
+            
             if user is not None:
                 print(f"DEBUG: Authentication successful for {username}")
                 login(request, user)
