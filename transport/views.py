@@ -642,16 +642,22 @@ def custom_login_view(request):
             # Pokušaj autentifikaciju sa username ili email
             user = authenticate(request, username=username, password=password)
             
-            # Ako ne uspe sa username, pokušaj sa email
+            # Ako ne uspe sa username, pokušaj sa email (case insensitive)
             if user is None:
                 try:
-                    # Pronađi korisnika po email adresi
-                    user_by_email = User.objects.get(email=username)
+                    # Pronađi korisnika po email adresi (case insensitive)
+                    user_by_email = User.objects.get(email__iexact=username)
                     user = authenticate(request, username=user_by_email.username, password=password)
                     print(f"DEBUG: Tried authentication with email {username}, found user: {user_by_email.username}")
                 except User.DoesNotExist:
-                    print(f"DEBUG: No user found with email: {username}")
-                    user = None
+                    # Pokušaj i sa username case insensitive
+                    try:
+                        user_by_username = User.objects.get(username__iexact=username)
+                        user = authenticate(request, username=user_by_username.username, password=password)
+                        print(f"DEBUG: Tried case insensitive username {username}, found user: {user_by_username.username}")
+                    except User.DoesNotExist:
+                        print(f"DEBUG: No user found with username or email: {username}")
+                        user = None
             
             if user is not None:
                 print(f"DEBUG: Authentication successful for {username}")
@@ -1755,7 +1761,7 @@ def signup_sender_new_view(request):
                 request.session.set_expiry(0)  # Browser session
             
             messages.success(request, 'Uspešno ste se registrovali!')
-            return redirect('transport:sender_dashboard')
+            return redirect('transport:shipper_dashboard')
             
         except Exception as e:
             messages.error(request, f'Greška pri registraciji: {str(e)}')
