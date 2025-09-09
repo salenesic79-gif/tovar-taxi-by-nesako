@@ -649,12 +649,19 @@ def websocket_test(request):
 
 def custom_login_view(request):
     """Custom login view sa role-based redirect"""
-    print(f"DEBUG: custom_login_view called, method: {request.method}")
+    # Očisti postojeće messages na početku GET zahteva
+    if request.method == 'GET':
+        storage = messages.get_messages(request)
+        for message in storage:
+            pass  # Ovo briše sve postojeće messages
     
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print(f"DEBUG: Attempting login for username: {username}")
+        
+        if not username or not password:
+            messages.error(request, 'Molimo unesite korisničko ime i lozinku.')
+            return render(request, 'registration/login.html')
         
         # Pokušaj autentifikaciju sa username ili email
         user = authenticate(request, username=username, password=password)
@@ -662,47 +669,33 @@ def custom_login_view(request):
         # Ako ne uspe sa username, pokušaj sa email (case insensitive)
         if user is None:
             try:
-                # Pronađi korisnika po email adresi (case insensitive)
                 user_by_email = User.objects.get(email__iexact=username)
                 user = authenticate(request, username=user_by_email.username, password=password)
-                print(f"DEBUG: Tried authentication with email {username}, found user: {user_by_email.username}")
             except User.DoesNotExist:
-                # Pokušaj i sa username case insensitive
                 try:
                     user_by_username = User.objects.get(username__iexact=username)
                     user = authenticate(request, username=user_by_username.username, password=password)
-                    print(f"DEBUG: Tried case insensitive username {username}, found user: {user_by_username.username}")
                 except User.DoesNotExist:
-                    print(f"DEBUG: No user found with username or email: {username}")
                     user = None
             
         if user is not None:
-            print(f"DEBUG: Authentication successful for {username}")
             login(request, user)
             
-            # Role-based redirect - NAKON login-a
+            # Role-based redirect
             try:
-                profile = user.profile  # Sada možemo pristupiti profilu
-                print(f"DEBUG: User role: {profile.role}")
+                profile = user.profile
                 
                 if profile.role == 'naručilac':
-                    print("DEBUG: Redirecting to shipper_dashboard")
                     return redirect('transport:shipper_dashboard')
                 elif profile.role == 'prevoznik':
-                    print("DEBUG: Redirecting to carrier_dashboard")
                     return redirect('transport:carrier_dashboard')
                 elif profile.role == 'vozač':
-                    print("DEBUG: Redirecting to driver_dashboard")
                     return redirect('transport:driver_dashboard')
                 else:
-                    print("DEBUG: Unknown role, redirecting to home")
                     return redirect('home')
             except Profile.DoesNotExist:
-                print(f"DEBUG: Profile does not exist for user {username}, redirecting to home")
-                # Ako nema profil, idi na home
                 return redirect('home')
         else:
-            print(f"DEBUG: Authentication failed for username: {username}")
             messages.error(request, 'Neispravno korisničko ime ili lozinka.')
     
     return render(request, 'registration/login.html')
