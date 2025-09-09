@@ -704,10 +704,7 @@ def custom_login_view(request):
         else:
             print(f"DEBUG: Authentication failed for username: {username}")
             messages.error(request, 'Neispravno korisničko ime ili lozinka.')
-    else:
-        pass
     
-    print("DEBUG: Rendering login template")
     return render(request, 'registration/login.html')
 
 

@@ -181,12 +181,10 @@
             <form method="post" action="{% url 'transport:custom_login' %}">
                 {% csrf_token %}
                 
-                {% if form.errors %}
+                {% if messages %}
                     <ul class="errorlist">
-                        {% for field, errors in form.errors.items %}
-                            {% for error in errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
+                        {% for message in messages %}
+                            <li class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
