@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prevoznik Dashboard - Tovar Taxi</title>
+    <title>{{ user.get_full_name|default:user.username }} - Tovar Taxi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -172,12 +172,15 @@
             background: #000;
             color: white;
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             justify-content: center;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 12px;
             margin: 7px;
             border-radius: 4px;
+            padding-bottom: 8px;
+            text-align: center;
+            line-height: 1;
         }
 
         .plate-number {
@@ -190,6 +193,10 @@
             letter-spacing: 3px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
             text-transform: uppercase;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 8px;
         }
 
         /* Vehicle Colors */
@@ -606,6 +613,7 @@
             border-radius: 8px;
         }
 
+        /* PWA and Mobile Optimizations */
         @media (max-width: 768px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -616,7 +624,8 @@
             }
             
             .quick-actions {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
+                gap: 15px;
             }
             
             .dashboard-container {
@@ -625,11 +634,103 @@
             }
             
             .welcome-section {
-                padding: 25px;
+                padding: 20px 15px;
             }
             
-            .welcome-title {
-                font-size: 2rem;
+            .main-welcome-title {
+                font-size: 24px;
+                line-height: 1.3;
+            }
+            
+            .vehicle-selection-title {
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .license-plates-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .license-plate {
+                width: 100%;
+                max-width: 300px;
+                margin: 0;
+            }
+            
+            .manufacturer-logo {
+                font-size: 12px;
+                width: 50px;
+                height: 50px;
+            }
+            
+            .plate-number {
+                font-size: 20px;
+                letter-spacing: 2px;
+            }
+            
+            .header {
+                padding: 0.5rem 1rem;
+            }
+            
+            .brand-logo {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-welcome-title {
+                font-size: 20px;
+            }
+            
+            .vehicle-selection-title {
+                font-size: 18px;
+            }
+            
+            .license-plate {
+                height: 60px;
+            }
+            
+            .manufacturer-logo {
+                font-size: 10px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .plate-number {
+                font-size: 18px;
+                letter-spacing: 1px;
+            }
+            
+            .stat-card {
+                padding: 20px;
+            }
+            
+            .quick-action-item {
+                padding: 20px;
+            }
+        }
+        
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .license-plate {
+                min-height: 70px;
+            }
+            
+            .quick-action-item {
+                min-height: 80px;
+            }
+            
+            .btn-primary {
+                min-height: 48px;
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -676,7 +777,7 @@
                 {{ user.get_full_name|default:user.username|upper }}<br>
                 PRIJAVI TURU
             </h1>
-            <h2 class="vehicle-selection-title">IZABERI VOZILO</h2>
+            <h2 class="vehicle-selection-title">IZABERI VOZILO DA PRIJAVIŠ TURU</h2>
             
             <!-- Vehicle Cards -->
             <div class="vehicles-section">
@@ -685,17 +786,17 @@
                         {% for vehicle in vehicles %}
                             <div class="license-plate vehicle-{{ vehicle.vehicle_color|default:'white' }}" onclick="selectVehicleForTour('{{ vehicle.license_plate }}')">
                                 <div class="manufacturer-logo">
-                                    {% if vehicle.vehicle_brand == 'mercedes' %}MB
-                                    {% elif vehicle.vehicle_brand == 'volvo' %}VO
-                                    {% elif vehicle.vehicle_brand == 'scania' %}SC
-                                    {% elif vehicle.vehicle_brand == 'man' %}MN
-                                    {% elif vehicle.vehicle_brand == 'daf' %}DF
-                                    {% elif vehicle.vehicle_brand == 'iveco' %}IV
-                                    {% elif vehicle.vehicle_brand == 'renault' %}RN
-                                    {% elif vehicle.vehicle_brand == 'ford' %}FD
-                                    {% elif vehicle.vehicle_brand == 'isuzu' %}IS
-                                    {% elif vehicle.vehicle_brand == 'fiat' %}FT
-                                    {% else %}??{% endif %}
+                                    {% if vehicle.vehicle_brand == 'mercedes' %}MERCEDES
+                                    {% elif vehicle.vehicle_brand == 'volvo' %}VOLVO
+                                    {% elif vehicle.vehicle_brand == 'scania' %}SCANIA
+                                    {% elif vehicle.vehicle_brand == 'man' %}MAN
+                                    {% elif vehicle.vehicle_brand == 'daf' %}DAF
+                                    {% elif vehicle.vehicle_brand == 'iveco' %}IVECO
+                                    {% elif vehicle.vehicle_brand == 'renault' %}RENAULT
+                                    {% elif vehicle.vehicle_brand == 'ford' %}FORD
+                                    {% elif vehicle.vehicle_brand == 'isuzu' %}ISUZU
+                                    {% elif vehicle.vehicle_brand == 'fiat' %}FIAT
+                                    {% else %}BRAND{% endif %}
                                 </div>
                                 <div class="plate-number">{{ vehicle.license_plate }}</div>
                             </div>

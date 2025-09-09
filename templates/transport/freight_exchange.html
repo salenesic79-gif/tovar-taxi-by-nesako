@@ -1,7 +1,7 @@
 {% extends 'transport/base.html' %}
 {% load static %}
 
-{% block title %}Freight Exchange - Tovar Taxi{% endblock %}
+{% block title %}Trenutne dostupne ponude na app - Tovar Taxi{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -178,6 +178,28 @@
         margin-bottom: 1rem;
         opacity: 0.5;
     }
+    
+    /* PWA-specific styles */
+    @media (display-mode: standalone) {
+        .container-fluid {
+            padding-top: 20px;
+        }
+        
+        .header {
+            display: none; /* Hide header in PWA mode if needed */
+        }
+    }
+    
+    /* Improved accessibility */
+    .btn:focus {
+        outline: 2px solid #007bff;
+        outline-offset: 2px;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: 2px solid #007bff;
+        outline-offset: 2px;
+    }
 </style>
 {% endblock %}
 
@@ -259,15 +281,16 @@
         <div class="col-lg-9">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="text-gradient">
-                    {% if user.profile.user_type == 'carrier' %}
-                        🚛 Moja ugovorena tura
-                    {% else %}
-                        🔄 Freight Exchange
-                    {% endif %}
+                    🚛 Trenutne dostupne ponude na app
                 </h1>
                 <div class="d-flex gap-2">
-                    {% if user.profile.user_type == 'shipper' %}
-                        <a href="{% url 'create_shipment' %}" class="btn btn-primary">
+                    {% if user.profile.role == 'prevoznik' %}
+                        <button class="btn btn-success" onclick="showActiveOffersOnRoute()">
+                            <i class="fas fa-route me-2"></i>Aktivne ponude na ruti
+                        </button>
+                    {% endif %}
+                    {% if user.profile.role == 'naručilac' %}
+                        <a href="{% url 'transport:create_shipment' %}" class="btn btn-primary">
                             <i class="fas fa-plus me-2"></i>Nova pošiljka
                         </a>
                     {% endif %}
@@ -344,9 +367,23 @@
                                         <div class="col-md-8">
                                             <div class="detail-row">
                                                 <div class="detail-label">
-                                                    <i class="fas fa-boxes"></i>Teret
+                                                    <i class="fas fa-map-marker-alt"></i>Mesto preuzimanja
                                                 </div>
-                                                <div class="detail-value">{{ shipment.cargo_description|truncatechars:50 }}</div>
+                                                <div class="detail-value">{{ shipment.pickup_city|default:shipment.pickup_region|default:"Nepoznato" }}</div>
+                                            </div>
+                                            
+                                            <div class="detail-row">
+                                                <div class="detail-label">
+                                                    <i class="fas fa-map-pin"></i>Mesto istovara
+                                                </div>
+                                                <div class="detail-value">{{ shipment.delivery_city|default:shipment.delivery_region|default:"Nepoznato" }}</div>
+                                            </div>
+                                            
+                                            <div class="detail-row">
+                                                <div class="detail-label">
+                                                    <i class="fas fa-boxes"></i>Količina/Teret
+                                                </div>
+                                                <div class="detail-value">{{ shipment.cargo_description|truncatechars:40 }}</div>
                                             </div>
                                             
                                             <div class="detail-row">
@@ -358,7 +395,7 @@
                                             
                                             <div class="detail-row">
                                                 <div class="detail-label">
-                                                    <i class="fas fa-calendar-alt"></i>Preuzimanje
+                                                    <i class="fas fa-calendar-alt"></i>Datum preuzimanja
                                                 </div>
                                                 <div class="detail-value">{{ shipment.pickup_date|date:"d.m.Y H:i" }}</div>
                                             </div>
@@ -366,7 +403,7 @@
                                             {% if shipment.special_requirements %}
                                             <div class="detail-row">
                                                 <div class="detail-label">
-                                                    <i class="fas fa-exclamation-circle"></i>Zahtevi
+                                                    <i class="fas fa-exclamation-circle"></i>Posebni zahtevi
                                                 </div>
                                                 <div class="detail-value">{{ shipment.special_requirements|truncatechars:40 }}</div>
                                             </div>
@@ -378,8 +415,8 @@
                                                 {{ shipment.offered_price|floatformat:0 }} RSD
                                             </div>
                                             
-                                            {% if user.profile.user_type == 'carrier' and shipment.status == 'published' %}
-                                                <a href="{% url 'make_offer' shipment.pk %}" class="btn btn-success w-100 mb-2">
+                                            {% if user.profile.role == 'prevoznik' and shipment.status == 'published' %}
+                                                <a href="{% url 'transport:make_offer' shipment.pk %}" class="btn btn-success w-100 mb-2">
                                                     <i class="fas fa-handshake me-2"></i>Pošalji ponudu
                                                 </a>
                                             {% endif %}
@@ -457,6 +494,78 @@ function filterByMyOffers() {
     const url = new URL(window.location);
     url.searchParams.set('my_offers', 'true');
     window.location = url;
+}
+
+function showActiveOffersOnRoute() {
+    // Get user's current location or allow them to set a route
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            
+            // Filter offers within 35km radius
+            const url = new URL(window.location);
+            url.searchParams.set('near_route', 'true');
+            url.searchParams.set('lat', lat);
+            url.searchParams.set('lng', lng);
+            url.searchParams.set('radius', '35');
+            window.location = url;
+        }, function(error) {
+            // If geolocation fails, show a modal to manually enter route
+            alert('Molimo unesite rutu ručno ili omogućite pristup lokaciji.');
+            showRouteModal();
+        });
+    } else {
+        showRouteModal();
+    }
+}
+
+function showRouteModal() {
+    // Create a simple modal for route input
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Unesite rutu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="routeForm">
+                        <div class="mb-3">
+                            <label class="form-label">Polazni grad</label>
+                            <input type="text" class="form-control" id="startCity" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Odredišni grad</label>
+                            <input type="text" class="form-control" id="endCity" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Otkaži</button>
+                    <button type="button" class="btn btn-primary" onclick="filterByRoute()">Prikaži ponude</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+}
+
+function filterByRoute() {
+    const startCity = document.getElementById('startCity').value;
+    const endCity = document.getElementById('endCity').value;
+    
+    if (startCity && endCity) {
+        const url = new URL(window.location);
+        url.searchParams.set('route_start', startCity);
+        url.searchParams.set('route_end', endCity);
+        url.searchParams.set('route_filter', 'true');
+        window.location = url;
+    }
 }
 
 // Auto-submit form on filter change

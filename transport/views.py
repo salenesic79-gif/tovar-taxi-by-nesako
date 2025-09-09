@@ -215,12 +215,18 @@ def make_offer(request, shipment_id):
 @login_required
 def freight_exchange(request):
     """Berza tereta - lista dostupnih pošiljki"""
-    shipments = Shipment.objects.filter(status='published').order_by('-created_at')
+    # Prikaži samo neprihvaćene aktivne ponude, sortirane po mestu preuzimanja
+    shipments = Shipment.objects.filter(
+        status='published'
+    ).order_by('pickup_city', 'pickup_region', 'delivery_city')
     
     # Filtriranje
     pickup_city = request.GET.get('pickup_city')
     delivery_city = request.GET.get('delivery_city')
     cargo_type = request.GET.get('cargo_type')
+    max_weight = request.GET.get('max_weight')
+    min_price = request.GET.get('min_price')
+    pickup_date = request.GET.get('pickup_date')
     
     if pickup_city:
         shipments = shipments.filter(pickup_city__icontains=pickup_city)
@@ -228,17 +234,30 @@ def freight_exchange(request):
         shipments = shipments.filter(delivery_city__icontains=delivery_city)
     if cargo_type:
         shipments = shipments.filter(cargo_type__icontains=cargo_type)
+    if max_weight:
+        try:
+            shipments = shipments.filter(weight__lte=float(max_weight))
+        except ValueError:
+            pass
+    if min_price:
+        try:
+            shipments = shipments.filter(offered_price__gte=float(min_price))
+        except ValueError:
+            pass
+    if pickup_date:
+        shipments = shipments.filter(pickup_date__date=pickup_date)
     
-    # Paginacija
-    paginator = Paginator(shipments, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    # Dodaj gradove za filter dropdown
+    from .models import City
+    cities = City.objects.all().order_by('name')
     
     context = {
-        'page_obj': page_obj,
+        'shipments': shipments,
+        'cities': cities,
         'pickup_city': pickup_city,
         'delivery_city': delivery_city,
         'cargo_type': cargo_type,
+        'last_updated': timezone.now(),
     }
     return render(request, 'transport/freight_exchange.html', context)
 
