@@ -179,9 +179,11 @@ if not DEBUG:
     # SECURE_HSTS_SECONDS = 31536000
     # SECURE_REDIRECT_EXEMPT = []
     # SECURE_SSL_REDIRECT = True
-    # Kompletno uklanjamo secure cookies za PWA pristup
+    # Kompletno uklanjamo secure cookies za mobile i PWA pristup
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
-    # Dodajemo SameSite=None za cross-origin pristup
-    SESSION_COOKIE_SAMESITE = 'None'
-    CSRF_COOKIE_SAMESITE = 'None'
+    # Dodajemo Lax za mobile kompatibilnost umesto None
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    # Dodajemo cookie age za mobile
+    SESSION_COOKIE_AGE = 86400  # 24 sata
