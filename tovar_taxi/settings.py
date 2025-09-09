@@ -179,6 +179,9 @@ if not DEBUG:
     # SECURE_HSTS_SECONDS = 31536000
     # SECURE_REDIRECT_EXEMPT = []
     # SECURE_SSL_REDIRECT = True
-    # Privremeno uklanjamo secure cookies za PWA pristup
-    # SESSION_COOKIE_SECURE = True
-    # CSRF_COOKIE_SECURE = True
+    # Kompletno uklanjamo secure cookies za PWA pristup
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    # Dodajemo SameSite=None za cross-origin pristup
+    SESSION_COOKIE_SAMESITE = 'None'
+    CSRF_COOKIE_SAMESITE = 'None'
