@@ -663,15 +663,20 @@ def custom_login_view(request):
             messages.error(request, 'Molimo unesite korisničko ime i lozinku.')
             return render(request, 'registration/login.html')
         
-        # Debug: Proveri da li korisnik postoji u bazi
+        # Debug: Proveri da li korisnik postoji u bazi i prikaži sve korisnike
         from django.db import models
+        
+        # Prikaži sve korisnike u bazi za debug
+        all_users = User.objects.all()
+        user_list = [f"{u.username} ({u.email})" for u in all_users]
+        
         user_exists = User.objects.filter(
             models.Q(username__iexact=username) | 
             models.Q(email__iexact=username)
         ).exists()
         
         if not user_exists:
-            messages.error(request, f'Korisnik "{username}" nije registrovan u sistemu.')
+            messages.error(request, f'Korisnik "{username}" nije registrovan. Registrovani korisnici: {", ".join(user_list)}')
             return render(request, 'registration/login.html')
         
         # Pokušaj autentifikaciju sa username
