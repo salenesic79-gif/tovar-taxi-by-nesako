@@ -155,49 +155,57 @@
             border: 3px solid #000000;
             border-radius: 8px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             cursor: pointer;
             margin: 10px;
             transition: transform 0.2s;
             position: relative;
+            overflow: hidden;
         }
 
         .license-plate:hover {
             transform: scale(1.05);
         }
 
+        .plate-number {
+            height: 66.67%; /* Gornje dve trećine */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+            font-weight: 900;
+            font-size: 24px;
+            color: #000;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+            background: inherit;
+        }
+
         .manufacturer-logo {
-            width: 56px;
-            height: 56px;
+            height: 33.33%; /* Donja trećina */
             background: #000;
             color: white;
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 12px;
-            margin: 7px;
-            border-radius: 4px;
-            padding-bottom: 8px;
             text-align: center;
             line-height: 1;
+            font-size: 10px; /* Početna veličina */
         }
 
-        .plate-number {
-            flex: 1;
-            text-align: center;
-            font-family: 'Courier New', monospace;
-            font-weight: 900;
-            font-size: 26px;
-            color: #000;
-            letter-spacing: 3px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-            text-transform: uppercase;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            padding-top: 8px;
-        }
+        /* Dinamička veličina fonta za različite brendove */
+        .manufacturer-mercedes { font-size: 7px; }
+        .manufacturer-renault { font-size: 7px; }
+        .manufacturer-scania { font-size: 9px; }
+        .manufacturer-volvo { font-size: 10px; }
+        .manufacturer-iveco { font-size: 10px; }
+        .manufacturer-isuzu { font-size: 10px; }
+        .manufacturer-ford { font-size: 11px; }
+        .manufacturer-fiat { font-size: 12px; }
+        .manufacturer-man { font-size: 12px; }
+        .manufacturer-daf { font-size: 12px; }
 
         /* Vehicle Colors */
         .vehicle-white { 
@@ -287,6 +295,53 @@
             color: #000000;
             font-weight: 600;
             text-transform: uppercase;
+        }
+
+        /* Action Buttons Styling */
+        .action-buttons-container {
+            margin: 30px 0;
+        }
+
+        .action-buttons-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            min-height: 100px;
+        }
+
+        .action-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .action-button i {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .action-button span {
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1.3;
         }
 
         .dashboard-container {
@@ -619,8 +674,18 @@
                 grid-template-columns: 1fr;
             }
             
-            .stats-grid {
+            .action-buttons-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .action-button {
+                padding: 15px;
+                min-height: 80px;
+            }
+            
+            .action-button span {
+                font-size: 13px;
             }
             
             .quick-actions {
@@ -660,14 +725,23 @@
             }
             
             .manufacturer-logo {
-                font-size: 12px;
-                width: 50px;
-                height: 50px;
+                font-size: 8px;
             }
             
+            .manufacturer-mercedes { font-size: 6px; }
+            .manufacturer-renault { font-size: 6px; }
+            .manufacturer-scania { font-size: 7px; }
+            .manufacturer-volvo { font-size: 8px; }
+            .manufacturer-iveco { font-size: 8px; }
+            .manufacturer-isuzu { font-size: 8px; }
+            .manufacturer-ford { font-size: 9px; }
+            .manufacturer-fiat { font-size: 10px; }
+            .manufacturer-man { font-size: 10px; }
+            .manufacturer-daf { font-size: 10px; }
+            
             .plate-number {
-                font-size: 20px;
-                letter-spacing: 2px;
+                font-size: 18px;
+                letter-spacing: 1px;
             }
             
             .header {
@@ -785,20 +859,20 @@
                     {% if vehicles %}
                         {% for vehicle in vehicles %}
                             <div class="license-plate vehicle-{{ vehicle.vehicle_color|default:'white' }}" onclick="selectVehicleForTour('{{ vehicle.license_plate }}')">
-                                <div class="manufacturer-logo">
-                                    {% if vehicle.vehicle_brand == 'mercedes' %}MERCEDES
+                                <div class="plate-number">{{ vehicle.license_plate }}</div>
+                                <div class="manufacturer-logo manufacturer-{{ vehicle.vehicle_brand|default:'brand' }}">
+                                    {% if vehicle.vehicle_brand == 'mercedes' %}MERCEDES-BENZ
                                     {% elif vehicle.vehicle_brand == 'volvo' %}VOLVO
                                     {% elif vehicle.vehicle_brand == 'scania' %}SCANIA
                                     {% elif vehicle.vehicle_brand == 'man' %}MAN
                                     {% elif vehicle.vehicle_brand == 'daf' %}DAF
                                     {% elif vehicle.vehicle_brand == 'iveco' %}IVECO
-                                    {% elif vehicle.vehicle_brand == 'renault' %}RENAULT
+                                    {% elif vehicle.vehicle_brand == 'renault' %}RENAULT TRUCKS
                                     {% elif vehicle.vehicle_brand == 'ford' %}FORD
                                     {% elif vehicle.vehicle_brand == 'isuzu' %}ISUZU
                                     {% elif vehicle.vehicle_brand == 'fiat' %}FIAT
                                     {% else %}BRAND{% endif %}
                                 </div>
-                                <div class="plate-number">{{ vehicle.license_plate }}</div>
                             </div>
                         {% endfor %}
                     {% endif %}
@@ -811,21 +885,17 @@
             </div>
         </div>
 
-        <!-- Statistics Cards - samo Aktivne ponude i Prihvaćene ponude -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-handshake"></i>
-                </div>
-                <div class="stat-value">{{ total_offers|default:0 }}</div>
-                <div class="stat-label">Aktivne ponude</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-thumbs-up"></i>
-                </div>
-                <div class="stat-value">{{ accepted_offers|default:0 }}</div>
-                <div class="stat-label">Prihvaćene ponude</div>
+        <!-- Action Buttons -->
+        <div class="action-buttons-container">
+            <div class="action-buttons-grid">
+                <a href="{% url 'transport:freight_exchange' %}?near_route=true" class="action-button">
+                    <i class="fas fa-route"></i>
+                    <span>Aktivne ponude na ruti</span>
+                </a>
+                <a href="{% url 'transport:freight_exchange' %}" class="action-button">
+                    <i class="fas fa-list"></i>
+                    <span>Trenutne dostupne ponude na aplikaciji</span>
+                </a>
             </div>
         </div>
 
@@ -1020,7 +1090,7 @@
         <div class="dashboard-bottom">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1 class="mb-2"><i class="fas fa-truck-moving"></i> Prevoznik Dashboard</h1>
+                    <h1 class="mb-2"><i class="fas fa-truck-moving"></i> {{ user.get_full_name|default:user.username|upper }}</h1>
                     <p class="mb-0">Upravljajte svojim vozilima i rutama.</p>
                 </div>
                 <div class="col-md-4 text-end">

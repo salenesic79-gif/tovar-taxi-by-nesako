@@ -231,6 +231,8 @@ def freight_exchange(request):
     # Prikaži samo neprihvaćene aktivne ponude, sortirane po mestu preuzimanja
     shipments = Shipment.objects.filter(
         status='published'
+    ).exclude(
+        shipmentoffer__status='accepted'
     ).order_by('pickup_city', 'pickup_region', 'delivery_city')
     
     # Filtriranje
