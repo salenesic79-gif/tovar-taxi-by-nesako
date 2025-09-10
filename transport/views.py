@@ -656,14 +656,25 @@ def custom_login_view(request):
             pass  # Ovo briše sve postojeće messages
     
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
         
         if not username or not password:
             messages.error(request, 'Molimo unesite korisničko ime i lozinku.')
             return render(request, 'registration/login.html')
         
-        # Pokušaj autentifikaciju sa username ili email
+        # Debug: Proveri da li korisnik postoji u bazi
+        from django.db import models
+        user_exists = User.objects.filter(
+            models.Q(username__iexact=username) | 
+            models.Q(email__iexact=username)
+        ).exists()
+        
+        if not user_exists:
+            messages.error(request, f'Korisnik "{username}" nije registrovan u sistemu.')
+            return render(request, 'registration/login.html')
+        
+        # Pokušaj autentifikaciju sa username
         user = authenticate(request, username=username, password=password)
         
         # Ako ne uspe sa username, pokušaj sa email (case insensitive)
@@ -678,7 +689,7 @@ def custom_login_view(request):
                 except User.DoesNotExist:
                     user = None
             
-        if user is not None:
+        if user is not None and user.is_active:
             login(request, user)
             
             # Role-based redirect
@@ -694,9 +705,13 @@ def custom_login_view(request):
                 else:
                     return redirect('home')
             except Profile.DoesNotExist:
-                return redirect('home')
+                messages.error(request, 'Korisnik nema kreiran profil. Kontaktirajte administratora.')
+                return render(request, 'registration/login.html')
         else:
-            messages.error(request, 'Neispravno korisničko ime ili lozinka.')
+            if user and not user.is_active:
+                messages.error(request, 'Vaš nalog nije aktivan. Kontaktirajte administratora.')
+            else:
+                messages.error(request, 'Neispravna lozinka.')
     
     return render(request, 'registration/login.html')
 
