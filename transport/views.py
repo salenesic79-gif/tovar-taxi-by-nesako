@@ -27,7 +27,20 @@ def test_view(request):
 
 
 def home_view(request):
-    """Glavna stranica aplikacije"""
+    """Glavna stranica aplikacije - redirect authenticated users to their dashboard"""
+    # Ako je korisnik ulogovan, preusmeri ga na odgovarajući dashboard
+    if request.user.is_authenticated:
+        try:
+            profile = request.user.profile
+            if profile.role == 'naručilac':
+                return redirect('transport:shipper_dashboard')
+            elif profile.role == 'prevoznik':
+                return redirect('transport:carrier_dashboard')
+            elif profile.role == 'vozač':
+                return redirect('transport:driver_dashboard')
+        except Profile.DoesNotExist:
+            pass  # Nastavi sa prikazom home stranice
+    
     try:
         # Statistike za sve korisnike
         context = {
@@ -663,12 +676,8 @@ def custom_login_view(request):
             messages.error(request, 'Molimo unesite korisničko ime i lozinku.')
             return render(request, 'registration/login.html')
         
-        # Debug: Proveri da li korisnik postoji u bazi i prikaži sve korisnike
+        # Proveri da li korisnik postoji u bazi
         from django.db import models
-        
-        # Prikaži sve korisnike u bazi za debug
-        all_users = User.objects.all()
-        user_list = [f"{u.username} ({u.email})" for u in all_users]
         
         user_exists = User.objects.filter(
             models.Q(username__iexact=username) | 
@@ -676,7 +685,7 @@ def custom_login_view(request):
         ).exists()
         
         if not user_exists:
-            messages.error(request, f'Korisnik "{username}" nije registrovan. Registrovani korisnici: {", ".join(user_list)}')
+            messages.error(request, f'Korisnik "{username}" nije registrovan.')
             return render(request, 'registration/login.html')
         
         # Pokušaj autentifikaciju sa username
