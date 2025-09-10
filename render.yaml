@@ -13,3 +13,12 @@ services:
         value: 4
       - key: RENDER_EXTERNAL_HOSTNAME
         value: tovar-taxi-by-nesako-web.onrender.com
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tovar-taxi-db
+          property: connectionString
+
+databases:
+  - name: tovar-taxi-db
+    databaseName: tovar_taxi
+    user: tovar_taxi_user
