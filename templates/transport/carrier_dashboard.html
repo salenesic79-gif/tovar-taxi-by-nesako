@@ -65,29 +65,26 @@
         }
 
         .brand-logo-btn {
-            background: none;
-            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
             cursor: pointer;
-            padding: 0;
+            padding: 10px 15px;
             transition: all 0.3s;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
         }
 
         .brand-logo-btn:hover {
-            transform: scale(1.05);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         .brand-logo {
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #000;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            display: none;
         }
 
         .dropdown-menu {
@@ -174,12 +171,14 @@
             justify-content: center;
             font-family: 'Courier New', monospace;
             font-weight: 900;
-            font-size: 24px;
+            font-size: 28px;
             color: #000;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
             text-transform: uppercase;
             background: inherit;
+            width: 100%;
+            padding: 0 10px;
         }
 
         .manufacturer-logo {
@@ -192,7 +191,9 @@
             font-weight: bold;
             text-align: center;
             line-height: 1;
-            font-size: 10px; /* Početna veličina */
+            font-size: 12px;
+            width: 100%;
+            padding: 0 5px;
         }
 
         /* Dinamička veličina fonta za različite brendove */
@@ -284,14 +285,22 @@
             gap: 15px;
         }
 
-        .add-vehicle-plus {
-            font-size: 36px;
-            color: #000000;
-            font-weight: bold;
+        .add-vehicle-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 8px;
+        }
+
+        .add-vehicle-icon {
+            font-size: 24px;
+            color: #667eea;
         }
 
         .add-vehicle-text {
-            font-size: 16px;
+            font-size: 14px;
             color: #000000;
             font-weight: 600;
             text-transform: uppercase;
@@ -323,6 +332,7 @@
             text-align: center;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             min-height: 100px;
         }
 
@@ -817,9 +827,8 @@
             </a>
             <div class="brand-logo-container">
                 <button class="brand-logo-btn" onclick="toggleDropdown()">
-                    <div class="brand-logo">
-                        🚛
-                    </div>
+                    <span>{{ user.get_full_name|default:user.username|upper }}</span>
+                    <i class="fas fa-chevron-down"></i>
                 </button>
                 <div class="dropdown-menu" id="brandDropdown">
                     <a href="{% url 'home' %}" class="dropdown-item">
@@ -878,8 +887,10 @@
                     {% endif %}
 
                     <div class="license-plate add-vehicle-plate" data-bs-toggle="modal" data-bs-target="#addVehicleModal">
-                        <div class="add-vehicle-plus">+</div>
-                        <div class="add-vehicle-text">DODAJ VOZILO</div>
+                        <div class="add-vehicle-content">
+                            <i class="fas fa-plus add-vehicle-icon"></i>
+                            <span class="add-vehicle-text">DODAJ VOZILO</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -899,54 +910,6 @@
             </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <a href="{% url 'transport:create_route_availability' %}" class="quick-action-item">
-                <div class="quick-action-icon">
-                    <i class="fas fa-route"></i>
-                </div>
-                <h5>Prijavi rutu</h5>
-                <p class="text-muted mb-0">Dodaj slobodan prostor u vozilu</p>
-            </a>
-            <a href="{% url 'transport:freight_exchange' %}" class="quick-action-item">
-                <div class="quick-action-icon">
-                    <i class="fas fa-search"></i>
-                </div>
-                <h5>Berza tereta</h5>
-                <p class="text-muted mb-0">Pretraži dostupne pošiljke</p>
-            </a>
-            <a href="{% url 'transport:manage_vehicles' %}" class="quick-action-item">
-                <div class="quick-action-icon">
-                    <i class="fas fa-truck"></i>
-                </div>
-                <h5>Moja vozila</h5>
-                <p class="text-muted mb-0">Upravljaj voznim parkom</p>
-            </a>
-            <a href="{% url 'transport:my_tours' %}" class="quick-action-item">
-                <div class="quick-action-icon">
-                    <i class="fas fa-map-marked-alt"></i>
-                </div>
-                <h5>Moje ture</h5>
-                <p class="text-muted mb-0">Pregled svih tura</p>
-            </a>
-            <a href="{% url 'transport:notifications' %}" class="quick-action-item">
-                <div class="quick-action-icon">
-                    <i class="fas fa-bell"></i>
-                    {% if notifications.count > 0 %}
-                    <span class="notification-badge">{{ notifications.count }}</span>
-                    {% endif %}
-                </div>
-                <h5>Notifikacije</h5>
-                <p class="text-muted mb-0">Nove poruke i ponude</p>
-            </a>
-            <div class="quick-action-item" onclick="window.location.href='{% url 'transport:create_tour' %}'">
-                <div class="quick-action-icon">
-                    <i class="fas fa-route"></i>
-                </div>
-                <h5>Kreiraj turu</h5>
-                <p class="text-muted mb-0">Dodaj novu turu sa dostupnim prostorom</p>
-            </div>
-        </div>
 
         <!-- Active Routes & Available Capacity -->
         <div class="content-grid">

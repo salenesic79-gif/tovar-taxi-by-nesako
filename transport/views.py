@@ -37,7 +37,7 @@ def home_view(request):
             elif profile.role == 'prevoznik':
                 return redirect('transport:carrier_dashboard')
             elif profile.role == 'vozač':
-                return redirect('transport:driver_dashboard')
+                return redirect('transport:carrier_dashboard')
         except Profile.DoesNotExist:
             pass  # Nastavi sa prikazom home stranice
     
@@ -114,22 +114,6 @@ def carrier_dashboard(request):
     return render(request, 'transport/carrier_dashboard.html', context)
 
 
-@login_required
-def driver_dashboard(request):
-    """Dashboard za vozače"""
-    if request.user.profile.role != 'vozač':
-        return redirect('home')
-    
-    tours = Tour.objects.filter(driver=request.user).order_by('-created_at')
-    active_tours = tours.filter(status__in=['confirmed', 'in_progress', 'pickup_confirmed'])
-    
-    context = {
-        'tours': tours[:10],
-        'active_tours': active_tours,
-        'total_tours': tours.count(),
-        'completed_tours': tours.filter(status='completed').count(),
-    }
-    return render(request, 'transport/driver_dashboard.html', context)
 
 
 @login_required
@@ -161,7 +145,7 @@ def shipment_detail(request, pk):
     # Proveri da li korisnik može da vidi pošiljku
     can_view = (
         shipment.sender == request.user or
-        request.user.profile.role in ['prevoznik', 'vozač'] or
+        request.user.profile.role == 'prevoznik' or
         request.user.is_staff
     )
     
@@ -181,7 +165,7 @@ def shipment_detail(request, pk):
 @login_required
 def make_offer(request, shipment_id):
     """Kreiranje ponude za pošiljku"""
-    if request.user.profile.role not in ['prevoznik', 'vozač']:
+    if request.user.profile.role != 'prevoznik':
         return redirect('home')
     
     shipment = get_object_or_404(Shipment, pk=shipment_id, status='published')
@@ -280,7 +264,7 @@ def freight_exchange(request):
 @login_required
 def manage_vehicles(request):
     """Upravljanje vozilima"""
-    if request.user.profile.role not in ['prevoznik', 'vozač']:
+    if request.user.profile.role != 'prevoznik':
         return redirect('home')
     
     vehicles = Vehicle.objects.filter(owner=request.user).order_by('-created_at')
@@ -294,7 +278,7 @@ def manage_vehicles(request):
 @login_required
 def add_vehicle(request):
     """Dodavanje novog vozila - AJAX compatible"""
-    if request.user.profile.role not in ['prevoznik', 'vozač']:
+    if request.user.profile.role != 'prevoznik':
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'error': 'Nemate dozvolu za dodavanje vozila'})
         return redirect('home')
@@ -402,7 +386,7 @@ def get_brand_code(brand):
 @login_required
 def my_tours(request):
     """Lista tura korisnika"""
-    if request.user.profile.role == 'vozač':
+    if request.user.profile.role == 'prevoznik':
         tours = Tour.objects.filter(driver=request.user)
     elif request.user.profile.role == 'naručilac':
         tours = Tour.objects.filter(shipment__sender=request.user)
@@ -717,7 +701,7 @@ def custom_login_view(request):
                 elif profile.role == 'prevoznik':
                     return redirect('transport:carrier_dashboard')
                 elif profile.role == 'vozač':
-                    return redirect('transport:driver_dashboard')
+                    return redirect('transport:carrier_dashboard')
                 else:
                     return redirect('home')
             except Profile.DoesNotExist:
@@ -834,8 +818,8 @@ def create_food_delivery(request):
 
 @login_required
 def driver_dashboard_extended(request):
-    """Prošireni dashboard za vozače sa instant i food delivery"""
-    if request.user.profile.role not in ['prevoznik', 'vozač']:
+    """Prošireni dashboard za prevoznike sa instant i food delivery"""
+    if request.user.profile.role != 'prevoznik':
         return redirect('home')
     
     # Dostupne instant dostave
@@ -867,7 +851,7 @@ def driver_dashboard_extended(request):
         'active_deliveries': active_deliveries,
         'active_food_deliveries': active_food_deliveries,
     }
-    return render(request, 'transport/driver_dashboard_extended.html', context)
+    return render(request, 'transport/carrier_dashboard.html', context)
 
 
 @login_required

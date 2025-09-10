@@ -33,7 +33,6 @@ urlpatterns = [
     # Dashboards
     path('shipper-dashboard/', views.shipper_dashboard, name='shipper_dashboard'),
     path('carrier-dashboard/', views.carrier_dashboard, name='carrier_dashboard'),
-    path('driver-dashboard/', views.driver_dashboard, name='driver_dashboard'),
     
     # Shipments
     path('create-shipment/', views.create_shipment, name='create_shipment'),
