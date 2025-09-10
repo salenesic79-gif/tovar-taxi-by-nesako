@@ -1,0 +1,67 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:auth_user_changelist' %}">Korisnici</a>
+&rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="module aligned">
+    <h1>{{ title }}</h1>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <h2>Uvezi korisnike iz JSON fajla</h2>
+            <form method="post" enctype="multipart/form-data" style="margin-bottom: 30px;">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="json_file">JSON fajl:</label>
+                        <input type="file" name="json_file" accept=".json" required>
+                        <p class="help">Izaberite JSON fajl sa korisnicima izvezenim iz localhost-a</p>
+                    </div>
+                </div>
+                <div class="submit-row">
+                    <input type="submit" value="Uvezi iz JSON" class="default">
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <h2>Uvezi korisnike iz CSV fajla</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="csv_file">CSV fajl:</label>
+                        <input type="file" name="csv_file" accept=".csv" required>
+                        <p class="help">Izaberite CSV fajl sa korisnicima</p>
+                    </div>
+                </div>
+                <div class="submit-row">
+                    <input type="submit" value="Uvezi iz CSV" class="default">
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <h2>Instrukcije</h2>
+            <ol>
+                <li><strong>Localhost export:</strong> Idite na localhost admin → Korisnici → izaberite korisnike → Actions → "Izvezi korisnike (JSON)"</li>
+                <li><strong>Render import:</strong> Uploadujte JSON fajl ovde da uvezete korisnike na Render</li>
+                <li><strong>Napomena:</strong> Postojeći korisnici će biti ažurirani, novi će biti kreirani</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}
