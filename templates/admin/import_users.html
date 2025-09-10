@@ -1,67 +1,104 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls static admin_modify %}
 
-{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+{% block title %}Import korisnika{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+<a href="{% url 'admin:index' %}">Početna</a>
 &rsaquo; <a href="{% url 'admin:auth_user_changelist' %}">Korisnici</a>
-&rsaquo; {{ title }}
+&rsaquo; Import korisnika
 </div>
 {% endblock %}
 
 {% block content %}
 <div class="module aligned">
-    <h1>{{ title }}</h1>
+    <h1>📥 Import korisnika iz JSON fajla</h1>
     
     <div class="form-row">
-        <div class="form-group">
-            <h2>Uvezi korisnike iz JSON fajla</h2>
-            <form method="post" enctype="multipart/form-data" style="margin-bottom: 30px;">
-                {% csrf_token %}
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="json_file">JSON fajl:</label>
-                        <input type="file" name="json_file" accept=".json" required>
-                        <p class="help">Izaberite JSON fajl sa korisnicima izvezenim iz localhost-a</p>
-                    </div>
-                </div>
-                <div class="submit-row">
-                    <input type="submit" value="Uvezi iz JSON" class="default">
-                </div>
-            </form>
+        <div class="help">
+            <p><strong>Instrukcije:</strong></p>
+            <ul>
+                <li>Uploadujte JSON fajl koji ste eksportovali iz localhost admin panela</li>
+                <li>Fajl mora biti u JSON formatu sa korisničkim podacima i profilima</li>
+                <li>Korisnici koji već postoje će biti preskočeni</li>
+                <li>Lozinke će biti kopirane u hash formatu (korisnici mogu da se loguju sa istim lozinkama)</li>
+            </ul>
         </div>
     </div>
-    
-    <div class="form-row">
-        <div class="form-group">
-            <h2>Uvezi korisnike iz CSV fajla</h2>
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="csv_file">CSV fajl:</label>
-                        <input type="file" name="csv_file" accept=".csv" required>
-                        <p class="help">Izaberite CSV fajl sa korisnicima</p>
-                    </div>
-                </div>
-                <div class="submit-row">
-                    <input type="submit" value="Uvezi iz CSV" class="default">
-                </div>
-            </form>
+
+    <form method="post" enctype="multipart/form-data" class="aligned">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div>
+                <label for="users_file" class="required">JSON fajl sa korisnicima:</label>
+                <input type="file" name="users_file" id="users_file" accept=".json" required>
+                <p class="help">Izaberite JSON fajl eksportovan iz localhost admin panela</p>
+            </div>
         </div>
+
+        <div class="submit-row">
+            <input type="submit" value="📤 Importuj korisnike" class="default" name="_save">
+            <a href="{% url 'admin:auth_user_changelist' %}" class="button cancel-link">Otkaži</a>
+        </div>
+    </form>
+
+    <div class="module">
+        <h2>📋 Korak po korak instrukcije</h2>
+        <ol>
+            <li><strong>Na localhost:</strong> Idite u admin panel → Korisnici</li>
+            <li>Selektujte sve korisnike koje želite da eksportujete</li>
+            <li>U dropdown meniju "Akcija" izaberite "📤 Izvezi korisnike (JSON za Render)"</li>
+            <li>Kliknite "Izvrši" - fajl će se downloadovati</li>
+            <li><strong>Na Render:</strong> Uploadujte taj fajl ovde</li>
+            <li>Kliknite "Importuj korisnike"</li>
+        </ol>
     </div>
-    
-    <div class="form-row">
-        <div class="form-group">
-            <h2>Instrukcije</h2>
-            <ol>
-                <li><strong>Localhost export:</strong> Idite na localhost admin → Korisnici → izaberite korisnike → Actions → "Izvezi korisnike (JSON)"</li>
-                <li><strong>Render import:</strong> Uploadujte JSON fajl ovde da uvezete korisnike na Render</li>
-                <li><strong>Napomena:</strong> Postojeći korisnici će biti ažurirani, novi će biti kreirani</li>
-            </ol>
-        </div>
+
+    <div class="module">
+        <h2>⚠️ Napomene</h2>
+        <ul>
+            <li>Backup baza podataka pre importa</li>
+            <li>Korisnici sa istim username-om neće biti duplicirani</li>
+            <li>Admin korisnici će zadržati svoje privilegije</li>
+            <li>Svi profili (naručilac, prevoznik) će biti kreirani</li>
+        </ul>
     </div>
 </div>
+
+<style>
+.module {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.help {
+    background: #e3f2fd;
+    padding: 10px;
+    border-left: 4px solid #2196f3;
+    margin-bottom: 15px;
+}
+
+.submit-row {
+    padding: 15px 0;
+    border-top: 1px solid #ddd;
+    margin-top: 20px;
+}
+
+.cancel-link {
+    margin-left: 10px;
+    text-decoration: none;
+    color: #666;
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.cancel-link:hover {
+    background: #f5f5f5;
+}
+</style>
 {% endblock %}
