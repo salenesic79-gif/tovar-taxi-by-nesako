@@ -1,24 +1,20 @@
 services:
   - type: web
-    name: tovar-taxi-web
+    name: tovar-taxi
     env: python
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn tovar_taxi.wsgi:application --bind 0.0.0.0:$PORT --log-level debug"
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+    startCommand: gunicorn tovar_taxi.wsgi:application
     envVars:
       - key: DEBUG
-        value: true
+        value: False
       - key: SECRET_KEY
         generateValue: true
       - key: WEB_CONCURRENCY
         value: 4
-      - key: RENDER_EXTERNAL_HOSTNAME
-        value: tovar-taxi-by-nesako-web.onrender.com
-      - key: DATABASE_URL
-        fromDatabase:
-          name: tovar-taxi-db
-          property: connectionString
-
-databases:
-  - name: tovar-taxi-db
-    databaseName: tovar_taxi
-    user: tovar_taxi_user
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    autoDeploy: false
+    healthCheckPath: /

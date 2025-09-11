@@ -692,15 +692,22 @@ def custom_login_view(request):
         if user is not None and user.is_active:
             login(request, user)
             
+            # Proveri "Remember me" checkbox
+            remember_me = request.POST.get('remember_me')
+            if remember_me:
+                # Postavi session da traje 30 dana
+                request.session.set_expiry(60 * 60 * 24 * 30)  # 30 dana
+            else:
+                # Standardno ponašanje - session se briše kada se zatvori browser
+                request.session.set_expiry(0)
+
             # Role-based redirect
             try:
                 profile = user.profile
-                
+
                 if profile.role == 'naručilac':
                     return redirect('transport:shipper_dashboard')
-                elif profile.role == 'prevoznik':
-                    return redirect('transport:carrier_dashboard')
-                elif profile.role == 'vozač':
+                elif profile.role == 'prevoznik' or profile.role == 'vozač':
                     return redirect('transport:carrier_dashboard')
                 else:
                     return redirect('home')

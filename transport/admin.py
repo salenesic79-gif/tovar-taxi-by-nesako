@@ -296,7 +296,37 @@ class UserAdmin(BaseUserAdmin):
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
         extra_context['import_url'] = 'import-users/'
-        return super().changelist_view(request, extra_context)
+        extra_context['show_import_button'] = True
+        
+        # Dodaj import dugme direktno u response
+        response = super().changelist_view(request, extra_context)
+        
+        # Dodaj JavaScript za kreiranje dugmeta ako template ne radi
+        if hasattr(response, 'content'):
+            content = response.content.decode('utf-8')
+            if 'Import korisnika' not in content:
+                # Dodaj dugme preko JavaScript-a
+                js_code = '''
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var objectTools = document.querySelector('.object-tools');
+                    if (objectTools) {
+                        var importButton = document.createElement('li');
+                        importButton.innerHTML = '<a href="import-users/" class="addlink" style="background: #28a745; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none; font-weight: bold;">📥 Import korisnika</a>';
+                        objectTools.appendChild(importButton);
+                    }
+                });
+                </script>
+                '''
+                content = content.replace('</body>', js_code + '</body>')
+                response.content = content.encode('utf-8')
+        
+        return response
+    
+    def get_changelist_instance(self, request):
+        """Dodaj custom dugme u changelist"""
+        changelist = super().get_changelist_instance(request)
+        return changelist
 
 # Unregister the default User admin and register the new one
 admin.site.unregister(User)

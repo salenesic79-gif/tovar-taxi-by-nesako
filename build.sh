@@ -1,36 +1,30 @@
-#!/usr/bin/env bash
-# exit on error
-set -o errexit
+﻿#!/bin/bash
+# Build script za Render deployment
 
-echo "Starting build process..."
+echo "=== Tovar Taxi Build Script ==="
 
 # Install dependencies
-echo "Installing dependencies..."
+echo "Installing Python dependencies..."
 pip install -r requirements.txt
 
-# Create migrations
-echo "Creating migrations..."
-python manage.py makemigrations
+# Collect static files
+echo "Collecting static files..."
+python manage.py collectstatic --noinput
 
 # Run migrations
-echo "Running migrations..."
+echo "Running database migrations..."
 python manage.py migrate
 
 # Create superuser if it doesn't exist
-echo "Creating superuser..."
+echo "Checking for superuser..."
 python manage.py shell -c "
-from django.contrib.auth.models import User
-from transport.models import Profile
-if not User.objects.filter(username='admin').exists():
-    user = User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-    Profile.objects.create(user=user, role='naručilac', phone_number='', address='', company_name='Admin')
-    print('Superuser created successfully')
+from django.contrib.auth import get_user_model
+User = get_user_model()
+if not User.objects.filter(is_superuser=True).exists():
+    User.objects.create_superuser('admin', 'admin@tovartaxi.com', 'admin123')
+    print('Superuser created: admin/admin123')
 else:
     print('Superuser already exists')
 "
 
-# Collect static files
-echo "Collecting static files..."
-python manage.py collectstatic --noinput --clear
-
-echo "Build process completed successfully!"
+echo "Build completed successfully!"
