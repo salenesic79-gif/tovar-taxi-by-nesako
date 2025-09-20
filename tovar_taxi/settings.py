@@ -45,16 +45,16 @@ if RENDER_EXTERNAL_HOSTNAME:
 else:
     ALLOWED_HOSTS = ['tovar-taxi-by-nesako-web.onrender.com', 'tovar-taxi-by-nesako.onrender.com', 'localhost', '127.0.0.1', '192.168.0.21']
 
-# Application definition
+# Application definition - minimized for production
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels',
     'transport',
+    # 'django.contrib.admin',  # Removed temporarily to reduce memory
+    # 'channels',  # Removed temporarily to reduce memory
 ]
 
 MIDDLEWARE = [
@@ -63,9 +63,9 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.contrib.auth.middleware.AuthenticationMiddleware',  # Temporarily disabled
+    # 'django.contrib.messages.middleware.MessageMiddleware',  # Temporarily disabled
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Temporarily disabled
 ]
 
 ROOT_URLCONF = 'tovar_taxi.urls'
@@ -89,7 +89,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'tovar_taxi.wsgi.application'
 ASGI_APPLICATION = 'tovar_taxi.asgi.application'
 
-# Database
+# Database - optimized for production
 import dj_database_url
 import os
 
@@ -104,12 +104,17 @@ if DATABASE_URL:
         )
     }
 else:
+    # Use SQLite for development
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+
+# Disable database connection persistence when not needed
+if not DEBUG:
+    DATABASES['default']['CONN_MAX_AGE'] = 60  # Reduce from 600 to 60 seconds
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -167,12 +172,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Channels configuration
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-    },
-}
+# Channels configuration - disabled to reduce memory
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
+#     },
+# }
 
 # Stripe Configuration
 STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY', default='pk_test_51234567890abcdef')

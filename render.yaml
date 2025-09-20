@@ -6,15 +6,17 @@ services:
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
       python manage.py migrate
-    startCommand: gunicorn tovar_taxi.wsgi:application --bind 0.0.0.0:$PORT
+    startCommand: gunicorn tovar_taxi.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --preload
     envVars:
       - key: DEBUG
         value: False
       - key: SECRET_KEY
         generateValue: true
       - key: WEB_CONCURRENCY
-        value: 4
+        value: 2
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: GUNICORN_CMD_ARGS
+        value: "--workers=2 --timeout=120 --preload"
     autoDeploy: false
     healthCheckPath: /
