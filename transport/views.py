@@ -4,13 +4,14 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q, Count, Sum
 from django.utils import timezone
 from django.core.paginator import Paginator
 import json
+import math
 
 from .models import (
     Profile, Vehicle, Shipment, ShipmentOffer, Tour, ChatMessage, Notification, Location,
@@ -1115,7 +1116,7 @@ def update_tour_location(request):
         tour = Tour.objects.get(
             id=tour_id,
             driver=request.user,
-            status='active'
+            status__in=['confirmed', 'in_progress']
         )
         
         # Create location record
@@ -1126,34 +1127,10 @@ def update_tour_location(request):
             timestamp=timezone.now()
         )
         
-        # Check if tour is near destination (5km radius)
-        destination_reached = check_destination_proximity(tour, latitude, longitude)
-        
-        if destination_reached:
-            # Complete the tour
-            tour.status = 'completed'
-            tour.end_time = timezone.now()
+        # Update tour status to in progress if it was confirmed
+        if tour.status == 'confirmed':
+            tour.status = 'in_progress'
             tour.save()
-            
-            # Make vehicle available again
-            if tour.vehicle:
-                tour.vehicle.is_available = True
-                tour.vehicle.save()
-            
-            # Create completion notification
-            Notification.objects.create(
-                user=request.user,
-                title='Tura završena',
-                message=f'Tura {tour.polaziste} → {tour.odrediste} je automatski završena jer ste stigli na odredište.',
-                notification_type='tour_completed',
-                is_read=False
-            )
-            
-            return JsonResponse({
-                'success': True,
-                'tour_completed': True,
-                'message': 'Tura je automatski završena - stigli ste na odredište!'
-            })
         
         return JsonResponse({
             'success': True,

@@ -405,15 +405,6 @@ class PremiumSubscription(models.Model):
         return f"{self.user.username} - {self.subscription_type}"
 
 
-class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    message = models.TextField()
-    sound_file = models.CharField(max_length=50, default='ping.mp3')
-    is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return f"{self.user.username} - {self.message[:50]}"
 
 
 class Cargo(models.Model):
