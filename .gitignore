@@ -33,3 +33,4 @@ staticfiles/
 
 # Secret keys
 .env
+.aider*
