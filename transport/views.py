@@ -1319,8 +1319,7 @@ def create_cargo_view(request):
             user=request.user,
             title="Nova Pošiljka Kreirana",
             message=f"Kreirana pošiljka od {pallet_count} paleta za {price_data['total_price']} RSD",
-            notification_type='cargo',
-            sound_file='success'
+            notification_type='cargo'
         )
         
         return JsonResponse({
@@ -1375,16 +1374,14 @@ def accept_cargo_view(request, cargo_id):
         user=cargo.shipper,
         title="Pošiljka Prihvaćena",
         message=f"Prevoznik {request.user.get_full_name()} je prihvatio vašu pošiljku",
-        notification_type='cargo',
-        sound_file='success'
+        notification_type='cargo'
     )
     
     Notification.objects.create(
         user=request.user,
         title="Pošiljka Prihvaćena",
         message=f"Prihvatili ste pošiljku. Zarada: {carrier_price} RSD",
-        notification_type='payment',
-        sound_file='success'
+        notification_type='payment'
     )
     
     return JsonResponse({'success': True})
@@ -1414,8 +1411,7 @@ def confirm_delivery_view(request, cargo_id):
             user=cargo.carrier,
             title="Dostava Potvrđena",
             message=f"Dostava je potvrđena. Zarada: {cargo.carrier_price} RSD",
-            notification_type='payment',
-            sound_file='success'
+            notification_type='payment'
         )
         
         return JsonResponse({'success': True})
