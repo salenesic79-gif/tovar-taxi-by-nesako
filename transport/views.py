@@ -578,7 +578,9 @@ def accept_offer_api(request, offer_id):
     tour = Tour.objects.create(
         shipment=offer.shipment,
         offer=offer,
-        driver=offer.carrier
+        driver=offer.carrier,
+        vehicle=offer.vehicle,
+        status='confirmed'
     )
     
     # Kreiraj notifikacije
