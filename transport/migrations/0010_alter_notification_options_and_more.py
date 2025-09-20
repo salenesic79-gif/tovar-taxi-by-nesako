@@ -17,14 +17,10 @@ class Migration(migrations.Migration):
             name='notification',
             options={'ordering': ['-created_at']},
         ),
-        migrations.RemoveField(
-            model_name='notification',
-            name='sound_file',
-        ),
         migrations.AddField(
             model_name='notification',
             name='notification_type',
-            field=models.CharField(choices=[('new_offer', 'Nova ponuda'), ('offer_accepted', 'Ponuda prihvaćena'), ('offer_rejected', 'Ponuda odbijena'), ('tour_confirmed', 'Tura potvrđena'), ('pickup_confirmed', 'Preuzimanje potvrđeno'), ('delivery_confirmed', 'Isporuka potvrđena'), ('new_message', 'Nova poruka'), ('cargo', 'Nova pošiljka'), ('payment', 'Plaćanje'), ('tour_started', 'Tura pokrenuta'), ('tour_completed', 'Tura završena')], default='TYPE_DEFAULT', max_length=20),
+            field=models.CharField(choices=[('new_offer', 'Nova ponuda'), ('offer_accepted', 'Ponuda prihvaćena'), ('offer_rejected', 'Ponuda odbijena'), ('tour_confirmed', 'Tura potvrđena'), ('pickup_confirmed', 'Preuzimanje potvrđeno'), ('delivery_confirmed', 'Isporuka potvrđena'), ('new_message', 'Nova poruka'), ('cargo', 'Nova pošiljka'), ('payment', 'Plaćanje'), ('tour_started', 'Tura pokrenuta'), ('tour_completed', 'Tura završena')], default='new_offer', max_length=20),
             preserve_default=False,
         ),
         migrations.AddField(
@@ -35,7 +31,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='notification',
             name='title',
-            field=models.CharField(default='pogledaj ponudu', max_length=200),
+            field=models.CharField(default='Notification', max_length=200),
             preserve_default=False,
         ),
         migrations.AddField(
