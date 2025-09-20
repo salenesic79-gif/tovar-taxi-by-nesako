@@ -1170,6 +1170,59 @@ import json
 # Initialize Stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
+# Add utility functions that are referenced but not defined
+def calculate_distance(lat1, lng1, lat2, lng2):
+    """Calculate distance between two coordinates using Haversine formula"""
+    try:
+        # Convert degrees to radians
+        lat1, lng1, lat2, lng2 = map(math.radians, [float(lat1), float(lng1), float(lat2), float(lng2)])
+        
+        # Haversine formula
+        dlat = lat2 - lat1
+        dlng = lng2 - lng1
+        a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlng/2)**2
+        c = 2 * math.asin(math.sqrt(a))
+        r = 6371  # Radius of Earth in kilometers
+        return c * r
+    except (ValueError, TypeError):
+        return 0
+
+def calculate_price(pallet_count, distance_km):
+    """Calculate price based on pallet count and distance"""
+    # Get price table
+    try:
+        price_table = CenaPoKilometrazi.objects.get(broj_paleta=pallet_count)
+        if distance_km <= 200:
+            base_price = price_table.cena_do_200km
+        else:
+            base_price = price_table.cena_preko_200km
+    except CenaPoKilometrazi.DoesNotExist:
+        # Fallback pricing
+        base_price = 1000 * pallet_count
+    
+    total_price = base_price * max(1, (distance_km / 100))  # Adjust based on distance
+    return {'base_price': base_price, 'total_price': total_price}
+
+def get_eco_suggestion(weight):
+    """Get eco-friendly packaging suggestion"""
+    try:
+        weight = float(weight)
+        if weight < 100:
+            return "Preporučujemo papirnu ambalažu"
+        elif weight < 500:
+            return "Preporučujemo kartonsku ambalažu"
+        else:
+            return "Preporučujemo drvenu paletu sa recikliranim materijalom"
+    except (ValueError, TypeError):
+        return "Preporučujemo odgovarajuću ambalažu za vaš teret"
+
+def calculate_carrier_price(total_price):
+    """Calculate carrier price (85% of total)"""
+    try:
+        return float(total_price) * 0.85
+    except (ValueError, TypeError):
+        return 0
+
 @login_required
 def cargo_map_view(request):
     """Display cargo map interface with Stripe integration"""
