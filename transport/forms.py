@@ -212,7 +212,7 @@ class TourForm(forms.ModelForm):
         if user:
             self.fields['vehicle'].queryset = Vehicle.objects.filter(owner=user, is_available=True)
             
-        if vehicle_license:
+        if vehicle_license and user:
             try:
                 vehicle = Vehicle.objects.get(license_plate=vehicle_license, owner=user)
                 self.fields['vehicle'].initial = vehicle

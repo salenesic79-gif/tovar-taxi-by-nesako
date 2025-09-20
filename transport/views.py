@@ -433,7 +433,7 @@ def notifications(request):
     notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
     
     # Označi sve kao pročitane
-    notifications.filter(is_read=False).update(is_read=True)
+    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
     
     context = {
         'notifications': notifications,

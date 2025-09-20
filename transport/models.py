@@ -202,6 +202,10 @@ class Notification(models.Model):
         ('pickup_confirmed', 'Preuzimanje potvrđeno'),
         ('delivery_confirmed', 'Isporuka potvrđena'),
         ('new_message', 'Nova poruka'),
+        ('cargo', 'Nova pošiljka'),
+        ('payment', 'Plaćanje'),
+        ('tour_started', 'Tura pokrenuta'),
+        ('tour_completed', 'Tura završena'),
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
