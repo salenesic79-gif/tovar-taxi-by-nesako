@@ -418,11 +418,11 @@ def tour_detail(request, pk):
         messages.error(request, 'Nemate dozvolu da vidite ovu turu.')
         return redirect('home')
     
-    messages = ChatMessage.objects.filter(tour=tour).order_by('timestamp')
+    chat_messages = ChatMessage.objects.filter(tour=tour).order_by('timestamp')
     
     context = {
         'tour': tour,
-        'messages': messages,
+        'chat_messages': chat_messages,
         'can_chat': tour.driver == request.user or tour.shipment.sender == request.user,
     }
     return render(request, 'transport/tour_detail.html', context)
