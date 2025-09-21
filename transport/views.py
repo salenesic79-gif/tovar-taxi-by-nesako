@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
@@ -1507,6 +1507,11 @@ def signup_sender_new_view(request):
     
     return render(request, 'transport/signup_sender_new.html')
 
+
+def custom_logout_view(request):
+    """Custom logout view that always redirects to home page"""
+    logout(request)
+    return redirect('/')
 
 def signup_carrier_new_view(request):
     if request.method == 'POST':
