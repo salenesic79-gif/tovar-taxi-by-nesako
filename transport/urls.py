@@ -7,8 +7,6 @@ urlpatterns = [
     # Home page
     path('', views.home_view, name='transport_home'),
     
-    # Test URL
-    path('test/', views.test_view, name='test'),
     
     # Authentication
     path('login/', views.custom_login_view, name='custom_login'),

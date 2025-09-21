@@ -20,11 +20,6 @@ from .models import (
 from .forms import SignupForm, ShipmentForm, VehicleForm, ShipmentOfferForm, TourForm
 
 
-def test_view(request):
-    """Test view da proverim da li se Django view-ovi pozivaju"""
-    print("TEST VIEW CALLED!")
-    messages.success(request, "TEST VIEW RADI!")
-    return JsonResponse({'status': 'success', 'message': 'Test view radi!'})
 
 
 def home_view(request):
