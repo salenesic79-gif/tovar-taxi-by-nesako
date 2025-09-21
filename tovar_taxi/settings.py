@@ -225,9 +225,13 @@ if not DEBUG:
         'https://tovar-taxi-by-nesako.onrender.com'
     ]
 else:
-    # Development settings
+    # Development settings - disable all security features for HTTP
+    SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
     SESSION_COOKIE_AGE = 86400
