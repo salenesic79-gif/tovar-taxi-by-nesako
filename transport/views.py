@@ -27,13 +27,16 @@ def home_view(request):
     # Ako je korisnik ulogovan, preusmeri ga na odgovarajući dashboard
     if request.user.is_authenticated:
         try:
-            profile = request.user.profile
-            if profile.role == 'naručilac':
-                return redirect('transport:shipper_dashboard')
-            elif profile.role == 'prevoznik':
-                return redirect('transport:carrier_dashboard')
-            elif profile.role == 'vozač':
-                return redirect('transport:carrier_dashboard')
+            # Proveri da li korisnik ima profil
+            if hasattr(request.user, 'profile'):
+                profile = request.user.profile
+                if profile.role == 'naručilac':
+                    return redirect('transport:shipper_dashboard')
+                elif profile.role in ['prevoznik', 'vozač']:
+                    return redirect('transport:carrier_dashboard')
+            # Ako je superuser, ostani na home stranici
+            elif request.user.is_superuser:
+                pass
         except Profile.DoesNotExist:
             pass  # Nastavi sa prikazom home stranice
     
