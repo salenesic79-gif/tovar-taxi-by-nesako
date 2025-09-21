@@ -330,7 +330,7 @@ def add_vehicle(request):
                     'vehicle_color': vehicle.vehicle_color,
                     'vehicle_type': vehicle.vehicle_type,
                     'capacity': vehicle.capacity,
-                    'brand_code': get_brand_code(vehicle.vehicle_brand)
+                    'brand_code': '??'  # Simplified - brand code not needed
                 }
                 return JsonResponse({
                     'success': True, 
@@ -349,21 +349,6 @@ def add_vehicle(request):
     return render(request, 'transport/add_vehicle.html')
 
 
-def get_brand_code(brand):
-    """Helper function to get brand code for license plate display"""
-    brand_codes = {
-        'mercedes': 'MB',
-        'volvo': 'VO', 
-        'scania': 'SC',
-        'man': 'MN',
-        'daf': 'DF',
-        'iveco': 'IV',
-        'renault': 'RN',
-        'ford': 'FD',
-        'isuzu': 'IS',
-        'fiat': 'FT'
-    }
-    return brand_codes.get(brand, '??')
 
 
 @login_required
