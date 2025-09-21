@@ -237,3 +237,5 @@ else:
     SESSION_COOKIE_AGE = 86400
     SESSION_SAVE_EVERY_REQUEST = True
     SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+    # Dodatne postavke za development
+    SECURE_REDIRECT_EXEMPT = [r'.*']  # Isključi sve redirect-e na HTTPS
