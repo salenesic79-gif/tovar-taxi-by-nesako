@@ -63,9 +63,9 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    # 'django.contrib.auth.middleware.AuthenticationMiddleware',  # Temporarily disabled
-    # 'django.contrib.messages.middleware.MessageMiddleware',  # Temporarily disabled
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Temporarily disabled
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'tovar_taxi.urls'
