@@ -42,26 +42,13 @@ def home_view(request):
         except Profile.DoesNotExist:
             pass  # Nastavi sa prikazom home stranice
     
-    try:
-        # Statistike za sve korisnike
-        context = {
-            'total_shipments': Shipment.objects.filter(status='published').count(),
-            'total_carriers': Profile.objects.filter(role='prevoznik').count(),
-            'total_vehicles': Vehicle.objects.filter(is_available=True).count(),
-        }
-        print(f"[DEBUG] Home view context: {context}")
-        return render(request, 'transport/home.html', context)
-    except Exception as e:
-        print(f"[ERROR] Home view error: {str(e)}")
-        import traceback
-        print(f"[ERROR] Traceback: {traceback.format_exc()}")
-        # Fallback context
-        context = {
-            'total_shipments': 0,
-            'total_carriers': 0,
-            'total_vehicles': 0,
-        }
-        return render(request, 'transport/home.html', context)
+    # Pojednostavljena verzija za smanjenje opterećenja baze
+    context = {
+        'total_shipments': 0,
+        'total_carriers': 0,
+        'total_vehicles': 0,
+    }
+    return render(request, 'transport/home.html', context)
 
 
 @login_required
