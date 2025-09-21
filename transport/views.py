@@ -892,18 +892,17 @@ def calculate_distance(lat1, lng1, lat2, lng2):
 
 def calculate_price(pallet_count, distance_km):
     """Calculate price based on pallet count and distance"""
-    # Get price table
-    try:
-        price_table = CenaPoKilometrazi.objects.get(broj_paleta=pallet_count)
-        if distance_km <= 200:
-            base_price = price_table.cena_do_200km
-        else:
-            base_price = price_table.cena_preko_200km
-    except CenaPoKilometrazi.DoesNotExist:
-        # Fallback pricing
-        base_price = 1000 * pallet_count
+    # Simple pricing strategy without CenaPoKilometrazi model
+    # Base price per pallet
+    base_price_per_pallet = 1000
     
-    total_price = base_price * max(1, (distance_km / 100))  # Adjust based on distance
+    # Calculate base price
+    base_price = base_price_per_pallet * pallet_count
+    
+    # Adjust for distance
+    distance_multiplier = max(1, (distance_km / 100))
+    total_price = base_price * distance_multiplier
+    
     return {'base_price': base_price, 'total_price': total_price}
 
 def get_eco_suggestion(weight):
