@@ -17,16 +17,16 @@ urlpatterns = [
     path('create-shipment-request/', views.create_shipment_request, name='create_shipment_request'),
     path('create-route-availability/', views.create_route_availability, name='create_route_availability'),
     
-    # B2B and Instant Delivery
-    path('instant-delivery/', views.create_instant_delivery, name='create_instant_delivery'),
-    path('food-delivery/', views.create_food_delivery, name='create_food_delivery'),
-    path('premium-subscription/', views.premium_subscription_view, name='premium_subscription'),
+    # B2B and Instant Delivery - DISABLED FOR NOW
+    # path('instant-delivery/', views.create_instant_delivery, name='create_instant_delivery'),
+    # path('food-delivery/', views.create_food_delivery, name='create_food_delivery'),
+    # path('premium-subscription/', views.premium_subscription_view, name='premium_subscription'),
     
-    # Driver extended functionality
-    path('driver-dashboard-extended/', views.driver_dashboard_extended, name='driver_dashboard_extended'),
-    path('accept-delivery/<int:delivery_id>/', views.accept_delivery, name='accept_delivery'),
-    path('update-delivery-status/<int:delivery_id>/', views.update_delivery_status, name='update_delivery_status'),
-    path('update-location/', views.update_location, name='update_location'),
+    # Driver extended functionality - DISABLED FOR NOW
+    # path('driver-dashboard-extended/', views.driver_dashboard_extended, name='driver_dashboard_extended'),
+    # path('accept-delivery/<int:delivery_id>/', views.accept_delivery, name='accept_delivery'),
+    # path('update-delivery-status/<int:delivery_id>/', views.update_delivery_status, name='update_delivery_status'),
+    # path('update-location/', views.update_location, name='update_location'),
     
     # Dashboards
     path('shipper-dashboard/', views.shipper_dashboard, name='shipper_dashboard'),

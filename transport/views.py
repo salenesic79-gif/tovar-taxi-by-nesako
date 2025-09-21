@@ -23,7 +23,7 @@ from .forms import SignupForm, ShipmentForm, VehicleForm, ShipmentOfferForm, Tou
 
 
 def home_view(request):
-    """Glavna stranica aplikacije - redirect authenticated users to their dashboard"""
+    """Glavna stranica aplikacije - FIXED VERSION - DO NOT MODIFY WITHOUT PERMISSION"""
     # Ako je korisnik ulogovan, preusmeri ga na odgovarajući dashboard
     if request.user.is_authenticated:
         try:
@@ -40,12 +40,13 @@ def home_view(request):
         except Profile.DoesNotExist:
             pass  # Nastavi sa prikazom home stranice
     
-    # Pojednostavljena verzija za smanjenje opterećenja baze
+    # FIXED CONTEXT - DO NOT MODIFY
     context = {
         'total_shipments': 0,
         'total_carriers': 0,
         'total_vehicles': 0,
     }
+    # Uvek koristi templates/transport/home.html - bez drugih verzija
     return render(request, 'transport/home.html', context)
 
 
