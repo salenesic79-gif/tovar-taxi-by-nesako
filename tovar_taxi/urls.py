@@ -12,7 +12,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name='home'),
     path('transport/', include('transport.urls', namespace='transport')),
-    path('accounts/logout/', transport.views.custom_logout_view, name='logout'),
+    path('accounts/logout/', custom_logout_view, name='logout'),
     path('accounts/', include('django.contrib.auth.urls')),
     # Override accounts/profile/ redirect
     path('accounts/profile/', home_view, name='profile_redirect'),
