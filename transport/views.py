@@ -620,6 +620,16 @@ def websocket_test(request):
 
 def custom_login_view(request):
     """Custom login view sa role-based redirect"""
+    # Ako je već ulogovan, odmah vodi na odgovarajući dashboard
+    if request.user.is_authenticated:
+        try:
+            profile = request.user.profile
+            if profile.role == 'naručilac':
+                return redirect('transport:shipper_dashboard')
+            elif profile.role in ['prevoznik', 'vozač']:
+                return redirect('transport:carrier_dashboard')
+        except Profile.DoesNotExist:
+            pass
     # Očisti postojeće messages na početku GET zahteva
     if request.method == 'GET':
         storage = messages.get_messages(request)
@@ -666,12 +676,22 @@ def custom_login_view(request):
             
             # Proveri "Remember me" checkbox
             remember_me = request.POST.get('remember_me')
-            if remember_me:
-                # Postavi session da traje 30 dana
-                request.session.set_expiry(60 * 60 * 24 * 30)  # 30 dana
-            else:
-                # Standardno ponašanje - session se briše kada se zatvori browser
-                request.session.set_expiry(0)
+            # Za vozača/prevoznika uvek pamtimo 30 dana bez obzira na checkbox
+            try:
+                profile = user.profile
+                if profile.role in ['prevoznik', 'vozač']:
+                    request.session.set_expiry(60 * 60 * 24 * 30)
+                else:
+                    if remember_me:
+                        request.session.set_expiry(60 * 60 * 24 * 30)
+                    else:
+                        request.session.set_expiry(0)
+            except Profile.DoesNotExist:
+                # Ako nema profil, koristi checkbox ponašanje
+                if remember_me:
+                    request.session.set_expiry(60 * 60 * 24 * 30)
+                else:
+                    request.session.set_expiry(0)
 
             # Role-based redirect
             try:
@@ -1483,11 +1503,8 @@ def signup_sender_new_view(request):
             # Login user
             login(request, user)
             
-            # Set session expiry based on remember_me
-            if remember_me:
-                request.session.set_expiry(1209600)  # 2 weeks
-            else:
-                request.session.set_expiry(0)  # Browser session
+            # Zapamti sesiju na 30 dana za vozača/prevoznika bez obzira na checkbox
+            request.session.set_expiry(60 * 60 * 24 * 30)
             
             messages.success(request, 'Uspešno ste se registrovali!')
             return redirect('transport:shipper_dashboard')
@@ -1521,24 +1538,25 @@ def signup_carrier_new_view(request):
         password2 = request.POST.get('password2')
         phone_number = request.POST.get('phone_number')
         address = request.POST.get('address')
-        company_name = request.POST.get('company_name')
-        pib = request.POST.get('pib')
-        tip_vozila = request.POST.get('tip_vozila')
-        registarski_broj = request.POST.get('registarski_broj')
+        # Nova polja po zahtevu
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        drivers_license = request.POST.get('drivers_license')
+        experience_years = request.POST.get('experience_years')
         remember_me = request.POST.get('remember_me')
         
         # Validation
-        if not all([username, email, password1, password2, phone_number, address, company_name, pib, tip_vozila, registarski_broj]):
+        if not all([username, email, password1, password2, phone_number, address, first_name, last_name, drivers_license, experience_years]):
             messages.error(request, 'Molimo popunite sva obavezna polja.')
             return render(request, 'transport/signup_carrier_new.html', {
                 'username': username,
                 'email': email,
                 'phone_number': phone_number,
                 'address': address,
-                'company_name': company_name,
-                'pib': pib,
-                'tip_vozila': tip_vozila,
-                'registarski_broj': registarski_broj,
+                'first_name': first_name,
+                'last_name': last_name,
+                'drivers_license': drivers_license,
+                'experience_years': experience_years,
             })
         
         if password1 != password2:
@@ -1548,10 +1566,10 @@ def signup_carrier_new_view(request):
                 'email': email,
                 'phone_number': phone_number,
                 'address': address,
-                'company_name': company_name,
-                'pib': pib,
-                'tip_vozila': tip_vozila,
-                'registarski_broj': registarski_broj,
+                'first_name': first_name,
+                'last_name': last_name,
+                'drivers_license': drivers_license,
+                'experience_years': experience_years,
             })
         
         if User.objects.filter(username=username).exists():
@@ -1561,10 +1579,10 @@ def signup_carrier_new_view(request):
                 'email': email,
                 'phone_number': phone_number,
                 'address': address,
-                'company_name': company_name,
-                'pib': pib,
-                'tip_vozila': tip_vozila,
-                'registarski_broj': registarski_broj,
+                'first_name': first_name,
+                'last_name': last_name,
+                'drivers_license': drivers_license,
+                'experience_years': experience_years,
             })
         
         if User.objects.filter(email=email).exists():
@@ -1574,10 +1592,10 @@ def signup_carrier_new_view(request):
                 'email': email,
                 'phone_number': phone_number,
                 'address': address,
-                'company_name': company_name,
-                'pib': pib,
-                'tip_vozila': tip_vozila,
-                'registarski_broj': registarski_broj,
+                'first_name': first_name,
+                'last_name': last_name,
+                'drivers_license': drivers_license,
+                'experience_years': experience_years,
             })
         
         try:
@@ -1587,6 +1605,10 @@ def signup_carrier_new_view(request):
                 email=email,
                 password=password1
             )
+            # Sačuvaj ime i prezime
+            user.first_name = first_name or ''
+            user.last_name = last_name or ''
+            user.save(update_fields=['first_name', 'last_name'])
             
             # Create profile
             profile = Profile.objects.create(
@@ -1594,19 +1616,18 @@ def signup_carrier_new_view(request):
                 role='prevoznik',
                 phone_number=phone_number,
                 address=address,
-                company_name=company_name
+                company_name='',  # uklonjeno polje iz forme; zadržavamo prazno
+                drivers_license=drivers_license or '',
+                experience_years=experience_years or ''
             )
             
             # Login user
             login(request, user)
             
-            # Set session expiry based on remember_me
-            if remember_me:
-                request.session.set_expiry(1209600)  # 2 weeks
-            else:
-                request.session.set_expiry(0)  # Browser session
-            
-            messages.success(request, 'Uspešno ste se registrovali!')
+            # Zapamti sesiju 30 dana za vozača/prevoznika
+            request.session.set_expiry(60 * 60 * 24 * 30)
+
+            messages.success(request, 'Uspešno ste se registrovali! Vaš nalog je zapamćen na ovom uređaju narednih 30 dana.')
             return redirect('transport:carrier_dashboard')
             
         except Exception as e:
@@ -1616,10 +1637,10 @@ def signup_carrier_new_view(request):
                 'email': email,
                 'phone_number': phone_number,
                 'address': address,
-                'company_name': company_name,
-                'pib': pib,
-                'tip_vozila': tip_vozila,
-                'registarski_broj': registarski_broj,
+                'first_name': first_name,
+                'last_name': last_name,
+                'drivers_license': drivers_license,
+                'experience_years': experience_years,
             })
     
     return render(request, 'transport/signup_carrier_new.html')

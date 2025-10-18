@@ -17,6 +17,9 @@ class Profile(models.Model):
     company_name = models.CharField(max_length=200, blank=True)
     pib = models.CharField(max_length=20, blank=True, verbose_name='PIB')
     maticni_broj = models.CharField(max_length=20, blank=True, verbose_name='Matični broj')
+    # Nova polja za vozače/prevoznike
+    drivers_license = models.CharField(max_length=50, blank=True, help_text="Broj vozačke dozvole")
+    experience_years = models.CharField(max_length=10, blank=True, help_text="Godine iskustva (0-2, 2-5, 5-10, 10+)")
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
