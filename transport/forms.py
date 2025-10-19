@@ -123,9 +123,6 @@ class TourForm(forms.ModelForm):
     CARGO_TYPE_CHOICES = [
         ('paleta', 'Paleta 120x80'),
         ('paketna_roba', 'Paketna roba'),
-        ('paleta_paketna_roba', 'Paleta ili paketna roba'),
-        ('rasuti_teret', 'Rasuti teret'),
-        ('tečni_teret', 'Tečni teret'),
     ]
     
     ROUTE_CHOICES = [
@@ -188,10 +185,10 @@ class TourForm(forms.ModelForm):
         decimal_places=2,
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Slobodna kilaža',
-            'step': '0.01'
+            'placeholder': 'Slobodna kilaža (t), npr. 2.2 ili 2.5',
+            'step': '0.1'
         }),
-        label='Slobodna kilaža (kg)'
+        label='Slobodna kilaža (t)'
     )
     
     vehicle = forms.ModelChoiceField(

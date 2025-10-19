@@ -104,7 +104,7 @@
                 <img src="{% static 'images/TTaxi2_icon.ico.png' %}" alt="Tovar Taxi">
             </a>
             <div class="d-flex">
-                <a href="{% url 'login' %}" style="color: white; text-decoration: none; padding: 8px 12px; border: 1px solid #FFD700; border-radius: 5px;">Prijavi se</a>
+                <a href="{% url 'transport:custom_login' %}" style="color: white; text-decoration: none; padding: 8px 12px; border: 1px solid #FFD700; border-radius: 5px;">Prijavi se</a>
             </div>
         </div>
     </nav>
@@ -196,6 +196,15 @@
                 <i class="fas fa-truck me-3"></i>Registracija - Prevoznik
             </h1>
 
+            <!-- Messages -->
+            {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
             <!-- Registration Form -->
             <div class="mt-4">
                 <form method="post" action="{% url 'transport:signup_carrier_new' %}">
@@ -204,11 +213,11 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="username" class="form-label">Korisničko ime</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ username|default:'' }}" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="email" class="form-label">Email adresa</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ email|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -226,16 +235,16 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="phone_number" class="form-label">Broj telefona</label>
-                            <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
+                            <input type="tel" class="form-control" id="phone_number" name="phone_number" value="{{ phone_number|default:'' }}" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="experience_years" class="form-label">Godine iskustva</label>
                             <select class="form-control" id="experience_years" name="experience_years" required>
                                 <option value="">Izaberite godine iskustva</option>
-                                <option value="0-2">0-2</option>
-                                <option value="2-5">2-5</option>
-                                <option value="5-10">5-10</option>
-                                <option value="10+">10+</option>
+                                <option value="0-2" {% if experience_years == '0-2' %}selected{% endif %}>0-2</option>
+                                <option value="2-5" {% if experience_years == '2-5' %}selected{% endif %}>2-5</option>
+                                <option value="5-10" {% if experience_years == '5-10' %}selected{% endif %}>5-10</option>
+                                <option value="10+" {% if experience_years == '10+' %}selected{% endif %}>10+</option>
                             </select>
                         </div>
                     </div>
@@ -243,22 +252,22 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="first_name" class="form-label">Ime</label>
-                            <input type="text" class="form-control" id="first_name" name="first_name" required>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ first_name|default:'' }}" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="last_name" class="form-label">Prezime</label>
-                            <input type="text" class="form-control" id="last_name" name="last_name" required>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ last_name|default:'' }}" required>
                         </div>
                     </div>
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="drivers_license" class="form-label">Broj vozačke dozvole</label>
-                            <input type="text" class="form-control" id="drivers_license" name="drivers_license" required>
+                            <input type="text" class="form-control" id="drivers_license" name="drivers_license" value="{{ drivers_license|default:'' }}" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="address" class="form-label">Adresa</label>
-                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                            <textarea class="form-control" id="address" name="address" rows="3" required>{{ address|default:'' }}</textarea>
                         </div>
                     </div>
                     

@@ -740,13 +740,43 @@ def create_tour(request):
     
     if request.method == 'POST':
         form = TourForm(
-            request.POST, 
-            user=request.user, 
+            request.POST,
+            user=request.user,
             vehicle_license=vehicle_license
         )
         
         if form.is_valid():
             try:
+                # Izračunaj start_time na osnovu start_option dugmeta
+                start_option = request.POST.get('start_option', 'sada')
+                start_time = timezone.now()
+                try:
+                    from datetime import timedelta
+                    mapping = {
+                        'sada': 0,
+                        'kroz_2_sata': 2,
+                        'od_2_do_6_sati': 4,
+                        'do_12_sati': 12,
+                        'sutra': 24,
+                    }
+                    hours = mapping.get(start_option, 0)
+                    start_time = start_time + timedelta(hours=hours)
+                except Exception:
+                    pass
+
+                # Zapamti korisničke izbore (prefill za sledeći put)
+                try:
+                    request.session['tour_prefs'] = {
+                        'polaziste': form.cleaned_data.get('polaziste', ''),
+                        'odrediste': form.cleaned_data.get('odrediste', ''),
+                        'planirana_putanja': form.cleaned_data.get('planirana_putanja', ''),
+                        'dostupno_za_dotovar': form.cleaned_data.get('dostupno_za_dotovar', ''),
+                        'kapacitet': str(form.cleaned_data.get('kapacitet', '')),
+                        'slobodna_kilaza': str(form.cleaned_data.get('slobodna_kilaza', '')),
+                    }
+                except Exception:
+                    pass
+
                 # Create Tour object in database
                 tour = Tour.objects.create(
                     driver=request.user,
@@ -758,7 +788,7 @@ def create_tour(request):
                     kapacitet=form.cleaned_data.get('kapacitet', 0),
                     slobodna_kilaza=form.cleaned_data.get('slobodna_kilaza', 0),
                     status='active',
-                    start_time=timezone.now()
+                    start_time=start_time
                 )
                 
                 # Mark vehicle as unavailable during tour
@@ -782,6 +812,24 @@ def create_tour(request):
                     notification_type='tour_started',
                     is_read=False
                 )
+
+                # Zabeleži dostupnost kapaciteta kao lagani log u notifikacijama (privremeni "folder")
+                try:
+                    Notification.objects.create(
+                        user=request.user,
+                        notification_type='cargo',
+                        title='Dostupnost kapaciteta prijavljena',
+                        message=(
+                            f"Ruta: {tour.polaziste} → {tour.odrediste} | "
+                            f"Putanja: {tour.planirana_putanja or '—'} | "
+                            f"Dotovar: {tour.dostupno_za_dotovar} | "
+                            f"Slobodno mesta: {tour.kapacitet} | "
+                            f"Slobodna kilaža: {tour.slobodna_kilaza}"
+                        ),
+                        tour=tour
+                    )
+                except Exception:
+                    pass
                 
                 messages.success(
                     request, 
@@ -812,7 +860,14 @@ def create_tour(request):
                     'errors': form.errors
                 })
     else:
-        form = TourForm(user=request.user, vehicle_license=vehicle_license)
+        # Prefill forma iz prethodnih izbora ako postoje u sesiji
+        prefs = request.session.get('tour_prefs') or {}
+        initial = {}
+        for k in ['polaziste', 'odrediste', 'planirana_putanja', 'dostupno_za_dotovar', 'kapacitet', 'slobodna_kilaza']:
+            v = prefs.get(k)
+            if v is not None and v != '':
+                initial[k] = v
+        form = TourForm(user=request.user, vehicle_license=vehicle_license, initial=initial)
     
     context = {
         'form': form,

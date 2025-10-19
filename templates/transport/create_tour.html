@@ -191,27 +191,52 @@
         }
 
         .vehicle-info {
+            position: relative;
             background: rgba(255, 255, 255, 0.9);
             border: 2px solid #000000;
             border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            text-align: center;
+            padding: 0.5rem; /* smanjeno po visini */
+            margin-bottom: 1rem; /* smanjeno */
+            min-height: 64px;
+            overflow: hidden;
         }
 
         .vehicle-plate {
             font-family: 'Courier New', monospace;
-            font-size: 1.5rem;
+            font-size: 1.5rem; /* vracena velicina teksta */
             font-weight: 900;
             color: #000000;
             letter-spacing: 3px;
-            margin-bottom: 0.5rem;
+            line-height: 1.1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* max 2 reda */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-right: 140px; /* prostor za detalje desno-dole */
         }
 
         .vehicle-type {
-            font-weight: 600;
-            color: #666;
+            position: absolute;
+            right: 10px;
+            bottom: 8px;
+            font-weight: 700;
+            color: #222;
+            text-align: right;
         }
+
+        .suggestions {
+            position: absolute;
+            z-index: 1001;
+            background: #fff;
+            border: 1px solid #000;
+            border-radius: 6px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            max-height: 220px;
+            overflow-y: auto;
+            width: 100%;
+        }
+        .suggestion-item { padding: 8px 10px; cursor: pointer; }
+        .suggestion-item:hover { background: #f2f2f2; }
 
         @media (max-width: 768px) {
             .form-row {
@@ -253,16 +278,37 @@
             <p class="form-subtitle">Unesite detalje vaše ture i krenite sa transportom</p>
             
             {% if vehicle %}
-            <div class="vehicle-info">
-                <div class="vehicle-plate">{{ vehicle.license_plate }}</div>
-                <div class="vehicle-type">{{ vehicle.get_vehicle_type_display }} - {{ vehicle.capacity }}t</div>
+            <div class="vehicle-info" id="vehicleInfo" data-vehicle-color="{{ vehicle.vehicle_color|default:'#2ECC71' }}" style="background: {{ vehicle.vehicle_color|default:'#2ECC71' }};">
+                <div class="vehicle-plate" id="vehiclePlate">{{ vehicle.license_plate }}</div>
+                <div class="vehicle-type" id="vehicleType">{{ vehicle.get_vehicle_type_display }} - {{ vehicle.capacity }}t</div>
+                {% if vehicle.vehicle_brand %}
+                <div style="margin-top:8px;">
+                    <span class="badge" id="vehicleBrandBadge" style="background: transparent; color:#000; border:2px solid; font-weight:800; padding:8px 12px;">{{ vehicle.vehicle_brand }}</span>
+                </div>
+                {% endif %}
             </div>
             {% endif %}
             
             <form method="post" id="tourForm">
                 {% csrf_token %}
+                <input type="hidden" name="start_option" id="start_option" value="">
                 
-                <div class="form-group">
+                <div class="form-row" style="grid-template-columns: 220px 1fr; align-items:start;">
+                    <!-- Left side: start options -->
+                    <div class="form-group" style="position:sticky; top:120px;">
+                        <label class="form-label" style="font-weight:900;">Krećem:</label>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-dark" type="button" data-start="sada">sada</button>
+                            <button class="btn btn-outline-dark" type="button" data-start="kroz_2_sata">kroz dva sata</button>
+                            <button class="btn btn-outline-dark" type="button" data-start="od_2_do_6_sati">od 2 do 6 sati</button>
+                            <button class="btn btn-outline-dark" type="button" data-start="do_12_sati">do 12 sati</button>
+                            <button class="btn btn-outline-dark" type="button" data-start="sutra">sutra</button>
+                        </div>
+                    </div>
+
+                    <!-- Right side: form fields -->
+                    <div>
+                <div class="form-group location-group">
                     <label for="polaziste" class="form-label">
                         <i class="fas fa-map-marker-alt"></i> Polazište:
                     </label>
@@ -271,14 +317,16 @@
                         <button type="button" id="trenutnaLokacija" class="location-btn">
                             <i class="fas fa-location-arrow"></i> Moja lokacija
                         </button>
+                        <div id="polazisteSuggestions" class="suggestions" style="display:none;"></div>
                     </div>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group" style="position:relative;">
                     <label for="{{ form.odrediste.id_for_label }}" class="form-label">
                         <i class="fas fa-flag-checkered"></i> Odredište:
                     </label>
                     {{ form.odrediste }}
+                    <div id="odredisteSuggestions" class="suggestions" style="display:none;"></div>
                 </div>
                 
                 <div class="form-group">
@@ -286,6 +334,7 @@
                         <i class="fas fa-route"></i> Planirana putanja:
                     </label>
                     {{ form.planirana_putanja }}
+                    <div class="form-text">Prikazaćemo do 5 predloga ruta kad odabereš polazište i odredište.</div>
                 </div>
                 
                 <div class="form-group">
@@ -296,33 +345,38 @@
                 </div>
                 
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="{{ form.kapacitet.id_for_label }}" class="form-label">
-                            <i class="fas fa-weight-hanging"></i> Kapacitet (tone):
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="{{ form.kapacitet.id_for_label }}" class="form-label" id="capacityLabel">
+                            <i class="fas fa-weight-hanging"></i> Slobodno mesta:
                         </label>
                         {{ form.kapacitet }}
                     </div>
                     
-                    <div class="form-group">
+                    <div class="form-group" style="grid-column: 1 / -1;">
                         <label for="{{ form.slobodna_kilaza.id_for_label }}" class="form-label">
-                            <i class="fas fa-balance-scale"></i> Slobodna kilaža (kg):
+                            <i class="fas fa-balance-scale"></i> Slobodna kilaža (t):
                         </label>
                         {{ form.slobodna_kilaza }}
                     </div>
                 </div>
                 
                 {{ form.vehicle }}
-                
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-truck"></i> Krećem sada
-                </button>
+                </div> <!-- /right side -->
+                </div> <!-- /two-column row -->
             </form>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Geolokacija funkcionalnost
+        // Pomoćne promenljive
+        const OPENCAGE_API_KEY = window.OPENCAGE_API_KEY || 'YOUR_API_KEY';
+        const ORS_API_KEY = window.ORS_API_KEY || '';
+
+        let polazisteCoords = null;
+        let odredisteCoords = null;
+
+        // Geolokacija + reverse geocoding (OpenCage ako postoji ključ, fallback Nominatim)
         document.getElementById('trenutnaLokacija').addEventListener('click', function() {
             const button = this;
             const originalText = button.innerHTML;
@@ -336,18 +390,30 @@
                         const latitude = position.coords.latitude;
                         const longitude = position.coords.longitude;
                         
-                        // Pokušaj reverse geocoding
-                        fetch(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=YOUR_API_KEY`)
-                            .then(response => response.json())
+                        // Reverse geocoding
+                        const useOpenCage = OPENCAGE_API_KEY && OPENCAGE_API_KEY !== 'YOUR_API_KEY';
+                        const url = useOpenCage
+                          ? `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${OPENCAGE_API_KEY}&language=sr-Latn&limit=1`
+                          : `https://nominatim.openstreetmap.org/reverse?format=jsonv2&accept-language=sr-Latn&lat=${latitude}&lon=${longitude}`;
+
+                        fetch(url, { headers: useOpenCage ? {} : { 'Accept': 'application/json' }})
+                            .then(r => r.json())
                             .then(data => {
-                                if (data.results && data.results.length > 0) {
-                                    document.getElementById('polaziste').value = data.results[0].formatted;
+                                let display = '';
+                                if (useOpenCage) {
+                                    const comp = (data.results && data.results[0] && data.results[0].components) || {};
+                                    const city = comp.city || comp.town || comp.village;
+                                    const area = comp.suburb || comp.neighbourhood || comp.municipality || comp.county;
+                                    display = city ? (area ? `${city}, ${area}` : city) : (data.results?.[0]?.formatted || `${latitude}, ${longitude}`);
                                 } else {
-                                    document.getElementById('polaziste').value = `${latitude}, ${longitude}`;
+                                    const comp = data.address || {};
+                                    const city = comp.city || comp.town || comp.village;
+                                    const area = comp.suburb || comp.neighbourhood || comp.municipality || comp.county;
+                                    display = city ? (area ? `${city}, ${area}` : city) : (data.display_name || `${latitude}, ${longitude}`);
                                 }
-                            })
-                            .catch(() => {
-                                document.getElementById('polaziste').value = `${latitude}, ${longitude}`;
+                                document.getElementById('polaziste').value = display;
+                                polazisteCoords = { lat: latitude, lng: longitude };
+                                maybeLoadRoutes();
                             })
                             .finally(() => {
                                 button.innerHTML = originalText;
@@ -372,12 +438,190 @@
             }
         });
 
+        // Autocomplete helper (Nominatim)
+        function setupAutocomplete(inputId, boxId, setCoordsFn) {
+            const input = document.getElementById(inputId);
+            const box = document.getElementById(boxId);
+            if (!input || !box) return;
+
+            let timer = null;
+            let hovering = false;
+            let selecting = false;
+            input.addEventListener('input', function() {
+                const q = input.value.trim();
+                if (timer) clearTimeout(timer);
+                if (q.length < 2) { box.style.display = 'none'; box.innerHTML=''; return; }
+                timer = setTimeout(() => {
+                    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&accept-language=sr-Latn&addressdetails=1&dedupe=1&namedetails=1&limit=15&countrycodes=rs&q=${encodeURIComponent(q)}`;
+                    fetch(url, { headers: { 'Accept': 'application/json' }})
+                        .then(r => r.json())
+                        .then(list => {
+                            if (!Array.isArray(list) || list.length === 0) { box.style.display='none'; box.innerHTML=''; return; }
+                            box.innerHTML = list.map(item => {
+                                const addr = item.address || {};
+                                const city = addr.city || addr.town || addr.village || '';
+                                const area = addr.suburb || addr.neighbourhood || addr.municipality || addr.county || '';
+                                const label = city ? (area ? `${city}, ${area}` : city) : (item.display_name || '').split(',').slice(0,2).join(', ');
+                                return `<div class="suggestion-item" data-lat="${item.lat}" data-lon="${item.lon}" data-label="${label.replace(/\"/g,'&quot;')}">${label}</div>`;
+                            }).join('');
+                            box.style.display = 'block';
+                        })
+                        .catch(() => { box.style.display='none'; box.innerHTML=''; });
+                }, 250);
+            });
+
+            // Use mousedown to select before input loses focus
+            box.addEventListener('mousedown', function(e) {
+                const item = e.target.closest('.suggestion-item');
+                if (!item) return;
+                e.preventDefault();
+                selecting = true;
+                input.value = item.dataset.label;
+                const lat = parseFloat(item.dataset.lat);
+                const lon = parseFloat(item.dataset.lon);
+                setCoordsFn({ lat, lng: lon });
+                box.style.display = 'none';
+                maybeLoadRoutes();
+                setTimeout(()=>{ selecting = false; }, 0);
+            });
+
+            box.addEventListener('mouseenter', ()=>{ hovering = true; });
+            box.addEventListener('mouseleave', ()=>{ hovering = false; });
+
+            input.addEventListener('blur', function(){
+                if (hovering || selecting) return;
+                setTimeout(()=>{ if (!hovering && !selecting) box.style.display='none'; }, 300);
+            });
+            input.addEventListener('focus', function(){ if (box.innerHTML.trim() !== '') box.style.display='block'; });
+        }
+
+        setupAutocomplete('polaziste', 'polazisteSuggestions', (c)=>{ polazisteCoords=c; });
+        setupAutocomplete('id_odrediste', 'odredisteSuggestions', (c)=>{ odredisteCoords=c; });
+
+        // Učitaj do 5 ruta preko ORS ako postoji ključ
+        function maybeLoadRoutes() {
+            if (!ORS_API_KEY) return;
+            if (!polazisteCoords || !odredisteCoords) return;
+            const select = document.getElementById('id_planirana_putanja');
+            if (!select) return;
+            // ORS directions - heavy goods vehicle profile
+            const body = {
+                coordinates: [ [polazisteCoords.lng, polazisteCoords.lat], [odredisteCoords.lng, odredisteCoords.lat] ],
+                preference: 'recommended',
+                instructions: true,
+                units: 'km'
+            };
+            fetch('https://api.openrouteservice.org/v2/directions/driving-hgv/geojson', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': ORS_API_KEY },
+                body: JSON.stringify(body)
+            })
+            .then(r => r.json())
+            .then(data => {
+                const feat = (data.features && data.features[0]) || null;
+                if (!feat) return;
+                const summary = feat.properties?.summary || {};
+                const steps = (feat.properties?.segments?.[0]?.steps) || [];
+                // Izvuci magistrale/autoputeve (A/E/M + broj)
+                const rx = /(A|E|M)\s*\d+/i;
+                const counts = {};
+                steps.forEach(s => {
+                    const name = (s.name || '').trim();
+                    const m = name.match(rx);
+                    if (m) {
+                        const key = m[0].toUpperCase().replace(/\s+/g,'');
+                        counts[key] = (counts[key] || 0) + (s.distance || 0);
+                    }
+                });
+                let highways = Object.keys(counts).map(k => ({ road:k, dist:counts[k] }))
+                    .sort((a,b)=>b.dist-a.dist)
+                    .slice(0,5);
+
+                // Fallback: ako nema detektovanih magistrala, makar jedna opcija sa dužinom/vremenom
+                select.innerHTML = '';
+                if (!highways.length) {
+                    const km = (summary.distance ? (summary.distance/1000).toFixed(1) : '');
+                    const min = summary.duration ? Math.round(summary.duration/60) : '';
+                    const opt = document.createElement('option');
+                    opt.value = 'ruta_glavna';
+                    opt.textContent = km && min ? `Glavna ruta • ${km} km • ${min} min` : 'Glavna ruta';
+                    select.appendChild(opt);
+                    return;
+                }
+
+                highways.forEach((h, i) => {
+                    const km = (h.dist/1000).toFixed(1);
+                    const opt = document.createElement('option');
+                    opt.value = h.road;
+                    opt.textContent = `${h.road} • ${km} km`;
+                    select.appendChild(opt);
+                });
+            })
+            .catch(()=>{});
+        }
+
         // Form submission
         document.getElementById('tourForm').addEventListener('submit', function(e) {
             const submitBtn = this.querySelector('.submit-btn');
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kreiranje ture...';
             submitBtn.disabled = true;
+            // Pošto smo sakrili slobodna_kilaza, postavi vrednost 0 radi kompatibilnosti backend-a
+            const hiddenKg = document.getElementById('id_slobodna_kilaza');
+            if (hiddenKg && (hiddenKg.value === '' || hiddenKg.value == null)) {
+                hiddenKg.value = '0';
+            }
         });
+
+        // Dynamic capacity label/units based on cargo type
+        (function() {
+            const cargoSelect = document.getElementById('id_dostupno_za_dotovar');
+            const capacityInput = document.getElementById('id_kapacitet');
+            const capacityLabel = document.getElementById('capacityLabel');
+
+            function updateCapacityUI() {
+                if (!cargoSelect || !capacityInput || !capacityLabel) return;
+                const val = cargoSelect.value;
+                if (val === 'paleta') {
+                    capacityLabel.innerHTML = '<i class="fas fa-weight-hanging"></i> Slobodno mesta (palete):';
+                    capacityInput.setAttribute('step', '1');
+                    capacityInput.setAttribute('min', '0');
+                    capacityInput.setAttribute('placeholder', 'npr. 3');
+                    capacityInput.type = 'number';
+                } else if (val === 'paketna_roba') {
+                    capacityLabel.innerHTML = '<i class="fas fa-weight-hanging"></i> Slobodno mesta (m³):';
+                    capacityInput.setAttribute('step', '0.1');
+                    capacityInput.setAttribute('min', '0');
+                    capacityInput.setAttribute('placeholder', 'npr. 4.5');
+                    capacityInput.type = 'number';
+                } else {
+                    capacityLabel.innerHTML = '<i class="fas fa-weight-hanging"></i> Slobodno mesta:';
+                    capacityInput.removeAttribute('step');
+                    capacityInput.setAttribute('min', '0');
+                    capacityInput.setAttribute('placeholder', '');
+                    capacityInput.type = 'number';
+                }
+            }
+
+            if (cargoSelect) {
+                cargoSelect.addEventListener('change', updateCapacityUI);
+                // Initialize on load
+                updateCapacityUI();
+            }
+        })();
+
+        // Start options: clicking a button sets value and submits the form
+        (function() {
+            const form = document.getElementById('tourForm');
+            const startField = document.getElementById('start_option');
+            const buttons = document.querySelectorAll('[data-start]');
+            if (!form || !startField || !buttons.length) return;
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    startField.value = this.getAttribute('data-start');
+                    form.requestSubmit ? form.requestSubmit() : form.submit();
+                });
+            });
+        })();
     </script>
 </body>
 </html>
