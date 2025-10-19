@@ -82,6 +82,18 @@ def carrier_dashboard(request):
             address='',
             company_name=''
         )
+        profile = request.user.profile
+    
+    # Omogući čuvanje broja računa sa dashboard-a
+    if request.method == 'POST':
+        bank_account = request.POST.get('bank_account', '').strip()
+        try:
+            profile.bank_account = bank_account
+            profile.save()
+            messages.success(request, 'Broj računa je sačuvan.')
+        except Exception as e:
+            messages.error(request, f'Greška pri čuvanju broja računa: {e}')
+        return redirect('transport:carrier_dashboard')
     
     vehicles = Vehicle.objects.filter(owner=request.user)
     offers = ShipmentOffer.objects.filter(carrier=request.user).order_by('-created_at')

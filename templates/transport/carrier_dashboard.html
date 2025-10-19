@@ -910,6 +910,23 @@
             </div>
         </div>
 
+        <!-- Bank account form -->
+        <div class="content-section" style="max-width: 800px; margin: 0 auto 30px;">
+            <h3 class="section-title">
+                <i class="fas fa-piggy-bank"></i>
+                Broj računa za isplatu
+            </h3>
+            <form method="post" action="{% url 'transport:carrier_dashboard' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="bank_account" class="form-label">Unesite broj računa na koji želite da primate uplate</label>
+                    <input type="text" id="bank_account" name="bank_account" class="form-control" placeholder="npr. RS35 160-123456789-10" value="{{ request.user.profile.bank_account }}" />
+                    <div class="form-text">Čuva se za vaš nalog i koristi za isplate nakon uspešne usluge.</div>
+                </div>
+                <button type="submit" class="btn btn-modal-primary"><i class="fas fa-save"></i> Sačuvaj račun</button>
+            </form>
+        </div>
+
 
         <!-- Active Routes & Available Capacity -->
         <div class="content-grid">
